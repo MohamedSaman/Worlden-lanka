@@ -53,8 +53,8 @@
         .nav-link {
             color: #d1d5db;
             padding: 12px 20px;
-            border-radius: 8px;
-            margin: 4px 10px;
+            
+            margin: 4px 0;
             display: flex;
             align-items: center;
             transition: all 0.25s;
@@ -289,35 +289,6 @@
                         <i class="bi bi-people"></i> <span>Manage Customer</span>
                     </a>
                 </li>
-                <!-- <li class="nav-item">
-                    <a class="nav-link dropdown-toggle" href="#hrSubmenu" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="hrSubmenu">
-                        <i class="bi bi-people"></i> <span>HR Management</span>
-                    </a>
-                    <div class="collapse" id="hrSubmenu">
-                        <ul class="nav flex-column ms-3">
-                            <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.manage-admin') ? 'active' : '' }}" href="{{ route('admin.manage-admin') }}">
-                                    <i class="bi bi-shield-lock"></i> <span>Manage Admin</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.manage-staff') ? 'active' : '' }}" href="{{ route('admin.manage-staff') }}">
-                                    <i class="bi bi-person-lines-fill"></i> <span>Manage Staff</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.manage-customer') ? 'active' : '' }}" href="{{ route('admin.manage-customer') }}">
-                                    <i class="bi bi-people"></i> <span>Manage Customer</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.supplier-list') ? 'active' : '' }}" href="{{ route('admin.supplier-list') }}">
-                                    <i class="bi bi-truck"></i> <span>Manage Suppliers</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li> -->
                 <li class="nav-item">
                     <a class="nav-link dropdown-toggle" href="#inventorySubmenu" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="inventorySubmenu">
                         <i class="bi bi-box-seam"></i> <span>Inventory</span>
@@ -343,16 +314,6 @@
                     </a>
                     <div class="collapse" id="salesSubmenu">
                         <ul class="nav flex-column ms-3">
-                            <!-- <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.staff-sale-details') ? 'active' : '' }}" href="{{ route('admin.staff-sale-details') }}">
-                                    <i class="bi bi-shield-lock"></i> <span>Staff Sales</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.staff-due-details') ? 'active' : '' }}" href="{{ route('admin.staff-due-details') }}">
-                                    <i class="bi bi-person-lines-fill"></i> <span>Staff Due</span>
-                                </a>
-                            </li> -->
                             <li class="nav-item">
                                 <a class="nav-link py-2 {{ request()->routeIs('admin.customer-sale-details') ? 'active' : '' }}" href="{{ route('admin.customer-sale-details') }}">
                                     <i class="bi bi-people"></i> <span>Customer Sales</span>
@@ -368,11 +329,6 @@
                                     <i class="bi bi-cash-coin"></i> <span>Due Cheque</span>
                                 </a>
                             </li>
-                            <!-- <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.due-payments') ? 'active' : '' }}" href="{{ route('admin.due-payments') }}">
-                                    <i class="bi bi-cash-coin"></i> <span>Complete Payment</span>
-                                </a>
-                            </li> -->
                             <li class="nav-item">
                                 <a class="nav-link py-2 {{ request()->routeIs('admin.view-payments') ? 'active' : '' }}" href="{{ route('admin.view-payments') }}">
                                     <i class="bi bi-credit-card-2-back"></i> <span>View Payments</span>
@@ -397,30 +353,6 @@
                         <i class="bi bi-shield-lock"></i> <span>Product Stock</span>
                     </a>
                 </li>
-                <!-- <li class="nav-item">
-                    <a class="nav-link dropdown-toggle" href="#stockSubmenu" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="stockSubmenu">
-                        <i class="bi bi-boxes"></i> <span>Stock Details</span>
-                    </a>
-                    <div class="collapse" id="stockSubmenu">
-                        <ul class="nav flex-column ms-3">
-                            <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.watch-stock-details') ? 'active' : '' }}" href="{{ route('admin.watch-stock-details') }}">
-                                    <i class="bi bi-shield-lock"></i> <span>Watch Stock</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.staff-stock-details') ? 'active' : '' }}" href="{{ route('admin.staff-stock-details') }}">
-                                    <i class="bi bi-person-lines-fill"></i> <span>Staff Stock</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li> -->
-                <!-- <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.billing-page') ? 'active' : '' }}" href="{{ route('admin.billing-page') }}">
-                        <i class="bi bi-person-badge"></i> <span>Staff Stock Assign</span>
-                    </a>
-                </li> -->
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.store-billing') ? 'active' : '' }}" href="{{ route('admin.store-billing') }}">
                         <i class="bi bi-cash"></i> <span>Store Billing</span>

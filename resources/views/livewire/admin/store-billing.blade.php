@@ -55,9 +55,7 @@
                                                 </div>
                                             </div>
                                             <div class="text-muted small mt-1">
-                                                <span class="me-2">Code: {{ $result->product_code ?? '-' }}</span> |
-                                                <span class="mx-2">Model: {{ $result->model ?? '-' }}</span> |
-                                                <span class="ms-2">Brand: {{ $result->brand ?? 'Unbranded' }}</span>
+                                                <span class="me-2">Code: {{ $result->product_code ?? '-' }}</span>
                                             </div>
                                         </div>
 

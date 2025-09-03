@@ -1,107 +1,100 @@
 <div class="container-fluid py-6 bg-gray-50 min-vh-100 transition-colors duration-300">
-    <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
+    <div class="card border-0 ">
         <!-- Card Header -->
-        <div class="card-header text-white p-5 rounded-t-4 d-flex justify-content-between align-items-center flex-wrap"
-            style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);">
-            <div class="d-flex align-items-center gap-3">
-                <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center">
-                    <i class="bi bi-person text-white fs-4" aria-hidden="true"></i>
+        <div class="card-header bg-transparent pb-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+
+            <!-- Left: Icon + Title -->
+            <div class="d-flex align-items-center gap-3 flex-shrink-0">
+                <div class="icon-shape icon-lg bg-opacity-25 p-3 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-people fs-4" aria-hidden="true" style="color:#233D7F;"></i>
                 </div>
                 <div>
-                    <h3 class="mb-1 fw-bold tracking-tight text-white">Customer Sales Details</h3>
-                    <p class="text-white opacity-80 mb-0 text-sm">Monitor and manage customer sales records</p>
+                    <h3 class="mb-1 fw-bold tracking-tight text-dark">Customer Sales Details</h3>
+                    <p class="text-dark opacity-80 mb-0 text-sm">Monitor and manage your Customer Sales Records</p>
                 </div>
             </div>
-            <div class="d-flex gap-2">
+
+            <!-- Middle: Search Bar -->
+            <div class="flex-grow-1 d-flex justify-content-lg-center">
+                <div class="input-group " style="max-width: 400px;">
+                    <span class="input-group-text bg-gray-100 border-0 px-3">
+                        <i class="bi bi-search text-primary"></i>
+                    </span>
+                    <input type="text"
+                        class="form-control "
+                        placeholder="Search customers..."
+                        wire:model.live.debounce.300ms="search"
+                        autocomplete="off">
+                </div>
+            </div>
+
+            <!-- Right: Buttons -->
+            <div class="d-flex gap-2 flex-shrink-0 justify-content-lg-end">
                 <button wire:click="exportToCSV"
                     class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                    aria-label="Export customer sales to CSV">
+                    aria-label="Export customer sales to CSV"
+                    style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F;">
                     <i class="bi bi-download me-1" aria-hidden="true"></i> Export CSV
                 </button>
                 <button wire:click="printData"
                     class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                    aria-label="Print customer sales details">
+                    aria-label="Print customer sales details"
+                    style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F;">
                     <i class="bi bi-printer me-1" aria-hidden="true"></i> Print
                 </button>
             </div>
         </div>
 
         <!-- Card Body -->
-        <div class="card-body p-5">
-            <!-- Search Bar (Added to match Product Stock Details) -->
-            <div class="input-group shadow-sm rounded-full overflow-hidden mb-5" style="max-width: 400px;">
-                <span class="input-group-text bg-white border-0">
-                    <i class="bi bi-search text-blue-600" aria-hidden="true"></i>
-                </span>
-                <input type="text"
-                    class="form-control border-0 py-2.5 bg-white text-gray-800"
-                    placeholder="Search customers..."
-                    wire:model.live.debounce.300ms="search"
-                    autocomplete="off"
-                    aria-label="Search customers"
-                    aria-describedby="search-icon">
-            </div>
+        <div class="card-body p-1  pt-5 bg-transparent">
 
             <!-- Sales Table or Empty State -->
             @if($customerSales->count())
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            <div class="table-responsive  shadow-sm rounded-2 overflow-hidden">
+                <table class="table table-sm">
                     <thead>
                         <tr>
-                            <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" scope="col"
-                                style="background-color: #eff6ff; color: #1e3a8a;">#</th>
-                            <th class="text-uppercase text-xs fw-semibold py-3" scope="col"
-                                style="background-color: #eff6ff; color: #1e3a8a;">Customer Name</th>
-                            <th class="text-uppercase text-xs fw-semibold py-3" scope="col"
-                                style="background-color: #eff6ff; color: #1e3a8a;">Email</th>
-                            <th class="text-uppercase text-xs fw-semibold py-3 text-center" scope="col"
-                                style="background-color: #eff6ff; color: #1e3a8a;">Type</th>
-                            <th class="text-uppercase text-xs fw-semibold py-3 text-center" scope="col"
-                                style="background-color: #eff6ff; color: #1e3a8a;">Invoices</th>
-                            <th class="text-uppercase text-xs fw-semibold py-3 text-center" scope="col"
-                                style="background-color: #eff6ff; color: #1e3a8a;">Total Sales</th>
-                            <th class="text-uppercase text-xs fw-semibold py-3 text-center" scope="col"
-                                style="background-color: #eff6ff; color: #1e3a8a;">Total Paid</th>
-                            <th class="text-uppercase text-xs fw-semibold py-3 text-center" scope="col"
-                                style="background-color: #eff6ff; color: #1e3a8a;">Total Due</th>
-                            <th class="text-uppercase text-xs fw-semibold py-3 text-center" scope="col"
-                                style="background-color: #eff6ff; color: #1e3a8a;">Action</th>
+                            <th class="text-center ps-4 py-3">ID</th>
+                            <th class="text-center py-3">Customer Name</th>
+                            <th class="text-center py-3">Email</th>
+                            <th class="text-center py-3">Type</th>
+                            <th class="text-center py-3">Invoices</th>
+                            <th class="text-center py-3">Total Sales</th>
+                            <th class="text-center py-3">Total Paid</th>
+                            <th class="text-center py-3">Total Due</th>
+                            <th class="text-center py-3">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($customerSales as $index => $customer)
-                        <tr class="border-bottom transition-all hover:bg-[#f1f5f9] {{ $index % 2 == 0 ? 'bg-[#f9fafb]' : '' }}">
-                            <td class="ps-4 text-center text-sm text-gray-800" data-label="#" scope="row">
+                        <tr class="transition-all hover:bg-gray-50">
+                            <td class="text-sm text-center  ps-4 py-3" >
                                 {{ $customerSales->firstItem() + $index }}
                             </td>
-                            <td class="text-sm fw-semibold text-gray-800" data-label="Customer Name">{{ $customer->name }}</td>
-                            <td class="text-sm text-gray-600" data-label="Email">{{ $customer->email }}</td>
-                            <td class="text-center" data-label="Type">
-                                <span class="badge"
-                                    style="background-color: {{ $customer->type == 'wholesale' ? '#1e40af' : '#0ea5e9' }};
-                                             color: #ffffff; padding: 6px 12px; border-radius: 9999px; font-weight: 600;">
-                                    {{ ucfirst($customer->type) }}
-                                </span>
+                            <td class="text-sm text-center py-3" data-label="Customer Name">{{ $customer->name }}</td>
+                            <td class="text-sm text-center py-3">{{ $customer->email }}</td>
+                            <td class="text-sm text-center py-3">
+                                {{ ucfirst($customer->type) }}
                             </td>
-                            <td class="text-center text-sm text-gray-800" data-label="Invoices">{{ $customer->invoice_count }}</td>
-                            <td class="text-center text-sm text-gray-800" data-label="Total Sales">Rs.{{ number_format($customer->total_sales, 2) }}</td>
-                            <td class="text-center" data-label="Total Paid">
+                            <td class="text-sm text-center py-3" >{{ $customer->invoice_count }}</td>
+                            <td class="text-sm text-center py-3 text-gray-800" data-label="Total Sales">Rs.{{ number_format($customer->total_sales, 2) }}</td>
+                            <td class="text-sm text-center py-3">
                                 <span class="badge"
                                     style="background-color: {{ $customer->total_sales - $customer->total_due > 0 ? '#22c55e' : '#ef4444' }};
                                              color: #ffffff; padding: 6px 12px; border-radius: 9999px; font-weight: 600;">
                                     Rs.{{ number_format($customer->total_sales - $customer->total_due, 2) }}
                                 </span>
                             </td>
-                            <td class="text-center" data-label="Total Due">
+                            <td class="text-sm text-center py-3">
                                 <span class="badge"
                                     style="background-color: {{ $customer->total_due > 0 ? '#ef4444' : '#22c55e' }};
                                              color: #ffffff; padding: 6px 12px; border-radius: 9999px; font-weight: 600;">
                                     Rs.{{ number_format($customer->total_due, 2) }}
                                 </span>
                             </td>
-                            <td class="text-center" data-label="Action">
+                            <td class="text-sm text-center py-3">
                                 <button wire:click="viewSaleDetails({{ $customer->customer_id }})"
-                                    class="btn btn-outline-primary btn-sm rounded-full shadow-sm px-3 py-1 transition-transform hover:scale-105"
+                                    class="btn text-primary btn-sm"
                                     aria-label="View customer sales details">
                                     <i class="bi bi-eye"></i>
                                 </button>
@@ -317,103 +310,6 @@
 </div>
 
 @push('styles')
-<style>
-    body {
-        font-family: 'Inter', sans-serif;
-        font-size: 15px;
-        color: #1f2937;
-    }
-
-    .tracking-tight {
-        letter-spacing: -0.025em;
-    }
-
-    .transition-all {
-        transition: all 0.3s ease;
-    }
-
-    .transition-transform {
-        transition: transform 0.2s ease;
-    }
-
-    .hover\:scale-105:hover {
-        transform: scale(1.05);
-    }
-
-    .hover\:scale-110:hover {
-        transform: scale(1.1);
-    }
-
-    .icon-shape {
-        width: 2rem;
-        height: 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .icon-shape.icon-lg {
-        width: 3rem;
-        height: 3rem;
-    }
-
-    .table {
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-    .table th,
-    .table td {
-        border: 1px solid #e5e7eb;
-        vertical-align: middle;
-    }
-
-    .table tbody tr:nth-child(even) {
-        background-color: #f9fafb;
-    }
-
-    .table tbody tr:hover {
-        background-color: #f1f5f9;
-    }
-
-    .rounded-full {
-        border-radius: 9999px;
-    }
-
-    .rounded-4 {
-        border-radius: 1rem;
-    }
-
-    .shadow-lg {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2 rgba(0, 0, 0, 0.05);
-    }
-
-    .shadow-sm {
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    }
-
-    .btn-light {
-        background-color: #ffffff;
-        border-color: #ffffff;
-        color: #1e3a8a;
-    }
-
-    .btn-light:hover {
-        background-color: #f1f5f9;
-        border-color: #f1f5f9;
-        color: #1e3a8a;
-    }
-
-    .btn-outline-primary {
-        border-color: #1e40af;
-        color: #1e40af;
-    }
-
-    .btn-outline-primary:hover {
-        background-color: #1e40af;
-        color: #ffffff;
-    }
-</style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">

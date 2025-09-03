@@ -28,12 +28,12 @@
 
         <!-- Middle: Search Bar -->
         <div class="flex-grow-1 d-flex justify-content-lg-center">
-            <div class="input-group rounded-pill overflow-hidden w-100" style="max-width: 400px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
-                <span class="input-group-text bg-white border-0 px-3">
+            <div class="input-group" style="max-width: 400px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                <span class="input-group-text bg-gray-100 border-0 px-3">
                     <i class="bi bi-search text-primary"></i>
                 </span>
                 <input type="text"
-                    class="form-control border-0 py-2 bg-white"
+                    class="form-control"
                     placeholder="Search products..."
                     wire:model.live.debounce.300ms="search"
                     autocomplete="off">
@@ -42,21 +42,23 @@
 
         <!-- Right: Buttons -->
         <div class="d-flex gap-2 flex-shrink-0 justify-content-lg-end">
+            <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform btn-create"
+                wire:click="toggleAddModal"
+                style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F;transition: all 0.3s ease; hover: transform: scale(1.05)">
+                <i class="bi bi-plus-circle me-2"></i> Add Product
+            </button>
             <button wire:click="exportToCSV"
                 class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform "
                 aria-label="Export stock details to CSV"
                 style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F; transition: all 0.3s ease; hover: transform: scale(1.05)">
                 <i class="bi bi-download me-1" aria-hidden="true"></i> Export CSV
             </button>
-            <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform btn-create"
-                wire:click="toggleAddModal"
-                style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F;transition: all 0.3s ease; hover: transform: scale(1.05)">
-                <i class="bi bi-plus-circle me-2"></i> Add Product
-            </button>
+            
         </div>
     </div>
     <div class="d-flex  align-items-center justify-content-between gap-4">
-        <p class="ms-4">You can create custom field here </p>
+        <p class="ms-4">You can create custom field here <i class="bi bi-arrow-right ms-4"></i>
+ </p>
         <button
             class="btn btn-primary rounded-full mt-2 px-4 mb-4 fw-medium transition-all hover:shadow "
             wire:click="$set('showAddFieldModal', true)"

@@ -1,70 +1,75 @@
 <div class="container py-6 min-vh-100 transition-colors duration-300">
     <div class="card border-0  ">
         <!-- Card Header -->
-        <div class="card-header bg-transparent text-black p-3 d-flex justify-content-between align-items-center flex-wrap">
+        <div class="card-header bg-transparent pb-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 border-bottom" style="border-color: #233D7F;">
+
             <div class="d-flex align-items-center gap-3">
-                <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center">
-                    <i class="bi bi-box-seam text-black fs-4" aria-hidden="true"></i>
+                <div class="icon-shape icon-lg bg-opacity-25 p-3 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-shield-lock text-black fs-4" aria-hidden="true" style="color:#233D7F;"></i>
                 </div>
                 <div>
                     <h3 class="mb-1 fw-bold tracking-tight text-black">Product Stock Details</h3>
                     <p class="text-black opacity-80 mb-0 text-sm">Monitor and manage your product inventory</p>
                 </div>
             </div>
+
+            <!-- Middle: Search Bar -->
+            <div class="flex-grow-1 d-flex justify-content-lg-center">
+                <div class="input-group" style="max-width: 400px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                    <span class="input-group-text bg-gray-100 border-0 px-3">
+                        <i class="bi bi-search text-primary"></i>
+                    </span>
+                    <input type="text"
+                        class="form-control"
+                        placeholder="Search products..."
+                        wire:model.live.debounce.300ms="search"
+                        autocomplete="off">
+                </div>
+            </div>
+
             <div class="d-flex gap-2">
                 <button wire:click="exportToCSV"
                     class="btn text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                    aria-label="Export stock details to CSV">
+                    aria-label="Export stock details to CSV"
+                    style="background-color: #233D7F; border-color: #233D7F; color: white;transition: all 0.3s ease; hover: transform: scale(1.05)">
                     <i class="bi bi-download me-1" aria-hidden="true"></i> Export CSV
                 </button>
                 <button id="printButton"
                     class="btn text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                    aria-label="Print stock details">
+                    aria-label="Print stock details"
+                    style="background-color: #233D7F; border-color: #233D7F; color: white;transition: all 0.3s ease; hover: transform: scale(1.05)">
                     <i class="bi bi-printer me-1" aria-hidden="true"></i> Print
                 </button>
             </div>
         </div>
 
         <!-- Card Body -->
-        <div class="card-body p-5 shadow-lg rounded-1 overflow-hidden bg-white">
-            <!-- Search Bar -->
-            <div class="input-group shadow-sm rounded-pill overflow-hidden mb-5" style="max-width: 400px;">
-                <span class="input-group-text bg-white border-0">
-                    <i class="bi bi-search text-blue-600" aria-hidden="true"></i>
-                </span>
-                <input type="text"
-                    class="form-control border-0 py-2.5 bg-transparent text-gray-800"
-                    placeholder="Search products..."
-                    wire:model.live.debounce.300ms="search"
-                    autocomplete="off"
-                    aria-label="Search products"
-                    aria-describedby="search-icon">
-            </div>
+        <div class="card-body p-1  pt-5 bg-transparent">
 
             <!-- Stock Table or Empty State -->
             @if($hasStock)
-            <div class="table-responsive">
+            <div class="table-responsive shadow-sm rounded-2 overflow-hidden">
                 <table class="table table-sm ">
                     <thead>
                         <tr>
-                            <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" scope="col"">ID</th>
-                            <th class="text-uppercase text-xs fw-semibold py-3 text-center" scope="col"">Image</th>
-                            <th class="text-uppercase text-xs fw-semibold py-3" scope="col"">Product Name</th>
-                            <th class="text-uppercase text-xs fw-semibold py-3" scope="col"">Product Code</th>
-                            <th class="text-uppercase text-xs fw-semibold py-3" scope="col"">Category</th>
-                            <th class="text-uppercase text-xs fw-semibold py-3 text-center" scope="col"">Sold</th>
-                            <th class="text-uppercase text-xs fw-semibold py-3 text-center" scope="col"">Available</th>
-                            <th class="text-uppercase text-xs fw-semibold py-3 text-center" scope="col"">Damage</th>
-                            <th class="text-uppercase text-xs fw-semibold py-3 text-center" scope="col"">Total</th>
+                            <th class="text-center py-3 ps-4">ID</th>
+                            <th class=" text-center py-3" >Image</th>
+                            <th class="text-center py-3" >Product Name</th>
+                            <th class="text-center py-3" >Product Code</th>
+                            <th class="text-center py-3" >Category</th>
+                            <th class="text-center py-3" >Sold</th>
+                            <th class="text-center py-3" >Available</th>
+                            <th class="text-center py-3" >Damage</th>
+                            <th class="text-center py-3" >Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($products as $index => $product)
-                        <tr class=" transition-all  {{ $index % 2 == 0 ? 'bg-[#f9fafb]' : '' }}">
-                            <td class="ps-4 text-center text-sm text-gray-800" data-label="#" scope="row">
+                        <tr class="transition-all hover:bg-gray-50">
+                            <td class="text-sm text-center ps-4 py-3">
                                 {{ $products->firstItem() + $index }}
                             </td>
-                            <td class="text-center" data-label="Image">
+                            <td class="text-sm text-center py-3">
                                 @if($product->image)
                                 <div class="image-wrapper rounded-lg shadow-sm transition-transform hover:scale-110">
                                     <img src="{{ asset('storage/' . $product->image) }}"
@@ -79,25 +84,25 @@
                                 </div>
                                 @endif
                             </td>
-                            <td class="text-sm fw-semibold text-gray-800" data-label="Product Name">{{ $product->product_name }}</td>
-                            <td class="text-sm text-gray-600" data-label="Product Code">{{ $product->product_code }}</td>
-                            <td class="text-sm text-gray-600" data-label="Category">{{ $product->category?->name ?? 'N/A' }}</td>
-                            <td class="text-center text-sm text-gray-800" data-label="Sold">{{ $product->sold }}</td>
-                            <td class="text-center" data-label="Available">
+                            <td class="text-sm text-center py-3">{{ $product->product_name }}</td>
+                            <td class="text-sm text-center py-3" >{{ $product->product_code }}</td>
+                            <td class="text-sm text-center py-3" >{{ $product->category?->name ?? 'N/A' }}</td>
+                            <td class="text-sm text-center py-3" >{{ $product->sold }}</td>
+                            <td class="text-sm text-center py-3" >
                                 <span class="badge"
                                     style="background-color: {{ $product->stock_quantity > 0 ? '#22c55e' : '#ef4444' }};
                                              color: #ffffff; padding: 6px 12px; border-radius: 9999px; font-weight: 600;">
                                     {{ $product->stock_quantity }}
                                 </span>
                             </td>
-                            <td class="text-center text-sm text-gray-800" data-label="Damage">{{ $product->damage_quantity }}</td>
-                            <td class="text-center fw-semibold text-sm text-gray-800" data-label="Total">
+                            <td class="text-sm text-center py-3">{{ $product->damage_quantity }}</td>
+                            <td class="text-sm text-center py-3" >
                                 {{ $product->sold + $product->stock_quantity + $product->damage_quantity }}
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="9" class="text-center py-6">
+                            <td class="text-sm text-center py-3">
                                 <div style="width:72px;height:72px;background-color:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;margin-bottom:12px;">
                                     <i class="bi bi-box-seam text-gray-600 fs-3"></i>
                                 </div>
@@ -106,7 +111,7 @@
                             </td>
                         </tr>
                         @endforelse
-                    </tbody>
+                        </tbody>
                 </table>
             </div>
             @else
@@ -124,18 +129,6 @@
 
 @push('styles')
 <style>
-    body {
-        font-family: 'Inter', sans-serif;
-        font-size: 15px;
-        color: #1f2937;
-    }
-    .btn{
-        background-color: #233D7F;
-    }
-    .btn:hover{
-        background-color: #233D7F;
-    }
-
     .tracking-tight {
         letter-spacing: -0.025em;
     }
@@ -174,25 +167,7 @@
         height: 4.5rem;
     }
 
-    .table {
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-    .table th,
-    .table td {
-        border: 1px solid #e5e7eb;
-        vertical-align: middle;
-    }
-
-    .table tbody tr:nth-child(even) {
-        background-color: #f9fafb;
-    }
-
-    .table tbody tr:hover {
-        background-color: #f1f5f9;
-    }
-
+    
     .image-wrapper {
         display: inline-block;
         overflow: hidden;
@@ -200,27 +175,6 @@
         transition: transform 0.2s ease;
     }
 
-
-
-    .shadow-lg {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2 rgba(0, 0, 0, 0.05);
-    }
-
-    .shadow-sm {
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    }
-
-    .btn-light {
-        background-color: #ffffff;
-        border-color: #ffffff;
-        color: #1e3a8a;
-    }
-
-    .btn-light:hover {
-        background-color: #f1f5f9;
-        border-color: #f1f5f9;
-        color: #1e3a8a;
-    }
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
