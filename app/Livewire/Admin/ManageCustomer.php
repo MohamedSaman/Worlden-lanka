@@ -15,19 +15,14 @@ use Livewire\Attributes\On;
 #[Title('Manage Customer')]
 class ManageCustomer extends Component
 {
-    public function render()
-    {
-        $customers = Customer::all();
-        return view('livewire.admin.manage-customer',[
-            'customers'=> $customers
-        ]);
-    }
+    
     public $name;
     public $contactNumber;
     public $address;
     public $email;
     public $customerType;
     public $bussinessName;
+    public $search = '';
 
     public function createCustomer(){
         // $this->reset();
@@ -125,6 +120,16 @@ class ManageCustomer extends Component
             // log($e->getMessage());
             $this->js("Swal.fire('Error!', '".$e->getMessage()."', 'error')");
         }
+    }
+
+    public function render()
+    {
+        $customers = Customer::all();
+
+
+        return view('livewire.admin.manage-customer',[
+            'customers'=> $customers
+        ]);
     }
 }
 

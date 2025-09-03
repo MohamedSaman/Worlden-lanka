@@ -1,63 +1,63 @@
 <div class="container-fluid py-2">
     <div class="card border-0 " style="border-color: #233D7F;">
-        <div class="card-header bg-transparent text-black p-3 d-flex justify-content-between align-items-center flex-wrap">
-            <div class="d-flex align-items-center gap-3">
-                <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center">
-                    <i class="bi bi-box-seam text-black fs-4" aria-hidden="true"></i>
+
+    <!-- header  -->
+        <div class="card-header bg-transparent pb-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+
+            <!-- Left: Icon + Title -->
+            <div class="d-flex align-items-center gap-3 flex-shrink-0">
+                <div class="icon-shape icon-lg bg-opacity-25 p-3 d-flex align-items-center justify-content-center">
+                    <i class="bi bi-box-seam fs-4" aria-hidden="true" style="color:#233D7F;"></i>
                 </div>
                 <div>
-                    <h3 class="mb-1 fw-bold tracking-tight text-black">Product Stock Details</h3>
-                    <p class="text-black opacity-80 mb-0 text-sm">Monitor and manage your product inventory</p>
+                    <h3 class="mb-1 fw-bold tracking-tight text-dark">Customer Management</h3>
+                    <p class="text-dark opacity-80 mb-0 text-sm">Monitor and manage your Customer Details</p>
                 </div>
             </div>
-            <div class="d-flex gap-2">
-                <button class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="createCustomer" style="background-color: #00C8FF; border-color: #00C8FF; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">
-                    <i class="bi bi-plus-circle me-2"></i>Create Customer
-                </button>
-                <button id="printButton"
-                    class="btn text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                    aria-label="Print stock details">
-                    <i class="bi bi-printer me-1" aria-hidden="true"></i> Print
-                </button>
+
+            <!-- Middle: Search Bar -->
+            <div class="flex-grow-1 d-flex justify-content-lg-center">
+                <div class="input-group rounded-pill overflow-hidden w-100" style="max-width: 400px;">
+                    <span class="input-group-text bg-white border-0 px-3">
+                        <i class="bi bi-search text-primary"></i>
+                    </span>
+                    <input type="text"
+                        class="form-control border-0 py-2 bg-white"
+                        placeholder="Search customers..."
+                        wire:model.live.debounce.300ms="search"
+                        autocomplete="off">
+                </div>
             </div>
 
-            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
-
-
-                <!-- <div class="card-tools">
-                    <button class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="createCustomer" style="background-color: #00C8FF; border-color: #00C8FF; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">
-                        <i class="bi bi-plus-circle me-2"></i>Create Customer
-                    </button>
-                </div> -->
+            <!-- Right: Buttons -->
+            <div class="d-flex gap-2 flex-shrink-0 justify-content-lg-end">
+                <button wire:click="exportToCSV"
+                    class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
+                    aria-label="Export stock details to CSV"
+                    style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F;">
+                    <i class="bi bi-download me-1" aria-hidden="true"></i> Export CSV
+                </button>
+                <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105 btn-create"
+                    wire:click="createCustomer"
+                    style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F;">
+                    <i class="bi bi-plus-circle me-2"></i> Create Customer
+                </button>
             </div>
         </div>
-        <div class="card-body p-5 shadow-lg rounded-1 overflow-hidden bg-white">
-            <!-- Search Bar -->
-            <div class="input-group shadow-sm rounded-pill overflow-hidden m-4" style="max-width: 400px;">
-                <span class="input-group-text bg-white border-0">
-                    <i class="bi bi-search text-blue-600" aria-hidden="true"></i>
-                </span>
-                <input type="text"
-                    class="form-control border-0 py-2.5 bg-transparent text-gray-800"
-                    placeholder="Search Customer..."
-                    wire:model.live.debounce.300ms="search"
-                    autocomplete="off"
-                    aria-label="Search customer"
-                    aria-describedby="search-icon">
-            </div>
 
 
-            <div class="table-responsive">
-                <table class="table table-sm">
+        <div class="card-body p-1  pt-5 bg-transparent">
+            <div class="table-responsive  shadow-sm rounded-2 overflow-hidden">
+                <table class="table table-sm ">
                     <thead>
                         <tr>
-                            <th class="text-uppercase text-center ps-4 py-3">ID</th>
-                            <th class="text-uppercase text-center py-3">Customer Name</th>
-                            <th class="text-uppercase text-center py-3">Business Name</th>
-                            <th class="text-uppercase text-center py-3">Contact Number</th>
-                            <th class="text-uppercase text-center py-3">Email</th>
-                            <th class="text-uppercase text-center py-3">Type</th>
-                            <th class="text-uppercase text-center py-3">Address</th>
+                            <th class="text-center ps-4 py-3">ID</th>
+                            <th class="text-center py-3">Customer Name</th>
+                            <th class="text-center py-3">Business Name</th>
+                            <th class="text-center py-3">Contact Number</th>
+                            <th class="text-center py-3">Email</th>
+                            <th class="text-center py-3">Type</th>
+                            <th class="text-center py-3">Address</th>
                             <th class="text-center py-3">Action</th>
                         </tr>
                     </thead>
@@ -65,22 +65,22 @@
                         @if ($customers->count() > 0)
                         @foreach ($customers as $customer)
                         <tr class="transition-all hover:bg-gray-50">
-                            <td class="text-sm text-center  ps-4 ">{{$loop->iteration }}</td>
-                            <td class="text-sm text-center  ">{{ $customer->name ?? '-' }}</td>
-                            <td class="text-sm text-center  ">{{ $customer->business_name ?? '-' }}</td>
-                            <td class="text-sm text-center  ">{{ $customer->phone ?? '-' }}</td>
-                            <td class="text-sm text-center  ">{{ $customer->email ?? '-' }}</td>
-                            <td class="text-sm text-center  ">{{ ucfirst($customer->type) ?? '-' }}</td>
-                            <td class="text-sm text-center  ">{{ $customer->address ?? '-' }}</td>
+                            <td class="text-sm text-center  ps-4 py-3">{{$loop->iteration }}</td>
+                            <td class="text-sm text-center py-3 ">{{ $customer->name ?? '-' }}</td>
+                            <td class="text-sm text-center py-3 ">{{ $customer->business_name ?? '-' }}</td>
+                            <td class="text-sm text-center py-3 ">{{ $customer->phone ?? '-' }}</td>
+                            <td class="text-sm text-center py-3 ">{{ $customer->email ?? '-' }}</td>
+                            <td class="text-sm text-center py-3 ">{{ ucfirst($customer->type) ?? '-' }}</td>
+                            <td class="text-sm text-center py-3 ">{{ $customer->address ?? '-' }}</td>
                             <td class="text-sm text-center">
                                 <div class="btn-group btn-group-sm gap-2" role="group">
-                                    <button class="btn btn-outline-primary rounded-pill px-3 transition-all hover:shadow" wire:click="editCustomer({{ $customer->id }})" wire:loading.attr="disabled" title="Edit">
+                                    <button class="btn text-info rounded-pill px-3 " wire:click="editCustomer({{ $customer->id }})" wire:loading.attr="disabled" title="Edit">
                                         <i class="bi bi-pencil" wire:loading.class="d-none" wire:target="editCustomer({{ $customer->id }})"></i>
                                         <span wire:loading wire:target="editCustomer({{ $customer->id }})">
                                             <i class="spinner-border spinner-border-sm"></i>
                                         </span>
                                     </button>
-                                    <button class="btn btn-outline-danger rounded-pill px-3 transition-all hover:shadow" wire:click="confirmDelete({{ $customer->id }})" title="Delete">
+                                    <button class="btn text-danger rounded-pill px-3" wire:click="confirmDelete({{ $customer->id }})" title="Delete">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>
@@ -234,6 +234,15 @@
 
 @push('styles')
 <style>
+    .input-group{
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    .btn{
+        transition: all 0.3s ease;
+    }
+    .btn:hover{
+        transform: scale(1.05);
+    }
     .tracking-tight {
         letter-spacing: -0.025em;
     }

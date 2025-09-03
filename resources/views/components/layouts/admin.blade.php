@@ -431,7 +431,7 @@
 
         <!-- Top Navigation Bar -->
         <nav class="top-bar">
-            <button id="sidebarToggler" class="btn btn-light rounded-pill me-3 transition-all hover:shadow" style="border-color: #233D7F;">
+            <button id="sidebarToggler" class="btn btn-light rounded-pill me-3 transition-all hover:shadow" style="border-color: #233D7F;" onclick="setActiveMenuItem()">
                 <i class="bi bi-list fs-5" style="color: #233D7F;"></i>
             </button>
             <div class="ms-auto dropdown">

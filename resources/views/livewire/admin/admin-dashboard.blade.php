@@ -84,6 +84,10 @@
             margin: 0.4rem 0;
             color: #233d7f;
         }
+        /* progress */
+        .progress{
+            height: 10px;
+        }
 
         /* ===== Chart Card ===== */
         .chart-card {
@@ -329,8 +333,8 @@
                             <small>Revenue</small>
                             <small>{{ $revenuePercentage }}% of total sales</small>
                         </div>
-                        <div class="progress">
-                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ $revenuePercentage }}%;" aria-valuenow="{{ $revenuePercentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress " >
+                            <div class="progress-bar bg-success" role="progressbar" style=" width: {{ $revenuePercentage }}%;" aria-valuenow="{{ $revenuePercentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <div class="d-flex justify-content-between">
                             <small class="text-muted text-truncate-mobile">Rs.{{ number_format($totalRevenue) }} of Rs.{{ number_format($totalRevenue + $totalDueAmount) }}</small>
@@ -460,7 +464,7 @@
                                 <h6 class="card-title fw-bold tracking-tight" style="color: #233D7F;">Recent Sales</h6>
                                 <p class="text-muted small mb-0">Latest transactions</p>
                             </div>
-                            <a href="#" class="btn btn-outline-primary">
+                            <a href="{{ route('admin.view-payments') }}" class="btn btn-outline-primary">
                                 <i class="bi bi-list-ul"></i> View All
                             </a>
                         </div>

@@ -1,4 +1,6 @@
 <div class="container-fluid py-1">
+
+
     <!-- Success Message -->
     @if (session()->has('message'))
     <div class="alert alert-success alert-dismissible fade show mb-5 rounded-3 shadow-sm" role="alert" style="border-left: 5px solid #28a745; color: #233D7F; background: #e6f4ea;">
@@ -11,145 +13,153 @@
     @endif
 
     <!-- Header Section -->
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-2">
-        <h1 class="h2 fw-bold text-uppercase tracking-tight" style="color: #233D7F;">Product Details</h1>
-        <div class="d-flex flex-column flex-md-row align-items-center gap-3 mt-3 mt-md-0">
-            <div class="input-group" style="max-width: 250px;">
-                <span class="input-group-text bg-white border-2 border-end-0" style="border-color: #233D7F;">
-                    <i class="bi bi-search text-primary"></i>
-                </span>
-                <input
-                    type="text"
-                    wire:model.debounce.500ms="search"
-                    placeholder="Search products..."
-                    class="form-control border-2 border-start-0 shadow-sm"
-                    style="border-color: #233D7F; color: #233D7F;">
+    <div class="card-header bg-transparent pb-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 border-bottom" style="border-color: #233D7F;">
+
+        <!-- Left: Icon + Title -->
+        <div class="d-flex align-items-center gap-3 flex-shrink-0">
+            <div class="icon-shape icon-lg bg-opacity-25 p-3 d-flex align-items-center justify-content-center">
+                <i class="bi bi-box-seam fs-4" aria-hidden="true" style="color:#233D7F;"></i>
             </div>
-            <div class="d-flex gap-2">
-                <button
-                    class="btn btn-primary rounded-pill px-4 py-2 fw-medium transition-all hover:shadow"
-                    wire:click="toggleAddModal"
-                    style="background-color: #00C8FF; border-color: #00C8FF; color: white;"
-                    onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';"
-                    onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">
-                    <i class="bi bi-plus-circle me-2"></i>Add Product
-                </button>
+            <div>
+                <h3 class="mb-1 fw-bold tracking-tight text-dark">Product Details</h3>
+                <p class="text-dark opacity-80 mb-0 text-sm">Monitor and manage your Product Details</p>
             </div>
         </div>
+
+        <!-- Middle: Search Bar -->
+        <div class="flex-grow-1 d-flex justify-content-lg-center">
+            <div class="input-group rounded-pill overflow-hidden w-100" style="max-width: 400px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
+                <span class="input-group-text bg-white border-0 px-3">
+                    <i class="bi bi-search text-primary"></i>
+                </span>
+                <input type="text"
+                    class="form-control border-0 py-2 bg-white"
+                    placeholder="Search products..."
+                    wire:model.live.debounce.300ms="search"
+                    autocomplete="off">
+            </div>
+        </div>
+
+        <!-- Right: Buttons -->
+        <div class="d-flex gap-2 flex-shrink-0 justify-content-lg-end">
+            <button wire:click="exportToCSV"
+                class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform "
+                aria-label="Export stock details to CSV"
+                style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F; transition: all 0.3s ease; hover: transform: scale(1.05)">
+                <i class="bi bi-download me-1" aria-hidden="true"></i> Export CSV
+            </button>
+            <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform btn-create"
+                wire:click="toggleAddModal"
+                style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F;transition: all 0.3s ease; hover: transform: scale(1.05)">
+                <i class="bi bi-plus-circle me-2"></i> Add Product
+            </button>
+        </div>
     </div>
-    <div>
+    <div class="d-flex  align-items-center justify-content-between gap-4">
+        <p class="ms-4">You can create custom field here </p>
         <button
-            class="btn btn-primary rounded-pill px-4 mb-4 fw-medium transition-all hover:shadow"
+            class="btn btn-primary rounded-full mt-2 px-4 mb-4 fw-medium transition-all hover:shadow "
             wire:click="$set('showAddFieldModal', true)"
-            style="background-color: #00C8FF; border-color: #00C8FF; color: white;"
-            onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';"
-            onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">
+            style="background-color: #233D7F; border-color: #233D7F; color: white;">
             <i class="bi bi-plus-circle me-2"></i>Add Field
         </button>
 
         <!-- Delete Field Button -->
-        <button
+        <!-- <button
             class="btn btn-danger rounded-pill px-4 mb-4 fw-medium transition-all hover:shadow"
             wire:click="$set('showDeleteFieldModal', true)"
             style="background-color: #DC3545; border-color: #DC3545; color: white;"
             onmouseover="this.style.backgroundColor='#A71D2A'; this.style.borderColor='#A71D2A';"
             onmouseout="this.style.backgroundColor='#DC3545'; this.style.borderColor='#DC3545';">
             <i class="bi bi-trash me-2"></i>Delete Field
-        </button>
+        </button> -->
     </div>
 
     <!-- Products Table -->
-    <div class="card border-0 shadow-lg rounded-4 overflow-hidden" style="border-color: #233D7F;">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead style="background-color: #233D7F; color: white;">
-                        <tr>
-                            <th class="ps-4 py-3">ID</th>
-                            <th class="py-3">Product Code</th>
-                            <th class="py-3">Product Name</th>
-                            <th class="py-3">Category</th>
-                            <th class="py-3">Supplier Price</th>
-                            <th class="py-3">Selling Price</th>
-                            <th class="py-3">Stock Quantity</th>
-                            <th class="py-3">Damage Quantity</th>
-                            <th class="py-3">Sold Quantity</th>
-                            @foreach ($fieldKeys as $key)
-                            <th class="text-center py-3">{{ $key }}</th>
-                            @endforeach
-                            <th class="py-3">Status</th>
-                            <th class="text-center py-3">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody style="color: #233D7F;">
-                        @forelse ($products as $product)
-                        <tr class="transition-all hover:bg-gray-50">
-                            <td class="ps-4 py-3">{{ $product->id }}</td>
-                            <td class="py-3">{{ $product->product_code }}</td>
-                            <td class="py-3">{{ $product->product_name }}</td>
-                            <td class="py-3">{{ $product->category->name ?? 'N/A' }}</td>
-                            <td class="py-3">Rs. {{ number_format($product->supplier_price, 2) }}</td>
-                            <td class="py-3">Rs. {{ number_format($product->selling_price, 2) }}</td>
-                            <td class="py-3">{{ $product->stock_quantity }}</td>
-                            <td class="py-3">{{ $product->damage_quantity }}</td>
-                            <td class="py-3">{{ $product->sold }}</td>
-                            @foreach ($fieldKeys as $key)
-                            <td class="text-center py-3">{{ $product->customer_field[$key] ?? '-' }}</td>
-                            @endforeach
-                            <td class="py-3">
-                                @php
-                                $status = $product->status;
-                                @endphp
-                                @if ($status === 'Available')
-                                <span class="badge bg-success text-white px-3 py-2 rounded-pill">Available</span>
-                                @else
-                                <span class="badge bg-secondary text-white px-3 py-2 rounded-pill">Unavailable</span>
-                                @endif
-                            </td>
-                            <td class="text-center py-3">
-                                <div class="d-flex justify-content-center gap-2">
-                                    <button
-                                        class="btn btn-sm btn-outline-primary rounded-circle transition-all hover:shadow"
-                                        wire:click="viewProduct({{ $product->id }})"
-                                        style="border-color: #233D7F; color: #233D7F;"
-                                        onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F'; this.style.color='white';"
-                                        onmouseout="this.style.backgroundColor='transparent'; this.style.borderColor='#233D7F'; this.style.color='#233D7F';"
-                                        title="View">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                    <button
-                                        class="btn btn-sm btn-outline-primary rounded-circle transition-all hover:shadow"
-                                        wire:click="editProduct({{ $product->id }})"
-                                        style="border-color: #00C8FF; color: #00C8FF;"
-                                        onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F'; this.style.color='white';"
-                                        onmouseout="this.style.backgroundColor='transparent'; this.style.borderColor='#00C8FF'; this.style.color='#00C8FF';"
-                                        title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button
-                                        class="btn btn-sm btn-outline-danger rounded-circle transition-all hover:shadow"
-                                        wire:click="confirmDelete({{ $product->id }})"
-                                        style="border-color: #EF4444; color: #EF4444;"
-                                        onmouseover="this.style.backgroundColor='#EF4444'; this.style.borderColor='#EF4444'; this.style.color='white';"
-                                        onmouseout="this.style.backgroundColor='transparent'; this.style.borderColor='#EF4444'; this.style.color='#EF4444';"
-                                        title="Delete">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="{{ 9 + count($fieldKeys) }}" class="text-center py-4" style="color: #233D7F;">
-                                <i class="bi bi-exclamation-circle me-2"></i>No products found.
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+    <div class="card-body py-0 px-1  bg-transparent">
+        <div class="table-responsive shadow-sm rounded-2 overflow-hidden">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th class="ps-4 py-3">ID</th>
+                        <th class="py-3">Product Code</th>
+                        <th class="py-3">Product Name</th>
+                        <th class="py-3">Category</th>
+                        <th class="py-3">Supplier Price</th>
+                        <th class="py-3">Selling Price</th>
+                        <th class="py-3">Stock Quantity</th>
+                        <th class="py-3">Damage Quantity</th>
+                        <th class="py-3">Sold Quantity</th>
+                        @foreach ($fieldKeys as $key)
+                        <th class="text-center py-3">{{ $key }}</th>
+                        @endforeach
+                        <th class="py-3">Status</th>
+                        <th class="text-center py-3">Actions</th>
+                    </tr>
+                </thead>
+                <tbody >
+                    @forelse ($products as $product)
+                    <tr class="transition-all hover:bg-gray-50">
+                        <td class="ps-4 py-3">{{ $product->id }}</td>
+                        <td class="py-3">{{ $product->product_code }}</td>
+                        <td class="py-3">{{ $product->product_name }}</td>
+                        <td class="py-3">{{ $product->category->name ?? 'N/A' }}</td>
+                        <td class="py-3">Rs. {{ number_format($product->supplier_price, 2) }}</td>
+                        <td class="py-3">Rs. {{ number_format($product->selling_price, 2) }}</td>
+                        <td class="py-3">{{ $product->stock_quantity }}</td>
+                        <td class="py-3">{{ $product->damage_quantity }}</td>
+                        <td class="py-3">{{ $product->sold }}</td>
+                        @foreach ($fieldKeys as $key)
+                        <td class="text-center py-3">{{ $product->customer_field[$key] ?? '-' }}</td>
+                        @endforeach
+                        <td class="py-3">
+                            @php
+                            $status = $product->status;
+                            @endphp
+                            @if ($status === 'Available')
+                            <span class="badge bg-success text-white px-3 py-2 rounded-pill">Available</span>
+                            @else
+                            <span class="badge bg-secondary text-white px-3 py-2 rounded-pill">Unavailable</span>
+                            @endif
+                        </td>
+                        <td class="text-center py-3">
+                            <div class="d-flex justify-content-center gap-2">
+                                <button
+                                    class="btn btn-sm "
+                                    wire:click="viewProduct({{ $product->id }})"
+                                    style="color: #233D7F;"
+                                    title="View">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button
+                                    class="btn btn-sm "
+                                    wire:click="editProduct({{ $product->id }})"
+                                    style="color: #00C8FF;"
+                                    title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button
+                                    class="btn btn-sm "
+                                    wire:click="confirmDelete({{ $product->id }})"
+                                    style=" color: #EF4444;"
+                                    title="Delete">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="{{ 9 + count($fieldKeys) }}" class="text-center py-4" style="color: #233D7F;">
+                            <i class="bi bi-exclamation-circle me-2"></i>No products found.
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
+
     {{ $products->links() }}
 
     <!-- Add Product Modal -->
@@ -658,7 +668,6 @@
         </div>
     </div>
     @endif
-
 
 
     @push('script')
