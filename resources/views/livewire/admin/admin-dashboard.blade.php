@@ -86,7 +86,8 @@
         }
         /* progress */
         .progress{
-            height: 10px;
+            height: 8px;
+            margin-bottom: 15px;
         }
 
         /* ===== Chart Card ===== */
@@ -435,8 +436,6 @@
             </div>
         </div>
 
-
-
         <!-- Chart and Recent Sales Section -->
         <div class="row">
             <div class="col-sm-12 col-lg-8 mb-4">
@@ -517,22 +516,9 @@
                         @php
                         $stockPercentage = ($product->stock_quantity + $product->damage_quantity) > 0 ? round(($product->stock_quantity / ($product->stock_quantity + $product->damage_quantity)) * 100, 2) : 0;
                         $statusClass = $product->stock_quantity == 0 ? 'out-of-stock' : ($stockPercentage <= 25 ? 'low-stock' : 'in-stock' );
-                            $statusText=$product->stock_quantity == 0 ? 'Out of Stock' : ($stockPercentage <= 25 ? 'Low Stock' : 'In Stock' );
-                                $progressClass=$product->stock_quantity == 0 ? 'bg-danger' : ($stockPercentage <= 25 ? 'bg-warning' : 'bg-success' );
-                                    @endphp
-                                    <!-- <div class="item-row @if(!$loop->first) mt-3 @endif">
-                                    <div class="item-details">
-                                        <h6 class="text-truncate-mobile" style="color: #233D7F;">{{ $product->name }}</h6>
-                                        <p class="text-muted small text-truncate-mobile">SKU: {{ $product->code }}</p>
-                                    </div>
-                                    <div class="d-flex align-items-end flex-wrap mt-1 mt-md-0">
-                                        <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
-                                        <div class="ms-2 text-muted small">{{ $product->stock_quantity }}/{{ $product->stock_quantity + $product->damage_quantity }}</div>
-                                    </div>
-                    </div>
-                    <div class="progress">
-                        <div class="progress-bar {{ $progressClass }}" style="width: {{ $stockPercentage }}%;"></div>
-                    </div> -->
+                        $statusText=$product->stock_quantity == 0 ? 'Out of Stock' : ($stockPercentage <= 25 ? 'Low Stock' : 'In Stock' );
+                        $progressClass=$product->stock_quantity == 0 ? 'bg-danger' : ($stockPercentage <= 25 ? 'bg-warning' : 'bg-success' );
+                        @endphp
 
                     <div class="mb-2">
                         <div class="d-flex justify-content-between align-items-center">
@@ -614,10 +600,10 @@
                         data: totals,
                         borderColor: '#233D7F',
                         backgroundColor: 'rgba(35, 61, 127, 0.2)',
-                        tension: 0.3,
+                        tension: 0,
                         fill: true,
                         pointBackgroundColor: '#233D7F',
-                        pointRadius: 4
+                        pointRadius: 3
                     }]
                 },
                 options: {

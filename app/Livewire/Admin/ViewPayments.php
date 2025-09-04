@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Livewire\Admin;
+
 use Livewire\Component;
 use App\Models\Payment;
 use Livewire\WithPagination;
@@ -13,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 class ViewPayments extends Component
 {
     use WithPagination;
-    
+
     public $search = '';
     public $selectedPayment = null;
     public $filters = [
@@ -21,18 +22,18 @@ class ViewPayments extends Component
         'paymentMethod' => '',
         'dateRange' => '',
     ];
-    
+
     public function viewPaymentDetails($paymentId)
     {
         try {
             $this->selectedPayment = Payment::with([
-                'sale',
-                'sale.customer',
-                'sale.user',
+                'sale', 
+                'sale.customer', 
+                'sale.user', 
                 'sale.items',
-                'sale.items.watch'
+                'sale.items.product' 
             ])->findOrFail($paymentId);
-            
+
             $this->dispatch('openModal', 'payment-receipt-modal');
         } catch (\Exception $e) {
             $this->dispatch('showToast', [
@@ -41,38 +42,40 @@ class ViewPayments extends Component
             ]);
         }
     }
-    
+
     public function resetFilters()
     {
         $this->reset('filters');
     }
-    
+
     public function render()
     {
+
+
         $query = Payment::query()
             ->with(['sale', 'sale.customer', 'sale.user'])
-            ->when($this->search, function($q) {
-                return $q->whereHas('sale', function($sq) {
+            ->when($this->search, function ($q) {
+                return $q->whereHas('sale', function ($sq) {
                     $sq->where('invoice_number', 'like', "%{$this->search}%")
-                       ->orWhereHas('customer', function($cq) {
-                           $cq->where('name', 'like', "%{$this->search}%")
-                              ->orWhere('phone', 'like', "%{$this->search}%");
-                       });
+                        ->orWhereHas('customer', function ($cq) {
+                            $cq->where('name', 'like', "%{$this->search}%")
+                                ->orWhere('phone', 'like', "%{$this->search}%");
+                        });
                 });
             })
-            ->when($this->filters['status'], function($q) {
+            ->when($this->filters['status'], function ($q) {
                 return $q->where('status', $this->filters['status']);
             })
-            ->when($this->filters['paymentMethod'], function($q) {
+            ->when($this->filters['paymentMethod'], function ($q) {
                 return $q->where('payment_method', $this->filters['paymentMethod']);
             });
-            
+
         $payments = $query->orderBy('created_at', 'desc')->paginate(15);
-        
+
         // Get summary stats
         $totalPayments = Payment::where('is_completed', 1)->sum('amount');
         $pendingPayments = Payment::where('is_completed', 0)->sum('amount');
-        
+
         return view('livewire.admin.view-payments', [
             'payments' => $payments,
             'totalPayments' => $totalPayments,

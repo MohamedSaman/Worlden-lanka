@@ -39,11 +39,11 @@ class Sale extends Model
         return $this->hasMany(Payment::class);
     }
 
-    public function user() 
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
-    
+
     // Generate unique invoice numbers
     public static function generateInvoiceNumber()
     {
@@ -52,15 +52,15 @@ class Sale extends Model
         $lastInvoice = self::where('invoice_number', 'like', "{$prefix}{$date}%")
             ->orderBy('invoice_number', 'desc')
             ->first();
-            
+
         $nextNumber = 1;
-        
+
         if ($lastInvoice) {
             $parts = explode('-', $lastInvoice->invoice_number);
             $lastNumber = intval(end($parts));
             $nextNumber = $lastNumber + 1;
         }
-        
+
         return $prefix . $date . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
     }
 }
