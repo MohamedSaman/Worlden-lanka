@@ -213,7 +213,7 @@
         aria-labelledby="payment-receipt-modal-label" aria-hidden="true">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content border-0 shadow-lg">
-                <div class="modal-header bg-success text-white">
+                <div class="modal-header  text-white" style="background-color: #233D7F;">
                     <h5 class="modal-title" id="payment-receipt-modal-label">
                         <i class="bi bi-receipt-cutoff me-2"></i>Payment Receipt
                     </h5>
@@ -230,8 +230,9 @@
                         <!-- Receipt Header -->
                         <div class="text-center mb-4">
                             <h3 class="mb-0">WORLDEN LANKA GROUP</h3>
-                            <p class="mb-0 text-muted small">NO 44, DOOLMALA, THIHARIYA</p>
-                            <p class="mb-0 text-muted small">Phone: (033) 228 7437 | Email: hakeem9053@gmail.com</p>
+                            <p class="mb-0 text-muted small">NO 20/2/1, 2nd FLOOR,HUNTER BUILDING,BANKSHALLL STREET,COLOMBO-11
+                            </p>
+                            <p class="mb-0 text-muted small">Phone: 011 - 2332786 | Email: plusaccessories.lk@gmail.com</p>
                             <h4 class="mt-3 border-bottom border-2 pb-2">PAYMENT RECEIPT</h4>
                         </div>
 

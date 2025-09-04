@@ -53,28 +53,17 @@
                 style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F; transition: all 0.3s ease; hover: transform: scale(1.05)">
                 <i class="bi bi-download me-1" aria-hidden="true"></i> Export CSV
             </button>
-            
+
         </div>
     </div>
     <div class="d-flex  align-items-center justify-content-between gap-4">
-        <p class="ms-4">You can create custom field here <i class="bi bi-arrow-right ms-4"></i>
- </p>
+        <p class="ms-4">You can create custom field here <i class="bi bi-arrow-right ms-4"></i></p>
         <button
             class="btn btn-primary rounded-full mt-2 px-4 mb-4 fw-medium transition-all hover:shadow "
             wire:click="$set('showAddFieldModal', true)"
             style="background-color: #233D7F; border-color: #233D7F; color: white;">
             <i class="bi bi-plus-circle me-2"></i>Add Field
         </button>
-
-        <!-- Delete Field Button -->
-        <!-- <button
-            class="btn btn-danger rounded-pill px-4 mb-4 fw-medium transition-all hover:shadow"
-            wire:click="$set('showDeleteFieldModal', true)"
-            style="background-color: #DC3545; border-color: #DC3545; color: white;"
-            onmouseover="this.style.backgroundColor='#A71D2A'; this.style.borderColor='#A71D2A';"
-            onmouseout="this.style.backgroundColor='#DC3545'; this.style.borderColor='#DC3545';">
-            <i class="bi bi-trash me-2"></i>Delete Field
-        </button> -->
     </div>
 
     <!-- Products Table -->
@@ -89,17 +78,18 @@
                         <th class="py-3">Category</th>
                         <th class="py-3">Supplier Price</th>
                         <th class="py-3">Selling Price</th>
-                        <th class="py-3">Stock Quantity</th>
-                        <th class="py-3">Damage Quantity</th>
-                        <th class="py-3">Sold Quantity</th>
+
+                        <th class="py-3">Total Quantity</th>
+                        <th class="py-3 text-center">Stock</th>
+                        <th class="py-3">Sold</th>
                         @foreach ($fieldKeys as $key)
-                        <th class="text-center py-3">{{ $key }}</th>
+                        <th class="text-center py-3 ">{{ $key }}</th>
                         @endforeach
-                        <th class="py-3">Status</th>
+                        <th class="py-3 text-center">Status</th>
                         <th class="text-center py-3">Actions</th>
                     </tr>
                 </thead>
-                <tbody >
+                <tbody>
                     @forelse ($products as $product)
                     <tr class="transition-all hover:bg-gray-50">
                         <td class="ps-4 py-3">{{ $product->id }}</td>
@@ -108,13 +98,19 @@
                         <td class="py-3">{{ $product->category->name ?? 'N/A' }}</td>
                         <td class="py-3">Rs. {{ number_format($product->supplier_price, 2) }}</td>
                         <td class="py-3">Rs. {{ number_format($product->selling_price, 2) }}</td>
-                        <td class="py-3">{{ $product->stock_quantity }}</td>
-                        <td class="py-3">{{ $product->damage_quantity }}</td>
-                        <td class="py-3">{{ $product->sold }}</td>
+                        <td class="py-3 text-center">{{ $product->stock_quantity + $product->damage_quantity }}</td>
+                        <td class="py-3 text-center">
+                            @if($product->stock_quantity > 0)
+                            <span class="badge bg-success text-white px-3 py-2 rounded-pill">In Stock</span>
+                            @else
+                            <span class="badge bg-danger text-white px-3 py-2 rounded-pill">Out of Stock</span>
+                            @endif
+                        </td>
+                        <td class="py-3 text-center">{{ $product->sold }}</td>
                         @foreach ($fieldKeys as $key)
                         <td class="text-center py-3">{{ $product->customer_field[$key] ?? '-' }}</td>
                         @endforeach
-                        <td class="py-3">
+                        <td class="py-3 text-center">
                             @php
                             $status = $product->status;
                             @endphp

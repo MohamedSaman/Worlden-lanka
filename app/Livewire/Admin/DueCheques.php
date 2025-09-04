@@ -123,6 +123,8 @@ class DueCheques extends Component
             })
             ->count();
 
+            // dd($this->pendingChequeCount);
+
         $this->awaitingApprovalCount = Payment::query()
             ->where('is_completed', false)
             ->where('due_payment_method', 'cheque')

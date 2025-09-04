@@ -998,9 +998,9 @@
                         <div class="receipt-container">
                             <!-- Receipt Header -->
                             <div class="text-center mb-4">
-                                <h3 class="mb-1 fw-bold tracking-tight" style="color: #233D7F;">NEW WATCH COMPANY ( MR TRADING )</h3>
-                                <p class="mb-0 text-muted small" style="color: #6B7280;">NO 44, DOOLMALA, THIHARIYA</p>
-                                <p class="mb-0 text-muted small" style="color: #6B7280;">Phone: (033) 228 7437 | Email: hakeem9053@gmail.com</p>
+                                <h3 class="mb-1 fw-bold tracking-tight" style="color: #233D7F;">WORLDEN LANKA</h3>
+                                <p class="mb-0 text-muted small" style="color: #6B7280;">NO 20/2/1, 2nd FLOOR,HUNTER BUILDING,BANKSHALLL STREET,COLOMBO-11</p>
+                                <p class="mb-0 text-muted small" style="color: #6B7280;">Phone: 011 - 2332786 | Email: plusaccessories.lk@gmail.com</p>
                                 <h4 class="mt-3 border-bottom border-2 pb-2 fw-bold" style="color: #233D7F; border-color: #233D7F;">SALES RECEIPT</h4>
                             </div>
 
