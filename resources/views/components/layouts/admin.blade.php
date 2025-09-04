@@ -276,7 +276,9 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-title">Worlden Lanka</div>
+                <div class="sidebar-title">
+                    <img src="{{ asset('images/LOGO.png') }}" alt="Logo" width= "200px" height ="100px">
+                </div>
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
@@ -362,40 +364,51 @@
         </div>
 
         <!-- Top Navigation Bar -->
-        <nav class="top-bar">
-            <button id="sidebarToggler" class="btn btn-light rounded-pill me-3 transition-all hover:shadow" style="border-color: #233D7F;" onclick="setActiveMenuItem()">
-                <i class="bi bi-list fs-5" style="color: #233D7F;"></i>
-            </button>
-            <div class="ms-auto dropdown">
-                <div class="admin-info dropdown-toggle" id="adminDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                    <div class="admin-avatar">A</div>
-                    <div class="admin-name">Admin</div>
-                </div>
-                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
-                    <li>
-                        <a class="dropdown-item" href="#">
-                            <i class="bi bi-person me-2"></i>My Profile
-                        </a>
-                    </li>
-                    <li>
-                        <a class="dropdown-item" href="#">
-                            <i class="bi bi-gear me-2"></i>Settings
-                        </a>
-                    </li>
-                    <li>
-                        <hr class="dropdown-divider">
-                    </li>
-                    <li>
-                        <form method="POST" action="{{ route('logout') }}" class="mb-0">
-                            @csrf
-                            <button type="submit" class="dropdown-item text-danger">
-                                <i class="bi bi-box-arrow-right me-2"></i>Logout
-                            </button>
-                        </form>
-                    </li>
-                </ul>
-            </div>
-        </nav>
+<nav class="top-bar d-flex align-items-center px-3">
+    <!-- Sidebar Toggle -->
+    <button id="sidebarToggler" class="btn btn-light rounded-pill me-3 transition-all hover:shadow"
+        style="border-color: #233D7F;">
+        <i class="bi bi-list fs-5" style="color: #233D7F;"></i>
+    </button>
+
+    <!-- Center Title -->
+    <div class="flex-grow-1 text-center fw-bold" style="color:#233D7F; font-size:18px;">
+        <h2 style="padding: 0;margin:0"><b>WORLDEN LANKA PVT</b></h2>
+    </div>
+
+    <!-- Right Dropdown -->
+    <div class="ms-auto dropdown">
+        <div class="admin-info dropdown-toggle" id="adminDropdown" role="button" data-bs-toggle="dropdown"
+            aria-expanded="false">
+            <div class="admin-avatar">A</div>
+            <div class="admin-name">Admin</div>
+        </div>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
+            <li>
+                <a class="dropdown-item" href="#">
+                    <i class="bi bi-person me-2"></i>My Profile
+                </a>
+            </li>
+            <li>
+                <a class="dropdown-item" href="#">
+                    <i class="bi bi-gear me-2"></i>Settings
+                </a>
+            </li>
+            <li>
+                <hr class="dropdown-divider">
+            </li>
+            <li>
+                <form method="POST" action="{{ route('logout') }}" class="mb-0">
+                    @csrf
+                    <button type="submit" class="dropdown-item text-danger">
+                        <i class="bi bi-box-arrow-right me-2"></i>Logout
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+</nav>
+
 
         <!-- Main Content -->
         <main class="main-content">
