@@ -42,7 +42,7 @@
         }
 
         .sidebar-header {
-            padding: 20px;
+            padding: 10px;
             font-size: 1.4rem;
             font-weight: 700;
             text-align: center;
