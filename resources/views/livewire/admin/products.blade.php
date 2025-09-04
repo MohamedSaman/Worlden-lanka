@@ -1,17 +1,5 @@
 <div class="container-fluid py-1">
 
-
-    <!-- Success Message -->
-    @if (session()->has('message'))
-    <div class="alert alert-success alert-dismissible fade show mb-5 rounded-3 shadow-sm" role="alert" style="border-left: 5px solid #28a745; color: #233D7F; background: #e6f4ea;">
-        <div class="d-flex align-items-center">
-            <i class="bi bi-check-circle-fill me-2 text-success"></i>
-            {{ session('message') }}
-        </div>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    @endif
-
     <!-- Header Section -->
     <div class="card-header bg-transparent pb-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 border-bottom" style="border-color: #233D7F;">
 
@@ -80,12 +68,12 @@
                         <th class="py-3">Selling Price</th>
 
                         <th class="py-3">Total Quantity</th>
-                        <th class="py-3 text-center">Stock</th>
                         <th class="py-3">Sold</th>
+                        <th class="py-3 text-center">Stock</th>
+                        
                         @foreach ($fieldKeys as $key)
                         <th class="text-center py-3 ">{{ $key }}</th>
                         @endforeach
-                        <th class="py-3 text-center">Status</th>
                         <th class="text-center py-3">Actions</th>
                     </tr>
                 </thead>
@@ -99,6 +87,7 @@
                         <td class="py-3">Rs. {{ number_format($product->supplier_price, 2) }}</td>
                         <td class="py-3">Rs. {{ number_format($product->selling_price, 2) }}</td>
                         <td class="py-3 text-center">{{ $product->stock_quantity + $product->damage_quantity }}</td>
+                        <td class="py-3 text-center">{{ $product->sold }}</td>
                         <td class="py-3 text-center">
                             @if($product->stock_quantity > 0)
                             <span class="badge bg-success text-white px-3 py-2 rounded-pill">In Stock</span>
@@ -106,20 +95,10 @@
                             <span class="badge bg-danger text-white px-3 py-2 rounded-pill">Out of Stock</span>
                             @endif
                         </td>
-                        <td class="py-3 text-center">{{ $product->sold }}</td>
+                        
                         @foreach ($fieldKeys as $key)
                         <td class="text-center py-3">{{ $product->customer_field[$key] ?? '-' }}</td>
                         @endforeach
-                        <td class="py-3 text-center">
-                            @php
-                            $status = $product->status;
-                            @endphp
-                            @if ($status === 'Available')
-                            <span class="badge bg-success text-white px-3 py-2 rounded-pill">Available</span>
-                            @else
-                            <span class="badge bg-secondary text-white px-3 py-2 rounded-pill">Unavailable</span>
-                            @endif
-                        </td>
                         <td class="text-center py-3">
                             <div class="d-flex justify-content-center gap-2">
                                 <button
@@ -173,16 +152,6 @@
                     <div class="modal-body p-5">
                         <div class="row g-4">
                             <div class="col-md-6">
-                                <label for="product_code" class="form-label fw-medium" style="color: #233D7F;">Product Code</label>
-                                <input
-                                    type="text"
-                                    id="product_code"
-                                    wire:model="product_code"
-                                    class="form-control border-2 shadow-sm"
-                                    style="border-color: #233D7F; color: #233D7F;">
-                                @error('product_code') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="col-md-6">
                                 <label for="category_id" class="form-label fw-medium" style="color: #233D7F;">Category</label>
                                 <select
                                     id="category_id"
@@ -196,7 +165,7 @@
                                 </select>
                                 @error('category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label for="product_name" class="form-label fw-medium" style="color: #233D7F;">Product Name</label>
                                 <input
                                     type="text"
@@ -207,17 +176,6 @@
                                 @error('product_name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
 
-                            <div class="col-md-6">
-                                <label for="stock_quantity" class="form-label fw-medium" style="color: #233D7F;">Stock Quantity</label>
-                                <input
-                                    type="number"
-                                    id="stock_quantity"
-                                    wire:model="stock_quantity"
-                                    class="form-control border-2 shadow-sm"
-                                    style="border-color: #233D7F; color: #233D7F;"
-                                    min="0" step="1">
-                                @error('stock_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                            </div>
                             <div class="col-md-6">
                                 <label for="supplier_price" class="form-label fw-medium" style="color: #233D7F;">Supplier Price</label>
                                 <div class="input-group">
@@ -247,6 +205,17 @@
                                 @error('selling_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
                             <div class="col-md-6">
+                                <label for="stock_quantity" class="form-label fw-medium" style="color: #233D7F;">Available Quantity</label>
+                                <input
+                                    type="number"
+                                    id="stock_quantity"
+                                    wire:model="stock_quantity"
+                                    class="form-control border-2 shadow-sm"
+                                    style="border-color: #233D7F; color: #233D7F;"
+                                    min="0" step="1">
+                                @error('stock_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="col-md-6">
                                 <label for="damage_quantity" class="form-label fw-medium" style="color: #233D7F;">Damage Quantity</label>
                                 <input
                                     type="number"
@@ -256,17 +225,6 @@
                                     style="border-color: #233D7F; color: #233D7F;"
                                     min="0" step="1">
                                 @error('damage_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label for="sold" class="form-label fw-medium" style="color: #233D7F;">Sold Quantity</label>
-                                <input
-                                    type="number"
-                                    id="sold"
-                                    wire:model="sold"
-                                    class="form-control border-2 shadow-sm"
-                                    style="border-color: #233D7F; color: #233D7F;"
-                                    min="0" step="1">
-                                @error('sold') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
                             <div class="col-md-6">
                                 <label for="status" class="form-label fw-medium" style="color: #233D7F;">Status</label>
@@ -669,6 +627,7 @@
 
 
     @push('script')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const alert = document.querySelector('.alert');

@@ -9,6 +9,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use TheSeer\Tokenizer\Exception;
 
 #[Layout('components.layouts.admin')]
 #[Title('Product Management')]
@@ -50,14 +51,12 @@ class Products extends Component
     public $viewCustomerFields = [];
 
     protected $rules = [
-        'product_code' => 'required|string|max:255|unique:product_details,product_code',
         'category_id' => 'required|exists:product_categories,id',
         'product_name' => 'required|string|min:3|max:255',
         'supplier_price' => 'required|numeric|min:0',
         'selling_price' => 'required|numeric|min:0',
         'stock_quantity' => 'required|integer|min:0',
         'damage_quantity' => 'required|integer|min:0',
-        'sold' => 'required|integer|min:0',
         'status' => 'required|in:Available,Unavailable',
         'customer_fields.*.key' => 'required|string|max:255',
         'customer_fields.*.value' => 'nullable|string|max:255',
@@ -198,32 +197,53 @@ class Products extends Component
 
     public function save()
     {
-        $this->rules['product_code'] = 'required|string|max:255|unique:product_details,product_code';
+        $this->rules['product_code'] = 'nullable';
         $this->validate();
 
+        // Get product name and category name first 2 letters (uppercase)
+        $productPrefix = strtoupper(substr($this->product_name, 0, 2));
+        $categoryName = ProductCategory::find($this->category_id)->name ?? 'XX';
+        $categoryPrefix = strtoupper(substr($categoryName, 0, 2));
+
+        // Find the last product with the same prefix
+        $prefix = $productPrefix . $categoryPrefix;
+        $lastProduct = ProductDetail::where('product_code', 'like', $prefix . '%')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        // Generate the next sequence number (4 digits)
+        $nextNumber = $lastProduct
+            ? intval(substr($lastProduct->product_code, 4)) + 1
+            : 1;
+
+        $generatedCode = $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
         $customerField = [];
         foreach ($this->customer_fields as $field) {
             if (!empty($field['key'])) {
                 $customerField[$field['key']] = $field['value'] ?? null;
             }
         }
+        try {
+            // dd( $generatedCode); passing 
+            ProductDetail::create([
+                'product_code' => $generatedCode,
+                'category_id' => $this->category_id,
+                'product_name' => $this->product_name,
+                'supplier_price' => $this->supplier_price,
+                'selling_price' => $this->selling_price,
+                'stock_quantity' => $this->stock_quantity,
+                'damage_quantity' => $this->damage_quantity,
+                'status' => $this->status,
+                'customer_field' => $customerField,
+            ]);
 
-        ProductDetail::create([
-            'product_code' => $this->product_code,
-            'category_id' => $this->category_id,
-            'product_name' => $this->product_name,
-            'supplier_price' => $this->supplier_price,
-            'selling_price' => $this->selling_price,
-            'stock_quantity' => $this->stock_quantity,
-            'damage_quantity' => $this->damage_quantity,
-            'sold' => $this->sold,
-            'status' => $this->status,
-            'customer_field' => $customerField,
-        ]);
-
-        $this->resetFields();
-        $this->showAddModal = false;
-        session()->flash('message', 'Product added successfully!');
+            $this->resetFields();
+            $this->showAddModal = false;
+            $this->js("Swal.fire('Success!', 'Customer Created Successfully', 'success')");
+        } catch (Exception $e) {
+            // log($e->getMessage());
+            $this->js("Swal.fire('Error!', '" . $e->getMessage() . "', 'error')");
+        }
     }
 
     public function editProduct($productId)
