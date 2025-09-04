@@ -756,17 +756,6 @@
                                                 <span class="badge bg-dark p-2 fs-6">Code: {{ $productDetails->product_code ?? 'N/A' }}</span>
                                             </div>
 
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <p class="text-muted mb-1">Brand</p>
-                                                    <h5 class="fw-bold text-primary">{{ $productDetails->brand ?? 'N/A' }}</h5>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <p class="text-muted mb-1">Model</p>
-                                                    <h5 class="text-primary">{{ $productDetails->model ?? 'N/A' }}</h5>
-                                                </div>
-                                            </div>
-
                                             <div class="mb-4">
                                                 <p class="text-muted mb-1">Description</p>
                                                 <p>{{ $productDetails->description ?? 'N/A' }}</p>
@@ -820,23 +809,6 @@
                                         data-bs-parent="#productDetailsAccordion">
                                         <div class="accordion-body">
                                             <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="card mb-3 border-primary">
-                                                        <div class="card-body d-flex justify-content-between">
-                                                            <p class="card-text fw-bold">Shop Stock</p>
-                                                            <h4 class="card-title text-primary">{{ $productDetails->shop_stock }}</h4>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="card mb-3 border-primary">
-                                                        <div class="card-body d-flex justify-content-between">
-                                                            <p class="card-text fw-bold">Store Stock</p>
-                                                            <h4 class="card-title text-primary">{{ $productDetails->store_stock }}</h4>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
                                                 <div class="col-md-6">
                                                     <div class="card mb-3 border-danger">
                                                         <div class="card-body d-flex justify-content-between">

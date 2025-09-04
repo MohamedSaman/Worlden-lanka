@@ -21,8 +21,8 @@ use Exception;
 
 class DuePayments extends Component
 {
-   use WithPagination, WithFileUploads;
-    
+    use WithPagination, WithFileUploads;
+
     public $search = '';
     public $selectedPayment = null;
     public $paymentDetail = null;
@@ -44,10 +44,7 @@ class DuePayments extends Component
 
     protected $listeners = ['refreshPayments' => '$refresh'];
 
-    public function mount()
-    {
-        // Initialize component
-    }
+    public function mount() {}
 
     public function updatedDuePaymentAttachment()
     {
@@ -69,7 +66,7 @@ class DuePayments extends Component
         $this->paymentNote = '';
         $this->duePaymentAttachment = null;
         $this->duePaymentAttachmentPreview = null;
-        
+
         $this->dispatch('openModal', 'payment-detail-modal');
     }
 
@@ -85,7 +82,7 @@ class DuePayments extends Component
             DB::beginTransaction();
 
             $payment = Payment::findOrFail($this->paymentId);
-            
+
             // Store attachment if provided
             $attachmentPath = $payment->due_payment_attachment;
             if ($this->duePaymentAttachment) {
@@ -95,14 +92,14 @@ class DuePayments extends Component
             }
             $receivedAmount = floatval($this->receivedAmount);
             $remainingAmount = $payment->amount - $receivedAmount;
-            if($payment->amount >= $receivedAmount) {
-                 $payment->update([
-                'amount' => $receivedAmount,
-                'due_payment_method' => $this->duePaymentMethod,
-                'due_payment_attachment' => $attachmentPath,
-                'status' => 'pending',  // Change status to pending for admin approval
-                'payment_date' => now(),
-            ]);
+            if ($payment->amount >= $receivedAmount) {
+                $payment->update([
+                    'amount' => $receivedAmount,
+                    'due_payment_method' => $this->duePaymentMethod,
+                    'due_payment_attachment' => $attachmentPath,
+                    'status' => 'pending',  // Change status to pending for admin approval
+                    'payment_date' => now(),
+                ]);
                 // If the received amount is less than the total amount, update the payment
             } else {
                 // If the received amount is equal to or greater than the total amount, mark as completed
@@ -124,7 +121,7 @@ class DuePayments extends Component
             // Add a note to track this payment submission
             if ($this->paymentNote) {
                 $payment->sale->update([
-                    'notes' => ($payment->sale->notes ? $payment->sale->notes . "\n" : '') . 
+                    'notes' => ($payment->sale->notes ? $payment->sale->notes . "\n" : '') .
                         "Payment received on " . now()->format('Y-m-d H:i') . ": " . $this->paymentNote
                 ]);
             }
@@ -141,19 +138,18 @@ class DuePayments extends Component
             }
 
             DB::commit();
-            
+
             $this->dispatch('closeModal', 'payment-detail-modal');
             $this->dispatch('showToast', [
-                'type' => 'success', 
+                'type' => 'success',
                 'message' => 'Payment submitted successfully and sent for admin approval'
             ]);
-            
+
             $this->reset(['paymentDetail', 'duePaymentMethod', 'duePaymentAttachment', 'paymentNote']);
-            
         } catch (Exception $e) {
             DB::rollback();
             $this->dispatch('showToast', [
-                'type' => 'error', 
+                'type' => 'error',
                 'message' => 'Failed to submit payment: ' . $e->getMessage()
             ]);
         }
@@ -163,11 +159,11 @@ class DuePayments extends Component
     {
         $this->extendDuePaymentId = $paymentId;
         $payment = Payment::findOrFail($paymentId);
-        
+
         // Set initial new due date to 7 days from current due date
         $this->newDueDate = $payment->due_date->addDays(7)->format('Y-m-d');
         $this->extensionReason = '';
-        
+
         $this->dispatch('openModal', 'extend-due-modal');
     }
 
@@ -183,7 +179,7 @@ class DuePayments extends Component
 
             $payment = Payment::findOrFail($this->extendDuePaymentId);
             $oldDueDate = $payment->due_date->format('Y-m-d');
-            
+
             // Update the due date
             $payment->update([
                 'due_date' => $this->newDueDate,
@@ -191,24 +187,23 @@ class DuePayments extends Component
 
             // Add a note to track this extension
             $payment->sale->update([
-                'notes' => ($payment->sale->notes ? $payment->sale->notes . "\n" : '') . 
+                'notes' => ($payment->sale->notes ? $payment->sale->notes . "\n" : '') .
                     "Due date extended on " . now()->format('Y-m-d H:i') . " from {$oldDueDate} to {$this->newDueDate}. Reason: {$this->extensionReason}"
             ]);
-            
+
             DB::commit();
-            
+
             $this->dispatch('closeModal', 'extend-due-modal');
             $this->dispatch('showToast', [
-                'type' => 'success', 
+                'type' => 'success',
                 'message' => 'Due date extended successfully'
             ]);
-            
+
             $this->reset(['extendDuePaymentId', 'newDueDate', 'extensionReason']);
-            
         } catch (Exception $e) {
             DB::rollback();
             $this->dispatch('showToast', [
-                'type' => 'error', 
+                'type' => 'error',
                 'message' => 'Failed to extend due date: ' . $e->getMessage()
             ]);
         }
@@ -225,7 +220,7 @@ class DuePayments extends Component
         if (!$file) {
             return null;
         }
-        
+
         $result = [
             'name' => $file->getClientOriginalName(),
             'type' => 'unknown',
@@ -233,14 +228,14 @@ class DuePayments extends Component
             'color' => 'text-secondary',
             'preview' => null
         ];
-        
+
         $extension = strtolower($file->getClientOriginalExtension());
-        
+
         if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif'])) {
             $result['type'] = 'image';
             $result['icon'] = 'bi-file-earmark-image';
             $result['color'] = 'text-primary';
-            
+
             try {
                 $result['preview'] = $file->temporaryUrl();
             } catch (\Exception $e) {
@@ -251,48 +246,43 @@ class DuePayments extends Component
             $result['icon'] = 'bi-file-earmark-pdf';
             $result['color'] = 'text-danger';
         }
-        
+
         return $result;
     }
 
     public function render()
     {
-        $query = Payment::query()
-            ->where('is_completed', false)
-            // Remove the whereNull('status') line to show all statuses
-            ->whereHas('sale', function($query) {
-                $query->where('user_id', auth()->id());
-            })
-            ->with(['sale.customer']);
-            
-        // Apply search filter
-        if ($this->search) {
-            $query->whereHas('sale', function($q) {
-                $q->where('invoice_number', 'like', "%{$this->search}%")
-                  ->orWhereHas('customer', function($q2) {
-                      $q2->where('name', 'like', "%{$this->search}%")
-                        ->orWhere('phone', 'like', "%{$this->search}%");
-                  });
-            });
-        }
-        
-        // Apply status filter - modify to include null values when needed
-        if ($this->filters['status'] === 'null') {
-            $query->whereNull('status');
-        } elseif ($this->filters['status']) {
-            $query->where('status', $this->filters['status']);
-        }
-        
-        // Apply date range filter
-        if ($this->filters['dateRange']) {
-            [$startDate, $endDate] = explode(' to ', $this->filters['dateRange']);
-            $query->whereBetween('due_date', [$startDate, $endDate]);
-        }
-        
-        $duePayments = $query->orderBy('due_date', 'asc')->paginate(10);
-        
+        // Full dataset for counts & calculations
+        $allPayments = Payment::where(function ($query) {
+            $query->whereNull('status')
+                ->orWhereIn('status', ['pending', 'rejected']);
+        })->get();
+
+        // Paginated dataset for table
+        $duePayments = Payment::where(function ($query) {
+            $query->whereNull('status')
+                ->orWhereIn('status', ['pending', 'rejected']);
+        })
+        ->orderBy('created_at', 'desc')
+        ->paginate(10);
+
+        // Counts
+        $pendingPaymentsCount =  $allPayments->where('status', null)->count();
+        $awaitingApprovalCount =$allPayments->where('status', 'pending')->count();
+        $overdueCount = $allPayments
+            ->whereIn('status', [null, 'rejected'])
+            ->filter(fn($payment) => $payment->due_date && now()->gt($payment->due_date))
+            ->count();
+
+        // Total amount of all due payments
+        $totalDueAmount = $allPayments->sum('amount');
+
         return view('livewire.admin.due-payments', [
-            'duePayments' => $duePayments
+            'duePayments' => $duePayments,
+            'pendingPaymentsCount' => $pendingPaymentsCount,
+            'awaitingApprovalCount' => $awaitingApprovalCount,
+            'overdueCount' => $overdueCount,
+            'totalDueAmount' => $totalDueAmount
         ]);
     }
 }

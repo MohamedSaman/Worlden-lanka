@@ -82,90 +82,76 @@ class Products extends Component
         $this->resetPage(); // Reset pagination when search changes
     }
 
-    public function addFieldKey()
+    public function manageField($action, $field = null)
     {
-        $this->validate([
-            'newFieldKey' => 'required|string',
-        ], [
-            'newFieldKey.required' => 'Please enter at least one field name.',
-        ]);
-
-        if (!$this->newFieldKey) return;
-
-        // Split the input by commas and trim each field name
-        $newFields = array_map('trim', explode(',', $this->newFieldKey));
-
-        foreach ($newFields as $field) {
-            if (!$field) continue; // Skip empty entries
-
-            // Convert field to Title Case
-            $field = ucwords(strtolower($field));
-            // Add the field to all products
-            foreach (ProductDetail::all() as $product) {
-                $fields = $product->customer_field ?? [];
-                $fields[$field] = null;
-                $product->update(['customer_field' => $fields]);
-            }
-
-            // Add the field to fieldKeys array if not exists
-            if (!in_array($field, $this->fieldKeys)) {
-                $this->fieldKeys[] = $field;
-            }
-        }
-
-        $this->newFieldKey = '';
-        $this->showAddFieldModal = false;
-        $this->dispatch('notify', [
-            'type' => 'success',
-            'message' => 'Field added successfully'
-        ]);
-    }
-
-    public function deleteField()
-    {
-        $this->validate([
-            'deleteFieldKey' => 'required|string|in:' . implode(',', $this->fieldKeys),
-        ], [
-            'deleteFieldKey.required' => 'Please select a field to delete.',
-            'deleteFieldKey.in' => 'Invalid field selected.',
-        ]);
-
         try {
-            $field = $this->deleteFieldKey;
-
-            // Get only products having customer_field data
-            $products = ProductDetail::whereNotNull('customer_field')->get();
-
             DB::beginTransaction();
 
-            foreach ($products as $product) {
-                $fields = is_array($product->customer_field) ? $product->customer_field : [];
-                if (array_key_exists($field, $fields)) {
-                    unset($fields[$field]);
-                    $product->customer_field = empty($fields) ? null : $fields;
-                    $product->save();
-                }
-            }
+            if ($action === 'add') {
+                // Validate newFieldKey input
+                $this->validate([
+                    'newFieldKey' => 'required|string',
+                ], [
+                    'newFieldKey.required' => 'Please enter at least one field name.',
+                ]);
 
-            // Update fieldKeys array
-            $this->fieldKeys = array_values(array_filter($this->fieldKeys, fn($f) => $f !== $field));
+                $newFields = array_map('trim', explode(',', $this->newFieldKey));
+
+                foreach ($newFields as $f) {
+                    if (!$f) continue;
+
+                    $f = ucwords(strtolower($f));
+
+                    // Add to all products
+                    foreach (ProductDetail::all() as $product) {
+                        $fields = $product->customer_field ?? [];
+                        $fields[$f] = null;
+                        $product->update(['customer_field' => $fields]);
+                    }
+
+                    // Add to Livewire array if not exists
+                    if (!in_array($f, $this->fieldKeys)) {
+                        $this->fieldKeys[] = $f;
+                    }
+                }
+
+                $this->newFieldKey = '';
+                $message = 'Field(s) added successfully';
+            } elseif ($action === 'delete' && $field) {
+                if (!in_array($field, $this->fieldKeys)) return;
+
+                $products = ProductDetail::whereNotNull('customer_field')->get();
+                foreach ($products as $product) {
+                    $fields = is_array($product->customer_field) ? $product->customer_field : [];
+                    if (array_key_exists($field, $fields)) {
+                        unset($fields[$field]);
+                        $product->customer_field = empty($fields) ? null : $fields;
+                        $product->save();
+                    }
+                }
+
+                // Remove from Livewire array
+                $this->fieldKeys = array_values(array_filter($this->fieldKeys, fn($f) => $f !== $field));
+                $message = 'Field deleted successfully';
+            }
 
             DB::commit();
 
             $this->dispatch('notify', [
                 'type' => 'success',
-                'message' => 'Field deleted successfully'
+                'message' => $message,
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
             $this->dispatch('notify', [
                 'type' => 'error',
-                'message' => 'Error deleting field: ' . $e->getMessage()
+                'message' => 'Error: ' . $e->getMessage(),
             ]);
         }
-
-        $this->reset(['deleteFieldKey', 'showDeleteFieldModal']);
     }
+
+
+
 
     public function toggleAddModal()
     {
@@ -205,28 +191,16 @@ class Products extends Component
         $categoryName = ProductCategory::find($this->category_id)->name ?? 'XX';
         $categoryPrefix = strtoupper(substr($categoryName, 0, 2));
 
-        // Find the last product with the same prefix
-        $prefix = $productPrefix . $categoryPrefix;
-        $lastProduct = ProductDetail::where('product_code', 'like', $prefix . '%')
-            ->orderBy('id', 'desc')
-            ->first();
-
-        // Generate the next sequence number (4 digits)
-        $nextNumber = $lastProduct
-            ? intval(substr($lastProduct->product_code, 4)) + 1
-            : 1;
-
-        $generatedCode = $prefix . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
         $customerField = [];
         foreach ($this->customer_fields as $field) {
             if (!empty($field['key'])) {
                 $customerField[$field['key']] = $field['value'] ?? null;
             }
         }
+
         try {
-            // dd( $generatedCode); passing 
-            ProductDetail::create([
-                'product_code' => $generatedCode,
+            // Create product without product_code first
+            $product = ProductDetail::create([
                 'category_id' => $this->category_id,
                 'product_name' => $this->product_name,
                 'supplier_price' => $this->supplier_price,
@@ -237,21 +211,26 @@ class Products extends Component
                 'customer_field' => $customerField,
             ]);
 
+            // Generate product_code using the newly created product ID
+            $generatedCode = $productPrefix . $categoryPrefix . '0' . $product->id;
+
+            // Update product with generated code
+            $product->update(['product_code' => $generatedCode]);
+
             $this->resetFields();
             $this->showAddModal = false;
-            $this->js("Swal.fire('Success!', 'Customer Created Successfully', 'success')");
+            $this->js("Swal.fire('Success!', 'Product Created Successfully', 'success')");
         } catch (Exception $e) {
-            // log($e->getMessage());
             $this->js("Swal.fire('Error!', '" . $e->getMessage() . "', 'error')");
         }
     }
+
 
     public function editProduct($productId)
     {
         $product = ProductDetail::findOrFail($productId);
 
         $this->editingProductId = $product->id;
-        $this->product_code = $product->product_code;
         $this->category_id = $product->category_id;
         $this->product_name = $product->product_name;
         $this->supplier_price = $product->supplier_price;
@@ -289,7 +268,6 @@ class Products extends Component
 
         $product = ProductDetail::findOrFail($this->editingProductId);
         $product->update([
-            'product_code' => $this->product_code,
             'category_id' => $this->category_id,
             'product_name' => $this->product_name,
             'supplier_price' => $this->supplier_price,
@@ -300,6 +278,8 @@ class Products extends Component
             'status' => $this->status,
             'customer_field' => $customerField,
         ]);
+
+
 
         $this->resetFields();
         $this->showEditModal = false;

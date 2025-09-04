@@ -70,7 +70,7 @@
                         <th class="py-3">Total Quantity</th>
                         <th class="py-3">Sold</th>
                         <th class="py-3 text-center">Stock</th>
-                        
+
                         @foreach ($fieldKeys as $key)
                         <th class="text-center py-3 ">{{ $key }}</th>
                         @endforeach
@@ -95,7 +95,7 @@
                             <span class="badge bg-danger text-white px-3 py-2 rounded-pill">Out of Stock</span>
                             @endif
                         </td>
-                        
+
                         @foreach ($fieldKeys as $key)
                         <td class="text-center py-3">{{ $product->customer_field[$key] ?? '-' }}</td>
                         @endforeach
@@ -284,16 +284,6 @@
                     <div class="modal-body p-5">
                         <div class="row g-4">
                             <div class="col-md-6">
-                                <label for="edit_product_code" class="form-label fw-medium" style="color: #233D7F;">Product Code</label>
-                                <input
-                                    type="text"
-                                    id="edit_product_code"
-                                    wire:model="product_code"
-                                    class="form-control border-2 shadow-sm"
-                                    style="border-color: #233D7F; color: #233D7F;">
-                                @error('product_code') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="col-md-6">
                                 <label for="edit_category_id" class="form-label fw-medium" style="color: #233D7F;">Category</label>
                                 <select
                                     id="edit_category_id"
@@ -307,7 +297,7 @@
                                 </select>
                                 @error('category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
-                            <div class="col-md-12">
+                            <div class="col-md-6">
                                 <label for="edit_product_name" class="form-label fw-medium" style="color: #233D7F;">Product Name</label>
                                 <input
                                     type="text"
@@ -461,22 +451,50 @@
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #233D7F; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+
+                <!-- Modal Header -->
                 <div class="modal-header py-3 px-4" style="background-color: #233D7F; color: white;">
                     <h5 class="modal-title fw-bold tracking-tight">Add New Fields</h5>
                     <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" wire:click="$set('showAddFieldModal', false)" aria-label="Close"></button>
                 </div>
+
+                <!-- Modal Body -->
                 <div class="modal-body p-5">
-                    <textarea wire:model="newFieldKey" class="form-control border-2 shadow-sm" placeholder="Enter field names separated by commas, e.g., Color, Size, Material" style="border-color: #233D7F; color: #233D7F; min-height: 100px;"></textarea>
+                    <!-- Input for new fields -->
+                    <input wire:model="newFieldKey" class="form-control border-2 shadow-sm mb-3" placeholder="Enter field names" style="border-color: #233D7F; color: #233D7F; " />
                     @error('newFieldKey') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+
+                    <!-- Display all fields (existing + newly added) -->
+                    @if (!empty($fieldKeys))
+                    <div class="mt-4">
+                        <h6 class="fw-bold mb-2">Fields:</h6>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach ($fieldKeys as $field)
+                            <span class="badge bg-primary d-flex align-items-center px-3 py-2 rounded-pill">
+                                {{ $field }}
+                                <button type="button" wire:click.prevent="manageField('delete', '{{ $field }}')"
+                                    class="btn btn-sm btn-danger ms-4 rounded-circle p-0"
+                                    style="width: 20px; height: 20px; font-size: 12px; line-height: 1;">
+                                    &times;
+                                </button>
+                            </span>
+
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
                 </div>
+
+                <!-- Modal Footer -->
                 <div class="modal-footer py-3 px-4" style="border-top: 1px solid #233D7F; background: #f8f9fa;">
                     <button class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="$set('showAddFieldModal', false)" style="background-color: #6B7280; border-color: #6B7280; color: white;">Cancel</button>
-                    <button class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="addFieldKey" style="background-color: #00C8FF; border-color: #00C8FF; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">Add</button>
+                    <button class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click.prevent="manageField('add')"  style="background-color: #00C8FF; border-color: #00C8FF; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">Add</button>
                 </div>
             </div>
         </div>
     </div>
     @endif
+
 
     <!-- Delete Field Modal -->
     @if ($showDeleteFieldModal)

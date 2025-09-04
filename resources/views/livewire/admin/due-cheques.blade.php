@@ -221,15 +221,15 @@
                                             </span>
                                         </div>
                                         @if (now()->gt($payment->due_date))
-                                        <span class="badge text-danger text-xs mt-1" style="background-color: #ef4444; color: #ffffff; padding: 6px 12px; border-radius: 9999px;">
+                                        <span class="badge text-xs mt-1" style="background-color: #ef4444; color: #ffffff; padding: 6px 12px; border-radius: 9999px;">
                                             {{ now()->diffForHumans($payment->due_date, ['parts' => 1]) }} overdue
                                         </span>
                                         @elseif(now()->diffInDays($payment->due_date) <= 3)
-                                            <span class="badge text-danger text-xs mt-1" style="background-color: #ef4444; color: #ffffff; padding: 6px 12px; border-radius: 9999px;">
+                                            <span class="badge  text-xs mt-1" style="background-color: #ef4444; color: #ffffff; padding: 6px 12px; border-radius: 9999px;">
                                             Due in {{ now()->diffForHumans($payment->due_date, ['parts' => 1]) }}
                                             </span>
                                             @else
-                                            <span class="badge text-info text-xs mt-1" style="background-color: #0ea5e9; color: #ffffff; padding: 6px 12px; border-radius: 9999px;">
+                                            <span class="badge text-xs mt-1" style="background-color: #0ea5e9; color: #ffffff; padding: 6px 12px; border-radius: 9999px;">
                                                 Due in {{ now()->diffForHumans($payment->due_date, ['parts' => 1]) }}
                                             </span>
                                             @endif

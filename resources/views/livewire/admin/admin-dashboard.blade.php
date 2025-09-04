@@ -600,7 +600,7 @@
                         data: totals,
                         borderColor: '#233D7F',
                         backgroundColor: 'rgba(35, 61, 127, 0.2)',
-                        tension: 0,
+                        tension: 0.3,
                         fill: true,
                         pointBackgroundColor: '#233D7F',
                         pointRadius: 3

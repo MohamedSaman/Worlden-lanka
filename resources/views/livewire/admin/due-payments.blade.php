@@ -29,7 +29,7 @@
                                         <div>
                                             <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Pending Payment</p>
                                             <div class="d-flex align-items-baseline mt-1">
-                                                <h3 class="mb-0 fw-bold text-gray-800">{{ $duePayments->where('status', null)->count() }}</h3>
+                                                <h3 class="mb-0 fw-bold text-gray-800">{{$pendingPaymentsCount}}</h3>
                                                 <span class="badge bg-info bg-opacity-10 text-info ms-2 rounded-full" style="padding: 6px 12px;">To Collect</span>
                                             </div>
                                         </div>
@@ -49,7 +49,7 @@
                                         <div>
                                             <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Awaiting Approval</p>
                                             <div class="d-flex align-items-baseline mt-1">
-                                                <h3 class="mb-0 fw-bold text-gray-800">{{ $duePayments->where('status', 'pending')->count() }}</h3>
+                                                <h3 class="mb-0 fw-bold text-gray-800">{{ $awaitingApprovalCount }}</h3>
                                                 <span class="badge bg-warning bg-opacity-10 text-warning ms-2 rounded-full" style="padding: 6px 12px;">In Review</span>
                                             </div>
                                         </div>
@@ -70,7 +70,7 @@
                                             <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Overdue</p>
                                             <div class="d-flex align-items-baseline mt-1">
                                                 <h3 class="mb-0 fw-bold text-gray-800">
-                                                    {{ $duePayments->where('status', null)->filter(function($payment) { return now()->gt($payment->due_date); })->count() }}
+                                                    {{ $overdueCount }}
                                                 </h3>
                                                 <span class="badge bg-danger bg-opacity-10 text-danger ms-2 rounded-full" style="padding: 6px 12px;">Attention</span>
                                             </div>
@@ -92,7 +92,7 @@
                                             <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Total Due</p>
                                             <div class="d-flex align-items-baseline mt-1">
                                                 <h4 class="mb-0 fw-bold text-gray-800">
-                                                    Rs.{{ number_format($duePayments->where('status', null)->sum('amount'), 2) }}
+                                                    Rs.{{$totalDueAmount}}
                                                 </h4>
                                             </div>
                                         </div>

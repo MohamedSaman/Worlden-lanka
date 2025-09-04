@@ -80,7 +80,7 @@
                                 </div>
                                 @else
                                 <div style="width:30px;height:30px;background-color:#f3f4f6;border-radius:0.5rem;display:flex;align-items:center;justify-content:center; margin:0 auto;">
-                                    <i class="bi bi-watch text-gray-600"></i>
+                                    <i class="bi bi-box-seam text-gray-600"></i>
                                 </div>
                                 @endif
                             </td>

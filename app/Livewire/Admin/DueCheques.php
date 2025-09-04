@@ -96,113 +96,9 @@ class DueCheques extends Component
             $filteredQuery->whereBetween('due_date', [$startDate, $endDate]);
         }
 
-        // Compute statistics using fresh queries
-        $this->pendingChequeCount = Payment::query()
-            ->where('is_completed', false)
-            ->where('due_payment_method', 'cheque')
-            ->whereNull('status')
-            ->when($this->search, function ($query) {
-                $query->whereHas('sale', function ($q) {
-                    $q->where('invoice_number', 'like', "%{$this->search}%")
-                      ->orWhereHas('customer', function ($q2) {
-                          $q2->where('name', 'like', "%{$this->search}%")
-                             ->orWhere('phone', 'like', "%{$this->search}%");
-                      });
-                });
-            })
-            ->when($this->filters['status'] === 'null', function ($query) {
-                $query->whereNull('status');
-            }, function ($query) {
-                if ($this->filters['status']) {
-                    $query->where('status', $this->filters['status']);
-                }
-            })
-            ->when($this->filters['dateRange'], function ($query) {
-                [$startDate, $endDate] = explode(' to ', $this->filters['dateRange']);
-                $query->whereBetween('due_date', [$startDate, $endDate]);
-            })
-            ->count();
-
-            // dd($this->pendingChequeCount);
-
-        $this->awaitingApprovalCount = Payment::query()
-            ->where('is_completed', false)
-            ->where('due_payment_method', 'cheque')
-            ->whereHas('sale', function ($query) {
-                $query->where('user_id', auth()->id());
-            })
-            ->where('status', 'pending')
-            ->when($this->search, function ($query) {
-                $query->whereHas('sale', function ($q) {
-                    $q->where('invoice_number', 'like', "%{$this->search}%")
-                      ->orWhereHas('customer', function ($q2) {
-                          $q2->where('name', 'like', "%{$this->search}%")
-                             ->orWhere('phone', 'like', "%{$this->search}%");
-                      });
-                });
-            })
-            ->when($this->filters['status'] === 'null', function ($query) {
-                $query->whereNull('status');
-            }, function ($query) {
-                if ($this->filters['status']) {
-                    $query->where('status', $this->filters['status']);
-                }
-            })
-            ->when($this->filters['dateRange'], function ($query) {
-                [$startDate, $endDate] = explode(' to ', $this->filters['dateRange']);
-                $query->whereBetween('due_date', [$startDate, $endDate]);
-            })
-            ->count();
-
-        $this->returnChequeCount = Payment::query()
-            ->where('is_completed', false)
-            ->where('due_payment_method', 'cheque')
-            ->where('status' , 'rejected')
-            ->whereHas('sale', function ($query) {
-                $query->where('user_id', auth()->id());
-            })
-            ->where('due_date', '<', now())
-            ->when($this->search, function ($query) {
-                $query->whereHas('sale', function ($q) {
-                    $q->where('invoice_number', 'like', "%{$this->search}%")
-                      ->orWhereHas('customer', function ($q2) {
-                          $q2->where('name', 'like', "%{$this->search}%")
-                             ->orWhere('phone', 'like', "%{$this->search}%");
-                      });
-                });
-            })
-            ->count();
-
-        $this->totalDueAmount = Payment::query()
-            ->where('is_completed', false)
-            ->where('due_payment_method', 'cheque')
-            ->whereHas('sale', function ($query) {
-                $query->where('user_id', auth()->id());
-            })
-            ->whereNull('status')
-            ->when($this->search, function ($query) {
-                $query->whereHas('sale', function ($q) {
-                    $q->where('invoice_number', 'like', "%{$this->search}%")
-                      ->orWhereHas('customer', function ($q2) {
-                          $q2->where('name', 'like', "%{$this->search}%")
-                             ->orWhere('phone', 'like', "%{$this->search}%");
-                      });
-                });
-            })
-            ->when($this->filters['status'] === 'null', function ($query) {
-                $query->whereNull('status');
-            }, function ($query) {
-                if ($this->filters['status']) {
-                    $query->where('status', $this->filters['status']);
-                }
-            })
-            ->when($this->filters['dateRange'], function ($query) {
-                [$startDate, $endDate] = explode(' to ', $this->filters['dateRange']);
-                $query->whereBetween('due_date', [$startDate, $endDate]);
-            })
-            ->sum('amount');
-
-        // Debug logging
+        
+         // Debug logging
+        
         Log::info('Cheque Statistics', [
             'pendingChequeCount' => $this->pendingChequeCount,
             'awaitingApprovalCount' => $this->awaitingApprovalCount,
@@ -486,10 +382,6 @@ class DueCheques extends Component
 
         return view('livewire.admin.due-cheques', [
             'duePayments' => $duePayments,
-            'pendingChequeCount' => $this->pendingChequeCount,
-            'awaitingApprovalCount' => $this->awaitingApprovalCount,
-            'returnChequeCount' => $this->returnChequeCount,
-            'totalDueAmount' => $this->totalDueAmount,
         ]);
     }
 }
