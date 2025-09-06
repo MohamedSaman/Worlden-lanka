@@ -209,11 +209,11 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('printButton').addEventListener('click', function() {
-            printWatchStockDetails();
+            printProductStockDetails();
         });
     });
 
-    function printWatchStockDetails() {
+    function printProductStockDetails() {
         const tableContent = document.querySelector('.table-responsive')?.cloneNode(true) || '';
         const printWindow = window.open('', '_blank', 'height=600,width=800');
 
@@ -255,7 +255,8 @@
                 ${tableContent.outerHTML}
                 <div class="print-footer">
                     <small>Generated on ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Colombo' })}</small><br>
-                    <small>NEW WATCH COMPANY (MR TRADING) | NO 44, DOOLMALA, THIHARIYA | Phone: (033) 228 7437</small>
+                    <small>WORLDEN LANKA</small><br>
+                    <small>20/2/1, 2nd FLOOR,HUNTER BUILDING,BANKSHALLL STREET,COLOMBO-11 | Phone: 011 - 2332786 | Email: plusaccessories.lk@gmail.com</small>
                 </div>
             </div>
         </body>

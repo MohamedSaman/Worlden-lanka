@@ -375,6 +375,18 @@
                                         </div>
                                         @endif
 
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Cheque Date</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="bi bi-calendar-date"></i>
+                                                </span>
+                                                <input type="date" class="form-control"
+                                                    wire:model=""
+                                                    min="{{ date('Y-m-d') }}">
+                                            </div>
+                                        </div>
+
                                         <!-- Bank name is still needed for cheque -->
                                         <div class="mt-2">
                                             <label class="form-label small fw-bold">Bank Name</label>
@@ -956,10 +968,7 @@
                             <i class="bi bi-receipt me-2"></i>Sales Receipt
                         </h5>
                         <div class="ms-auto d-flex gap-2">
-                            <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3 transition-all hover:shadow" wire:click="downloadReceipt" style="border-color: #00C8FF; color: #00C8FF;" onmouseover="this.style.backgroundColor='#00C8FF'; this.style.color='#FFFFFF';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#00C8FF';">
-                                <i class="bi bi-download me-1"></i>Download
-                            </button>
-                            <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3 transition-all hover:shadow" wire:click="printReceipt" style="border-color: #00C8FF; color: #00C8FF;" onmouseover="this.style.backgroundColor='#00C8FF'; this.style.color='#FFFFFF';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#00C8FF';">
+                            <button type="button" class="btn btn-sm rounded-full px-3 transition-all hover:shadow" id="printButton" style="background-color: #233D7F;border-color:#fff; color: #fff;">
                                 <i class="bi bi-printer me-1"></i>Print
                             </button>
                             <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1209,41 +1218,57 @@
 @endpush
 @push('scripts')
 <script>
-    document.addEventListener('printReceipt', function() {
-        const printContent = document.getElementById('receiptContent').innerHTML;
-        const originalContent = document.body.innerHTML;
-
-        const printStyles = `
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        margin: 0;
-                        padding: 20px;
-                        font-size: 14px;
-                    }
-                    .modal-header, .modal-footer, button {
-                        display: none !important;
-                    }
-                    .receipt-container {
-                        width: 100%;
-                        max-width: 800px;
-                        margin: 0 auto;
-                    }
-                    @media print {
-                        .no-print {
-                            display: none !important;
-                        }
-                    }
-                </style>
-            `;
-
-        document.body.innerHTML = printStyles + printContent;
-        window.print();
-        document.body.innerHTML = originalContent;
-
-        // Reinitialize Livewire after printing
-        window.Livewire.rescan();
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('printButton').addEventListener('click', function() {
+            printSalesReceipt();
+        });
     });
+
+    function printSalesReceipt() {
+        const receiptContent = document.querySelector('#receiptContent')?.cloneNode(true) || '';
+        const printWindow = window.open('', '_blank', 'height=600,width=800');
+
+        printWindow.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Sales Receipt - Print</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <style>
+            body { font-family: 'Inter', sans-serif; padding: 20px; font-size: 14px; color: #1f2937; }
+            .print-container { max-width: 900px; margin: 0 auto; }
+            .print-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #233D7F; text-align: center; }
+            .print-header h2 { color: #233D7F; font-weight: 700; }
+            table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+            th, td { padding: 8px; border: 1px solid #dee2e6; text-align: center; }
+            th { background-color: #233D7F; color: #FFFFFF; }
+            .badge { padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 500; color: #ffffff; }
+            .print-footer { margin-top: 20px; padding-top: 15px; border-top: 2px solid #e5e7eb; text-align: center; font-size: 12px; color: #6b7280; }
+            @media print {
+                .no-print { display: none; }
+                thead { display: table-header-group; }
+                tr { page-break-inside: avoid; }
+                body { padding: 10px; }
+                .print-container { max-width: 100%; }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="print-container">
+            ${receiptContent.outerHTML}
+        </div>
+    </body>
+    </html>
+    `);
+
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+    }
+
 
     document.addEventListener('closeModal', function(e) {
         const modalId = e.detail.modalId;

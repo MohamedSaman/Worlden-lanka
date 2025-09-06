@@ -4,10 +4,8 @@ namespace App\Livewire\Admin;
 
 use Livewire\Component;
 
-use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Layout;
-use Psy\Readline\Hoa\_Protocol\Readline;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
@@ -255,17 +253,20 @@ class DuePayments extends Component
         // Full dataset for counts & calculations
         $allPayments = Payment::where(function ($query) {
             $query->whereNull('status')
-                ->orWhereIn('status', ['pending', 'rejected']);
+                ->orWhereIn('status', ['pending', 'rejected'])
+                ->where('payment_method', '=', 'cash');
         })->get();
 
         // Paginated dataset for table
         $duePayments = Payment::where(function ($query) {
             $query->whereNull('status')
-                ->orWhereIn('status', ['pending', 'rejected']);
+                ->orWhereIn('status', ['pending', 'rejected'])
+                ->where('payment_method', '=', 'cash')
+                ->where('due_payment_method', '=', 'cash');
         })
-        ->orderBy('created_at', 'desc')
+        ->orderBy('due_date')
         ->paginate(10);
-
+        // dd( $duePayments);
         // Counts
         $pendingPaymentsCount =  $allPayments->where('status', null)->count();
         $awaitingApprovalCount =$allPayments->where('status', 'pending')->count();
