@@ -34,9 +34,8 @@
                                                 class="img-fluid rounded"
                                                 style="width: 60px; height: 60px; object-fit: cover;">
                                             @else
-                                            <div class="no-image bg-light d-flex align-items-center justify-content-center rounded"
-                                                style="width: 60px; height: 60px;">
-                                                <i class="fas fa-box text-muted"></i>
+                                            <div style="width:30px;height:30px;background-color:#f3f4f6;border-radius:0.5rem;display:flex;align-items:center;justify-content:center; margin:0 auto;">
+                                                <i class="bi bi-box-seam text-gray-600"></i>
                                             </div>
                                             @endif
                                         </div>
@@ -60,7 +59,7 @@
                                         </div>
 
                                         <!-- Add to Cart Button -->
-                                        <div class="product-action ms-3">
+                                        <div class="search-result-item p-2 border-bottom d-flex align-items-center" wire:key="result-{{ $result->id }}">
                                             <button class="btn btn-sm btn-primary"
                                                 wire:click="addToCart({{ $result->id }})"
                                                 {{ $result->stock_quantity <= 0 ? 'disabled' : '' }}>
@@ -114,9 +113,8 @@
                                                         alt="{{ $item['name'] }}"
                                                         style="width: 50px; height: 50px; object-fit: cover;">
                                                     @else
-                                                    <div class="avatar avatar-sm me-3 bg-gradient-secondary d-flex align-items-center justify-content-center rounded"
-                                                        style="width: 50px; height: 50px;">
-                                                        <i class="fas fa-box text-muted"></i> <!-- default product icon -->
+                                                    <div style="width:40px;height:40px;background-color:#f3f4f6;border-radius:0.5rem;display:flex;align-items:center;justify-content:center; margin-right: auto;">
+                                                        <i class="bi bi-box-seam text-gray-600"></i>
                                                     </div>
                                                     @endif
 
@@ -355,7 +353,7 @@
                                                     <i class="fas fa-calendar-alt me-2"></i>Credit Sale Details
                                                 </h6>
                                                 <p class="text-info">The total amount of <strong>Rs.{{ number_format($grandTotal, 2) }}</strong> will be recorded as a due payment.</p>
-                                                
+
                                             </div>
                                         </div>
                                         @endif

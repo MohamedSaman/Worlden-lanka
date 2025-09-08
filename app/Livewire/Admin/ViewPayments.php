@@ -27,11 +27,11 @@ class ViewPayments extends Component
     {
         try {
             $this->selectedPayment = Payment::with([
-                'sale', 
-                'sale.customer', 
-                'sale.user', 
+                'sale',
+                'sale.customer',
+                'sale.user',
                 'sale.items',
-                'sale.items.product' 
+                'sale.items.product'
             ])->findOrFail($paymentId);
 
             $this->dispatch('openModal', 'payment-receipt-modal');
@@ -54,6 +54,7 @@ class ViewPayments extends Component
 
         $query = Payment::query()
             ->with(['sale', 'sale.customer', 'sale.user'])
+            ->where('status', 'Paid') // Force only Paid status
             ->when($this->search, function ($q) {
                 return $q->whereHas('sale', function ($sq) {
                     $sq->where('invoice_number', 'like', "%{$this->search}%")
@@ -62,9 +63,6 @@ class ViewPayments extends Component
                                 ->orWhere('phone', 'like', "%{$this->search}%");
                         });
                 });
-            })
-            ->when($this->filters['status'], function ($q) {
-                return $q->where('status', $this->filters['status']);
             })
             ->when($this->filters['paymentMethod'], function ($q) {
                 return $q->where('payment_method', $this->filters['paymentMethod']);

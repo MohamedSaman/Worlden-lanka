@@ -57,7 +57,6 @@ class Products extends Component
         'selling_price' => 'required|numeric|min:0',
         'stock_quantity' => 'required|integer|min:0',
         'damage_quantity' => 'required|integer|min:0',
-        'status' => 'required|in:Available,Unavailable',
         'customer_fields.*.key' => 'required|string|max:255',
         'customer_fields.*.value' => 'nullable|string|max:255',
     ];
@@ -150,9 +149,6 @@ class Products extends Component
         }
     }
 
-
-
-
     public function toggleAddModal()
     {
         $this->showAddModal = !$this->showAddModal;
@@ -191,6 +187,8 @@ class Products extends Component
         $categoryName = ProductCategory::find($this->category_id)->name ?? 'XX';
         $categoryPrefix = strtoupper(substr($categoryName, 0, 2));
 
+
+
         $customerField = [];
         foreach ($this->customer_fields as $field) {
             if (!empty($field['key'])) {
@@ -199,15 +197,16 @@ class Products extends Component
         }
 
         try {
+            $totalQuantity = $this->stock_quantity ;
             // Create product without product_code first
             $product = ProductDetail::create([
                 'category_id' => $this->category_id,
                 'product_name' => $this->product_name,
                 'supplier_price' => $this->supplier_price,
                 'selling_price' => $this->selling_price,
-                'stock_quantity' => $this->stock_quantity,
+                'stock_quantity' => $totalQuantity - $this->damage_quantity,
                 'damage_quantity' => $this->damage_quantity,
-                'status' => $this->status,
+                'status' => 'Available',
                 'customer_field' => $customerField,
             ]);
 
@@ -257,7 +256,12 @@ class Products extends Component
     public function update()
     {
         $this->rules['product_code'] = 'required|string|max:255|unique:product_details,product_code,' . $this->editingProductId;
-        $this->validate();
+        $this->validate(
+            [],
+            [
+                'status.required' => 'Please select product status.',
+            ]
+        );
 
         $customerField = [];
         foreach ($this->customer_fields as $field) {

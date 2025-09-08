@@ -99,6 +99,9 @@ class StoreBilling extends Component
     {
         if (strlen($this->search) >= 2) {
             $this->searchResults = ProductDetail::join('product_categories', 'product_categories.id', '=', 'product_details.category_id')
+                ->where('product_details.product_name', 'LIKE', '%' . $this->search . '%')
+                ->orWhere('product_details.product_code', 'LIKE', '%' . $this->search . '%')
+                ->select('product_details.*') // Select only product_details columns to avoid ambiguity
                 ->get();
         } else {
             $this->searchResults = [];
@@ -243,14 +246,11 @@ class StoreBilling extends Component
             'id',
             'product_name',
             'product_code',
-            'description',
             'selling_price',
-            'discount_price',
             'stock_quantity',
             'damage_quantity',
             'sold',
-            'image',
-            \DB::raw("(stock_quantity - sold) as available_stock")
+            DB::raw("(stock_quantity) as available_stock")
         )
             ->where('id', $productId)
             ->first();
@@ -496,6 +496,20 @@ class StoreBilling extends Component
                         'payment_id'    => $payment->id,
                     ]);
                 }
+            } else {
+                // Save payment as credit (due) in payments table
+                Payment::create([
+                    'sale_id'         => $sale->id,
+                    'admin_sale_id'   => $adminSale->id,
+                    'amount'          => $this->grandTotal,
+                    'payment_method'  => 'credit',
+                    'payment_reference' => null,
+                    'bank_name'       => null,
+                    'is_completed'    => false,
+                    'payment_date'    => null,
+                    'status'          => null,
+                    'due_date'        => $this->balanceDueDate ?? null,
+                ]);
             }
 
             DB::commit();

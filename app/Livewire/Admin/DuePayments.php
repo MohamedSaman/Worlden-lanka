@@ -36,6 +36,14 @@ class DuePayments extends Component
     public $newDueDate;
     public $extensionReason = '';
 
+    // Cheque input fields and list
+    public $chequeNumber = '';
+    public $bankName = '';
+    public $chequeAmount = '';
+    public $chequeDate = '';
+    public $cheques = [];
+
+    public $duePayment;
     protected $listeners = ['refreshPayments' => '$refresh'];
 
     public function mount() {}
@@ -59,15 +67,49 @@ class DuePayments extends Component
         $this->paymentNote = '';
         $this->duePaymentAttachment = null;
         $this->duePaymentAttachmentPreview = null;
+        $this->receivedAmount = '';
+        $this->chequeNumber = '';
+        $this->bankName = '';
+        $this->chequeAmount = '';
+        $this->chequeDate = '';
+        $this->cheques = [];
 
         $this->dispatch('openModal', 'payment-detail-modal');
+    }
+
+    public function addCheque()
+    {
+        $this->validate([
+            'chequeNumber' => 'required',
+            'bankName' => 'required',
+            'chequeAmount' => 'required|numeric|min:0.01',
+            'chequeDate' => 'required|date',
+        ]);
+
+        $this->cheques[] = [
+            'number' => $this->chequeNumber,
+            'bank' => $this->bankName,
+            'amount' => floatval($this->chequeAmount),
+            'date' => $this->chequeDate,
+        ];
+
+        $this->chequeNumber = '';
+        $this->bankName = '';
+        $this->chequeAmount = '';
+        $this->chequeDate = '';
+    }
+
+    public function removeCheque($index)
+    {
+        if (isset($this->cheques[$index])) {
+            array_splice($this->cheques, $index, 1);
+        }
     }
 
     public function submitPayment()
     {
         $this->validate([
-            'receivedAmount' => 'required|numeric|min:0.01',
-            'duePaymentMethod' => 'required',
+            'receivedAmount' => 'nullable|numeric|min:0',
             'duePaymentAttachment' => 'nullable|file|mimes:jpg,jpeg,png,gif,pdf|max:2048',
         ]);
 
@@ -83,37 +125,49 @@ class DuePayments extends Component
                 $this->duePaymentAttachment->storeAs('public/due-receipts', $receiptName);
                 $attachmentPath = "due-receipts/{$receiptName}";
             }
-            $receivedAmount = floatval($this->receivedAmount);
-            $remainingAmount = $payment->amount - $receivedAmount;
-            if ($payment->amount >= $receivedAmount) {
-                $payment->update([
-                    'amount' => $receivedAmount,
-                    'due_payment_method' => $this->duePaymentMethod,
-                    'due_payment_attachment' => $attachmentPath,
-                    'status' => 'pending',  // Change status to pending for admin approval
-                    'payment_date' => now(),
-                ]);
 
-                // If payment method is cheque, add to Cheque table
-                if ($this->duePaymentMethod === 'cheque') {
-                    Cheque::create([
-                        'cheque_number' => $this->paymentNote ?? '', // You may want to add cheque number input
-                        'cheque_date'   => now(),
-                        'bank_name'     => '', // Add bank name input if needed
-                        'cheque_amount' => $receivedAmount,
-                        'status'        => 'pending',
-                        'customer_id'   => $payment->sale->customer_id,
-                        'payment_id'    => $payment->id,
-                    ]);
-                }
+            $cashAmount = floatval($this->receivedAmount) ?: 0;
+            $chequeTotal = collect($this->cheques)->sum('amount');
+            $totalPaid = $cashAmount + $chequeTotal;
 
-            } else {
+            if ($totalPaid <= 0) {
                 DB::rollBack();
                 $this->dispatch('showToast', [
                     'type' => 'error',
-                    'message' => 'Entered amount is too large. Please enter an amount less than or equal to the due amount.'
+                    'message' => 'Please enter a cash amount, add cheque(s), or both.'
                 ]);
                 return;
+            }
+
+            if ($totalPaid > $payment->amount) {
+                DB::rollBack();
+                $this->dispatch('showToast', [
+                    'type' => 'error',
+                    'message' => 'Total payment exceeds due amount.'
+                ]);
+                return;
+            }
+            // Update payment record
+            $payment->update([
+                'amount' => $totalPaid,
+                'due_payment_method' => $cashAmount > 0 && $chequeTotal > 0 ? 'cash+cheque' : ($chequeTotal > 0 ? 'cheque' : 'cash'),
+                'due_payment_attachment' => $attachmentPath,
+                'status' => 'Paid',
+                'is_completed' => true, 
+                'payment_date' => now(),
+            ]);
+
+            // Save cheques if any
+            foreach ($this->cheques as $cheque) {
+                Cheque::create([
+                    'cheque_number' => $cheque['number'],
+                    'cheque_date'   => $cheque['date'],
+                    'bank_name'     => $cheque['bank'],
+                    'cheque_amount' => $cheque['amount'],
+                    'status'        => 'pending',
+                    'customer_id'   => $payment->sale->customer_id,
+                    'payment_id'    => $payment->id,
+                ]);
             }
 
             // Add a note to track this payment submission
@@ -123,9 +177,15 @@ class DuePayments extends Component
                         "Payment received on " . now()->format('Y-m-d H:i') . ": " . $this->paymentNote
                 ]);
             }
+            $sale = $payment->sale; // using the relationship you already used above
+            $remainingAmount = $sale->due_amount - $totalPaid;
 
-            // If there is a remaining amount, create a new Payment record with status null
-            if ($remainingAmount > 0.01) {
+            $sale->update([
+                'due_amount' => $remainingAmount
+            ]);
+            // dd($sale->due_amount);
+            // dd($remainingAmount);
+            if ($remainingAmount > 0) {
                 Payment::create([
                     'sale_id' => $payment->sale_id,
                     'amount' => $remainingAmount,
@@ -135,6 +195,8 @@ class DuePayments extends Component
                 ]);
             }
 
+            // dd($remainingAmount);
+
             DB::commit();
 
             $this->dispatch('closeModal', 'payment-detail-modal');
@@ -143,7 +205,18 @@ class DuePayments extends Component
                 'message' => 'Payment submitted successfully and sent for admin approval'
             ]);
 
-            $this->reset(['paymentDetail', 'duePaymentMethod', 'duePaymentAttachment', 'paymentNote', 'receivedAmount']);
+            $this->reset([
+                'paymentDetail',
+                'duePaymentMethod',
+                'duePaymentAttachment',
+                'paymentNote',
+                'receivedAmount',
+                'chequeNumber',
+                'bankName',
+                'chequeAmount',
+                'chequeDate',
+                'cheques'
+            ]);
         } catch (Exception $e) {
             DB::rollback();
             $this->dispatch('showToast', [
@@ -153,47 +226,47 @@ class DuePayments extends Component
         }
     }
 
-    public function openExtendDueModal($paymentId)
-    {
-        $this->extendDuePaymentId = $paymentId;
-        $payment = Payment::findOrFail($paymentId);
+    // public function openExtendDueModal($paymentId)
+    // {
+    //     $this->extendDuePaymentId = $paymentId;
+    //     $payment = Payment::findOrFail($paymentId);
 
-        $this->newDueDate = $payment->due_date->addDays(7)->format('Y-m-d');
-        $this->extensionReason = '';
+    //     $this->newDueDate = $payment->due_date->addDays(7)->format('Y-m-d');
+    //     $this->extensionReason = '';
 
-        $this->dispatch('openModal', 'extend-due-modal');
-    }
+    //     $this->dispatch('openModal', 'extend-due-modal');
+    // }
 
-    public function extendDueDate()
-    {
-        $this->validate([
-            'extensionReason' => 'required|min:5',
-            'newDueDate' => 'required|date|after_or_equal:' . date('Y-m-d'),
-        ]);
+    // public function extendDueDate()
+    // {
+    //     $this->validate([
+    //         'extensionReason' => 'required|min:5',
+    //         'newDueDate' => 'required|date|after_or_equal:' . date('Y-m-d'),
+    //     ]);
 
-        try {
-            $payment = Payment::findOrFail($this->extendDuePaymentId);
-            $oldDueDate = $payment->due_date->format('Y-m-d');
-            $payment->update([
-                'due_date' => $this->newDueDate,
-            ]);
-            $payment->sale->update([
-                'notes' => ($payment->sale->notes ? $payment->sale->notes . "\n" : '') .
-                    "Due date extended from {$oldDueDate} to {$this->newDueDate}: {$this->extensionReason}"
-            ]);
-            $this->dispatch('closeModal', 'extend-due-modal');
-            $this->dispatch('showToast', [
-                'type' => 'success',
-                'message' => 'Due date extended successfully'
-            ]);
-            $this->reset(['extendDuePaymentId', 'newDueDate', 'extensionReason']);
-        } catch (Exception $e) {
-            $this->dispatch('showToast', [
-                'type' => 'error',
-                'message' => 'Failed to extend due date: ' . $e->getMessage()
-            ]);
-        }
-    }
+    //     try {
+    //         $payment = Payment::findOrFail($this->extendDuePaymentId);
+    //         $oldDueDate = $payment->due_date->format('Y-m-d');
+    //         $payment->update([
+    //             'due_date' => $this->newDueDate,
+    //         ]);
+    //         $payment->sale->update([
+    //             'notes' => ($payment->sale->notes ? $payment->sale->notes . "\n" : '') .
+    //                 "Due date extended from {$oldDueDate} to {$this->newDueDate}: {$this->extensionReason}"
+    //         ]);
+    //         $this->dispatch('closeModal', 'extend-due-modal');
+    //         $this->dispatch('showToast', [
+    //             'type' => 'success',
+    //             'message' => 'Due date extended successfully'
+    //         ]);
+    //         $this->reset(['extendDuePaymentId', 'newDueDate', 'extensionReason']);
+    //     } catch (Exception $e) {
+    //         $this->dispatch('showToast', [
+    //             'type' => 'error',
+    //             'message' => 'Failed to extend due date: ' . $e->getMessage()
+    //         ]);
+    //     }
+    // }
 
     private function getFilePreviewInfo($file)
     {
@@ -237,12 +310,15 @@ class DuePayments extends Component
     {
         $allPayments = Payment::where(function ($query) {
             if ($this->search) {
-                $query->whereHas('sale.customer', function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('phone', 'like', '%' . $this->search . '%');
-                })
-                ->orWhere('invoice_number', 'like', '%' . $this->search . '%');
+                $query->whereHas('sale', function ($q) {
+                    $q->where('invoice_number', 'like', '%' . $this->search . '%')
+                        ->orWhereHas('customer', function ($c) {
+                            $c->where('name', 'like', '%' . $this->search . '%')
+                                ->orWhere('phone', 'like', '%' . $this->search . '%');
+                        });
+                });
             }
+
             if ($this->filters['status'] !== '') {
                 if ($this->filters['status'] === 'null') {
                     $query->whereNull('status');
@@ -250,17 +326,20 @@ class DuePayments extends Component
                     $query->where('status', $this->filters['status']);
                 }
             }
-            // Add date range filter if needed
         })->get();
+
 
         $duePayments = Payment::where(function ($query) {
             if ($this->search) {
-                $query->whereHas('sale.customer', function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                      ->orWhere('phone', 'like', '%' . $this->search . '%');
-                })
-                ->orWhere('invoice_number', 'like', '%' . $this->search . '%');
+                $query->whereHas('sale', function ($q) {
+                    $q->where('invoice_number', 'like', '%' . $this->search . '%')
+                        ->orWhereHas('customer', function ($c) {
+                            $c->where('name', 'like', '%' . $this->search . '%')
+                                ->orWhere('phone', 'like', '%' . $this->search . '%');
+                        });
+                });
             }
+
             if ($this->filters['status'] !== '') {
                 if ($this->filters['status'] === 'null') {
                     $query->whereNull('status');
@@ -268,19 +347,14 @@ class DuePayments extends Component
                     $query->where('status', $this->filters['status']);
                 }
             }
-            // Add date range filter if needed
         })
-        ->orderBy('due_date')
-        ->paginate(10);
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
 
         $duePaymentsCount = $allPayments->where('status', null)->count();
-        $awaitingApprovalCount = $allPayments->where('status', 'pending')->count();
-        $overdueCount = $allPayments->where(function ($q) {
-            $q->whereNull('status')->where('due_date', '<', now());
-        })->count();
-        $totalDue = $allPayments->sum('amount');
+        $totalDue = Payment::whereNull('status')->sum('amount');
 
-        // Add status badge for each payment
         foreach ($duePayments as $payment) {
             if ($payment->status === null) {
                 $payment->status_badge = '<span class="badge bg-info">Pending</span>';
@@ -298,9 +372,12 @@ class DuePayments extends Component
         return view('livewire.admin.due-payments', [
             'duePayments' => $duePayments,
             'duePaymentsCount' => $duePaymentsCount,
-            'awaitingApprovalCount' => $awaitingApprovalCount,
-            'overdueCount' => $overdueCount,
             'totalDue' => $totalDue,
+            'cheques' => $this->cheques,
+            'chequeNumber' => $this->chequeNumber,
+            'bankName' => $this->bankName,
+            'chequeAmount' => $this->chequeAmount,
+            'chequeDate' => $this->chequeDate,
         ]);
     }
 }

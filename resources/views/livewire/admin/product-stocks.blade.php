@@ -255,7 +255,8 @@
                 ${tableContent.outerHTML}
                 <div class="print-footer">
                     <small>Generated on ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Colombo' })}</small><br>
-                    <small>WORLDEN LANKA</small><br>
+                    <p>PLUS</p><br>
+                    <small>Importers Of Garment Accessories & Machinery</small><br>
                     <small>20/2/1, 2nd FLOOR,HUNTER BUILDING,BANKSHALLL STREET,COLOMBO-11 | Phone: 011 - 2332786 | Email: plusaccessories.lk@gmail.com</small>
                 </div>
             </div>

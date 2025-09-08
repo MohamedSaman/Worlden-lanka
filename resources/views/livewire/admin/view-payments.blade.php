@@ -169,9 +169,7 @@
                                 <td>
                                     <span class="badge bg-{{ 
                                             $payment->status === 'pending' ? 'warning' : 
-                                            ($payment->status === 'approved' ? 'success' : 
-                                            ($payment->status === 'rejected' ? 'danger' : 
-                                            ($payment->is_completed ? 'success' : 'secondary'))) }}">
+                                            ($payment->status === 'Paid' ? 'success' : 'secondary') }}">
                                         {{ $payment->status ? ucfirst($payment->status) : ($payment->is_completed ? 'Paid' : 'Scheduled') }}
                                     </span>
                                 </td>

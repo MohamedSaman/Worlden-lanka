@@ -38,48 +38,6 @@
                             </div>
                         </div>
 
-                        <!-- Awaiting Approval Card -->
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-sm rounded-4 h-100 transition-all hover:scale-105">
-                                <div class="card-body p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-warning bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-clock-history text-warning"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Awaiting Approval</p>
-                                            <div class="d-flex align-items-baseline mt-1">
-                                                <h3 class="mb-0 fw-bold text-gray-800">{{ $awaitingApprovalCount }}</h3>
-                                                <span class="badge bg-warning bg-opacity-10 text-warning ms-2 rounded-full" style="padding: 6px 12px;">In Review</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Overdue Payments Card -->
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-sm rounded-4 h-100 transition-all hover:scale-105">
-                                <div class="card-body p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-exclamation-circle text-danger"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Overdue</p>
-                                            <div class="d-flex align-items-baseline mt-1">
-                                                <h3 class="mb-0 fw-bold text-gray-800">
-                                                    {{ $overdueCount }}
-                                                </h3>
-                                                <span class="badge bg-danger bg-opacity-10 text-danger ms-2 rounded-full" style="padding: 6px 12px;">Attention</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Total Due Amount Card -->
                         <div class="col-xl-3 col-md-6">
                             <div class="card border-0 shadow-sm rounded-4 h-100 transition-all hover:scale-105">
@@ -180,7 +138,6 @@
                                     <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Invoice</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3" style="color: #1e3a8a;">Customer</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Amount</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Due Date</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Status</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Actions</th>
                                 </tr>
@@ -207,65 +164,30 @@
                                     </td>
                                     <td class="text-center" data-label="Amount">
                                         <div class="d-flex align-items-center justify-content-center">
-                                            <div class="icon-shape icon-xs rounded-circle bg-success bg-opacity-10 me-2 text-center">
-                                                <i class="bi bi-currency-dollar text-success"></i>
-                                            </div>
                                             <span class="text-sm fw-semibold text-gray-800">Rs.{{ number_format($payment->amount, 2) }}</span>
                                         </div>
                                     </td>
-                                    <td class="text-center" data-label="Due Date">
-                                        <div class="d-flex align-items-center justify-content-center">
-                                            <div class="icon-shape icon-xs rounded-circle 
-                                                {{ now()->gt($payment->due_date) || now()->diffInDays($payment->due_date) <= 3 ? 'bg-danger bg-opacity-10' : 'bg-info bg-opacity-10' }} 
-                                                me-2 text-center text-white">
-                                                <i class="bi bi-calendar-date {{ now()->gt($payment->due_date) || now()->diffInDays($payment->due_date) <= 3 ? 'text-danger' : 'text-info' }}"></i>
-                                            </div>
-                                            <span class="text-sm {{ now()->gt($payment->due_date) || now()->diffInDays($payment->due_date) <= 3 ? 'text-danger fw-bold' : 'text-gray-800' }}">
-                                                {{ $payment->due_date ? $payment->due_date->format('d M Y') : 'N/A' }}
-                                            </span>
-                                        </div>
-                                        @if (now()->gt($payment->due_date))
-                                        <span class="badge  text-xs mt-1" style="background-color: #ef4444; color: #ffffff; padding: 6px 12px; border-radius: 9999px;">
-                                            {{ now()->diffForHumans($payment->due_date, ['parts' => 1]) }} overdue
-                                        </span>
-                                        @elseif(now()->diffInDays($payment->due_date) <= 3)
-                                            <span class="badge  text-xs mt-1" style="background-color: #ef4444; color: #ffffff; padding: 6px 12px; border-radius: 9999px;">
-                                            Due in {{ now()->diffForHumans($payment->due_date, ['parts' => 1]) }}
-                                            </span>
-                                            @else
-                                            <span class="badge text-xs mt-1" style="background-color: #0ea5e9; color: #ffffff; padding: 6px 12px; border-radius: 9999px;">
-                                                Due in {{ now()->diffForHumans($payment->due_date, ['parts' => 1]) }}
-                                            </span>
-                                            @endif
-                                    </td>
                                     <td class="text-center" data-label="Status">
-                                        {!! $payment->status_badge !!}
+                                        @if ($payment->status === null)
+                                        <span class="badge bg-danger bg-opacity-10 text-danger rounded-full px-3 py-1" style="font-size: 0.75rem;">Pending</span>
+
+                                        @elseif($payment->status === 'Paid')
+                                        <span class="badge bg-success bg-opacity-10 text-success rounded-full px-3 py-1" style="font-size: 0.75rem;">Paid</span>
+
+                                        @else
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-full px-3 py-1" style="font-size: 0.75rem;">No show</span>
+                                        @endif
                                     </td>
                                     <td class="text-center" data-label="Actions">
                                         @if ($payment->status === null)
-                                        <div class="btn-group">
-                                            <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                                                wire:click="getPaymentDetails({{ $payment->id }})">
-                                                <i class="bi bi-currency-dollar me-1"></i> Receive
-                                            </button>
-                                            <button class="btn btn-light rounded-full shadow-sm px-4 py-2 ms-2 transition-transform hover:scale-105"
-                                                wire:click="openExtendDueModal({{ $payment->id }})">
-                                                <i class="bi bi-calendar-plus me-1"></i> Extend Due
-                                            </button>
-                                        </div>
-                                        @elseif($payment->status === 'pending')
-                                        <span class="btn btn-light rounded-full shadow-sm px-4 py-2 disabled opacity-75">
-                                            <i class="bi bi-hourglass-split me-1"></i> Awaiting
-                                        </span>
-                                        @elseif($payment->status === 'rejected')
-                                        <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
+                                        <button class="btn btn-primary text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
                                             wire:click="getPaymentDetails({{ $payment->id }})">
-                                            <i class="bi bi-arrow-repeat me-1"></i> Resubmit
+                                            <i class="bi bi-currency-dollar me-1"></i> Receive
                                         </button>
                                         @else
-                                        <span class="btn btn-light rounded-full shadow-sm px-4 py-2 disabled opacity-75">
-                                            <i class="bi bi-check-circle me-1"></i> Complete
-                                        </span>
+                                        <button class="btn btn-success text-white rounded-full shadow-sm px-4 py-2 pe-none">
+                                            <i class="bi bi-check-circle-fill me-1"></i> Paid
+                                        </button>
                                         @endif
                                     </td>
                                 </tr>
@@ -283,9 +205,18 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="px-4 py-3 border-top">
-                        {{ $duePayments->links() }}
+                    @if ($duePayments->hasPages())
+                    <div class="card-footer p-4 bg-white border-top rounded-b-4">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                            <div class="text-sm text-gray-600">
+                                Showing <span class="fw-semibold text-gray-800">{{ $duePayments->firstItem() }}</span> to <span class="fw-semibold text-gray-800">{{ $duePayments->lastItem() }}</span> of <span class="fw-semibold text-gray-800">{{ $duePayments->total() }}</span> results
+                            </div>
+                            <div class="pagination-container">
+                                {{ $duePayments->links('pagination::bootstrap-5') }}
+                            </div>
+                        </div>
                     </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -316,218 +247,147 @@
                             </div>
                             <h6 class="text-uppercase text-sm fw-semibold mb-3 border-bottom pb-2" style="color: #1e3a8a;">Invoice Details</h6>
                             <div class="mb-3">
-                                <p class="mb-2 d-flex justify-content-between text-sm">
+                                <p class="mb-2">
                                     <span class="text-gray-600">Invoice:</span>
-                                    <span class="fw-bold text-gray-800">{{ $paymentDetail->sale->invoice_number }}</span>
+                                    <span class="fw-bold text-gray-800 fs-6">{{ $paymentDetail->sale->invoice_number }}</span>
                                 </p>
                                 <p class="mb-2 d-flex justify-content-between text-sm">
                                     <span class="text-gray-600">Sale Date:</span>
                                     <span class="text-gray-800">{{ $paymentDetail->sale->created_at->format('d/m/Y') }}</span>
                                 </p>
-                                <p class="mb-2 d-flex justify-content-between text-sm">
-                                    <span class="text-gray-600">Due Date:</span>
-                                    <span class="{{ now()->gt($paymentDetail->due_date) ? 'text-danger fw-bold' : 'text-gray-800' }}">
-                                        {{ $paymentDetail->due_date->format('d/m/Y') }}
-                                    </span>
-                                </p>
-                                <div class="card border-0 shadow-sm rounded-4 p-3 mt-3">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span class="text-sm text-gray-600">Amount Due:</span>
-                                        <span class="fw-bold text-primary" style="font-size: 1.5rem; color: #1e3a8a;">Rs.{{ number_format($paymentDetail->amount, 2) }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            @if (strpos($paymentDetail->sale->notes ?? '', 'Due date extended') !== false)
-                            <div class="alert alert-warning bg-warning bg-opacity-10 border-0 rounded-4 mt-3 p-3 text-sm">
-                                <div class="d-flex">
-                                    <div class="me-2">
-                                        <i class="bi bi-exclamation-triangle-fill text-warning"></i>
-                                    </div>
+
+                                <div class="card border-0 shadow-sm rounded-4 p-3 mt-3 bg-light">
                                     <div>
-                                        <p class="mb-0 fw-bold">Due date has been extended</p>
-                                        @php
-                                        $notes = explode("\n", $paymentDetail->sale->notes);
-                                        $extensionNotes = array_filter($notes, function ($note) {
-                                        return strpos($note, 'Due date extended') !== false;
-                                        });
-                                        @endphp
-                                        @foreach ($extensionNotes as $note)
-                                        <p class="mb-0 text-xs text-gray-600">{{ $note }}</p>
-                                        @endforeach
+                                        <span class="text-sm text-gray-600">Amount Due:</span>
+                                        <span class="fw-bold" style="font-size: 1.5rem; color: #1e3a8a;">Rs.{{ number_format($paymentDetail->amount, 2) }}</span>
                                     </div>
                                 </div>
                             </div>
-                            @endif
                         </div>
 
                         <!-- Payment Form -->
-                        <div class="col-md-9">
+                        <div class="col-md-9 p-0">
                             <form wire:submit.prevent="submitPayment">
-                                <div class="row g-0">
-                                    <div class="col-lg-12">
-                                        <div class="bg-light p-4 border-bottom rounded-top-4">
-                                            <div class="d-flex align-items-center">
-                                                <div class="icon-shape icon-md rounded-circle bg-white bg-opacity-25 p-2 me-3">
-                                                    <i class="bi bi-wallet2 text-primary fs-4"></i>
-                                                </div>
-                                                <div>
-                                                    <h5 class="mb-0 fw-bold text-gray-800" style="color: #1e3a8a;">Payment Collection</h5>
-                                                    <p class="text-sm text-gray-600 mb-0">Record customer payment details for admin approval</p>
-                                                </div>
-                                            </div>
+                                <div class="bg-light p-4 border-bottom rounded-top-end-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="icon-shape icon-md rounded-circle bg-white bg-opacity-25 p-2 me-3">
+                                            <i class="bi bi-wallet2 text-primary fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-0 fw-bold text-gray-800" style="color: #1e3a8a;">Payment Collection</h5>
+                                            <p class="text-sm text-gray-600 mb-0">Record customer payment details for admin approval</p>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6 p-4">
-                                        <div class="mb-4">
-                                            <label class="form-label text-sm fw-semibold mb-2" style="color: #1e3a8a;">Received Amount <span class="text-danger">*</span></label>
-                                            <input type="text"
-                                                class="form-control rounded-4 shadow-sm @error('receivedAmount') is-invalid @enderror"
-                                                wire:model="receivedAmount"
-                                                required>
+                                </div>
+
+                                <div class="p-4">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-4">
+                                            <label class="form-label text-sm fw-semibold mb-2" style="color: #1e3a8a;">Cash Amount</label>
+                                            <input type="text" class="form-control rounded-4 shadow-sm @error('receivedAmount') is-invalid @enderror" wire:model="receivedAmount" placeholder="Enter cash amount">
                                             @error('receivedAmount')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
-                                            <label class="form-label text-sm fw-semibold mb-2 mt-3" style="color: #1e3a8a;">Payment Method <span class="text-danger">*</span></label>
-                                            <div class="input-group shadow-sm rounded-4">
-                                                <span class="input-group-text bg-white border-end-0">
-                                                    <i class="bi bi-credit-card text-primary"></i>
-                                                </span>
-                                                <select class="form-select border-start-0 ps-0 rounded-end-4 @error('duePaymentMethod') is-invalid @enderror"
-                                                    wire:model="duePaymentMethod"
-                                                    required>
-                                                    <option value="">-- Select payment method --</option>
-                                                    <option value="cash">Cash</option>
-                                                    <option value="cheque">Cheque</option>
-                                                    <option value="bank_transfer">Bank Transfer</option>
-                                                    <option value="credit_card">Credit Card</option>
-                                                    <option value="debit_card">Debit Card</option>
-                                                </select>
-                                                @error('duePaymentMethod')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="border rounded-4 p-3 mb-4 shadow-sm bg-light">
+                                        <h6 class="text-sm fw-semibold mb-3" style="color: #1e3a8a;">Add Cheque Details</h6>
+                                        <div class="row g-3 align-items-end">
+                                            <div class="col-md-6">
+                                                <label class="form-label text-xs fw-semibold">Cheque No. <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control form-control-sm rounded-3 shadow-sm" wire:model="chequeNumber" placeholder="Cheque Number">
+                                                @error('chequeNumber') <span class="text-danger text-xs">{{ $message }}</span> @enderror
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label text-xs fw-semibold">Bank Name <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control form-control-sm rounded-3 shadow-sm" wire:model="bankName" placeholder="Bank Name">
+                                                @error('bankName') <span class="text-danger text-xs">{{ $message }}</span> @enderror
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label text-xs fw-semibold">Amount <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control form-control-sm rounded-3 shadow-sm" wire:model="chequeAmount" placeholder="Amount">
+                                                @error('chequeAmount') <span class="text-danger text-xs">{{ $message }}</span> @enderror
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label text-xs fw-semibold">Cheque Date <span class="text-danger">*</span></label>
+                                                <input type="date" class="form-control form-control-sm rounded-3 shadow-sm" wire:model="chequeDate">
+                                                @error('chequeDate') <span class="text-danger text-xs">{{ $message }}</span> @enderror
+                                            </div>
+                                            <div class="col-md-2">
+                                                <button type="button" wire:click="addCheque" class="btn btn-primary btn-sm w-100 rounded-3 shadow-sm">
+                                                    <i class="bi bi-plus-circle me-1"></i> Add
+                                                </button>
                                             </div>
                                         </div>
-                                        <div class="mb-4">
+                                    </div>
+
+                                    <div class="table-responsive mb-4">
+                                        <table class="table table-bordered table-sm align-middle">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th class="text-xs fw-semibold text-center">Cheque No.</th>
+                                                    <th class="text-xs fw-semibold">Bank</th>
+                                                    <th class="text-xs fw-semibold text-center">Date</th>
+                                                    <th class="text-xs fw-semibold text-end">Amount</th>
+                                                    <th class="text-xs fw-semibold text-center">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse($cheques as $index => $cheque)
+                                                <tr>
+                                                    <td class="text-center">{{ $cheque['number'] }}</td>
+                                                    <td>{{ $cheque['bank'] }}</td>
+                                                    <td class="text-center">{{ \Carbon\Carbon::parse($cheque['date'])->format('d/m/Y') }}</td>
+                                                    <td class="text-end">Rs.{{ number_format($cheque['amount'], 2) }}</td>
+                                                    <td class="text-center">
+                                                        <button type="button" wire:click="removeCheque({{ $index }})" class="btn btn-danger btn-sm p-0" style="width: 24px; height: 24px; line-height: 1;">
+                                                            <i class="bi bi-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                @empty
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted py-3">No cheques added yet.</td>
+                                                </tr>
+                                                @endforelse
+                                            </tbody>
+                                            @if(!empty($cheques))
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="3" class="text-end fw-bold">Total Cheque Amount:</td>
+                                                    <td class="text-end fw-bold">Rs.{{ number_format(collect($cheques)->sum('amount'), 2) }}</td>
+                                                    <td></td>
+                                                </tr>
+                                            </tfoot>
+                                            @endif
+                                        </table>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-12 mb-4">
                                             <label class="form-label text-sm fw-semibold mb-2" style="color: #1e3a8a;">Payment Notes</label>
-                                            <textarea class="form-control rounded-4 shadow-sm"
-                                                rows="3"
-                                                wire:model="paymentNote"
-                                                placeholder="Add any notes about this payment (optional)"></textarea>
-                                            <div class="form-text text-sm text-gray-600">Include any specific details about this payment.</div>
-                                        </div>
-                                        <div class="alert alert-info bg-info bg-opacity-10 border-0 rounded-4 d-flex align-items-center shadow-sm p-3">
-                                            <i class="bi bi-info-circle-fill text-info fs-5 me-3"></i>
-                                            <div>
-                                                <p class="mb-0 text-sm text-gray-800">This payment will be sent for admin approval.</p>
-                                                <p class="mb-0 text-xs text-gray-600">The customer's account will be updated once approved.</p>
-                                            </div>
+                                            <textarea class="form-control rounded-4 shadow-sm" rows="3" wire:model="paymentNote" placeholder="Add any notes about this payment (optional)"></textarea>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6 p-4 bg-light border-start rounded-end-4">
-                                        <div class="mb-4">
-                                            <label class="form-label text-sm fw-semibold mb-2" style="color: #1e3a8a;">Payment Receipt/Document</label>
-                                            <div class="input-group shadow-sm rounded-4 mb-2">
-                                                <span class="input-group-text bg-white border-end-0">
-                                                    <i class="bi bi-file-earmark-image text-primary"></i>
-                                                </span>
-                                                <input type="file"
-                                                    class="form-control border-start-0 ps-0 rounded-end-4 @error('duePaymentAttachment') is-invalid @enderror"
-                                                    wire:model="duePaymentAttachment">
-                                                @error('duePaymentAttachment')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                            <div class="form-text text-sm text-gray-600">Upload receipt, cheque image, or other payment proof.</div>
-                                        </div>
-                                        <div class="card border-0 shadow-sm rounded-4 bg-white">
-                                            <div class="card-header p-3" style="background-color: #eff6ff;">
-                                                <div class="d-flex align-items-center">
-                                                    <i class="bi bi-image text-primary me-2"></i>
-                                                    <span class="text-sm fw-semibold" style="color: #1e3a8a;">Document Preview</span>
-                                                </div>
-                                            </div>
-                                            <div class="card-body p-0 text-center">
-                                                @if ($duePaymentAttachment)
-                                                <div class="position-relative">
-                                                    @if(is_array($duePaymentAttachmentPreview))
-                                                    @if($duePaymentAttachmentPreview['type'] === 'pdf')
-                                                    <div class="d-flex flex-column align-items-center p-4">
-                                                        <i class="bi bi-file-earmark-pdf text-danger fs-1 mb-2"></i>
-                                                        <span class="text-sm text-gray-600">PDF document</span>
-                                                        <span class="text-xs text-gray-600">{{ $duePaymentAttachment->getClientOriginalName() }}</span>
-                                                    </div>
-                                                    @elseif($duePaymentAttachmentPreview['type'] === 'image' && !empty($duePaymentAttachmentPreview['preview']))
-                                                    <img src="{{ $duePaymentAttachmentPreview['preview'] }}"
-                                                        class="img-fluid"
-                                                        style="max-height: 200px;">
-                                                    @else
-                                                    <div class="d-flex flex-column align-items-center p-4">
-                                                        <i class="bi {{ $duePaymentAttachmentPreview['icon'] ?? 'bi-file-earmark' }} {{ $duePaymentAttachmentPreview['color'] ?? 'text-gray-600' }} fs-1 mb-2"></i>
-                                                        <span class="text-sm text-gray-600">File attached</span>
-                                                        <span class="text-xs text-gray-600">{{ $duePaymentAttachment->getClientOriginalName() }}</span>
-                                                    </div>
-                                                    @endif
-                                                    @else
-                                                    <div class="d-flex flex-column align-items-center p-4">
-                                                        <i class="bi bi-file-earmark text-gray-600 fs-1 mb-2"></i>
-                                                        <span class="text-sm text-gray-600">File attached</span>
-                                                        <span class="text-xs text-gray-600">{{ $duePaymentAttachment->getClientOriginalName() }}</span>
-                                                    </div>
-                                                    @endif
-                                                    <div class="position-absolute bottom-0 start-0 end-0 py-2 px-3 bg-dark bg-opacity-50 text-white text-start text-sm">
-                                                        <i class="bi bi-check-circle-fill text-success me-1"></i> New attachment preview
-                                                    </div>
-                                                </div>
-                                                @elseif($paymentDetail && $paymentDetail->due_payment_attachment)
-                                                <div class="position-relative">
-                                                    @php
-                                                    $attachment = is_array($paymentDetail->due_payment_attachment)
-                                                    ? ($paymentDetail->due_payment_attachment[0] ?? '')
-                                                    : $paymentDetail->due_payment_attachment;
-                                                    @endphp
-                                                    @if(pathinfo($attachment, PATHINFO_EXTENSION) === 'pdf')
-                                                    <div class="d-flex flex-column align-items-center p-4">
-                                                        <i class="bi bi-file-earmark-pdf text-danger fs-1 mb-2"></i>
-                                                        <a href="{{ asset('public/storage/' . $attachment) }}"
-                                                            target="_blank"
-                                                            class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105">
-                                                            <i class="bi bi-eye me-1"></i> View PDF
-                                                        </a>
-                                                    </div>
-                                                    @else
-                                                    <img src="{{ asset('public/storage/' . $attachment) }}"
-                                                        class="img-fluid"
-                                                        style="max-height: 200px;"
-                                                        onerror="this.onerror=null; this.src=''; this.parentNode.innerHTML='<div class=\'d-flex flex-column align-items-center p-4\'><i class=\'bi bi-file-earmark-image text-primary fs-1 mb-2\'></i><span class=\'text-sm text-gray-600\'>Image (cannot display preview)</span></div>';">
-                                                    @endif
-                                                    <div class="position-absolute bottom-0 start-0 end-0 py-2 px-3 bg-dark bg-opacity-50 text-white text-start text-sm">
-                                                        <i class="bi bi-exclamation-circle-fill text-warning me-1"></i> Existing attachment
-                                                    </div>
-                                                </div>
-                                                @else
-                                                <div class="p-5 d-flex flex-column align-items-center">
-                                                    <div class="icon-shape icon-md bg-light rounded-circle mb-3">
-                                                        <i class="bi bi-file-earmark-plus fs-4 text-gray-600"></i>
-                                                    </div>
-                                                    <p class="text-sm text-gray-600 mb-0">No document attached</p>
-                                                    <p class="text-xs text-gray-600">Upload receipt or payment proof</p>
-                                                </div>
-                                                @endif
-                                            </div>
+
+                                    <div class="alert alert-info bg-info bg-opacity-10 border-0 rounded-4 d-flex align-items-center shadow-sm p-3 mb-4">
+                                        <i class="bi bi-info-circle-fill text-info fs-5 me-3"></i>
+                                        <div>
+                                            <p class="mb-0 text-sm text-gray-800">This payment will be sent for admin approval.</p>
+                                            <p class="mb-0 text-xs text-gray-600">The customer's account will be updated once approved.</p>
                                         </div>
                                     </div>
-                                    <div class="col-12 p-4 bg-white border-top">
-                                        <div class="d-flex justify-content-end gap-2">
-                                            <button type="button"
-                                                class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                                                data-bs-dismiss="modal">
-                                                <i class="bi bi-x me-1"></i> Cancel
-                                            </button>
-                                            <button type="submit"
-                                                class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105">
-                                                <i class="bi bi-send me-1"></i> Submit for Approval
-                                            </button>
-                                        </div>
+                                </div>
+
+                                <div class="p-4 bg-white border-top rounded-bottom-end-4">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button type="button" class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105" data-bs-dismiss="modal">
+                                            <i class="bi bi-x me-1"></i> Cancel
+                                        </button>
+                                        <button type="submit" class="btn btn-primary text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105">
+                                            <i class="bi bi-send me-1"></i> Submit
+                                        </button>
                                     </div>
                                 </div>
                             </form>
@@ -770,10 +630,7 @@
             modal.hide();
         });
 
-        @this.on('showToast', ({
-            type,
-            message
-        }) => {
+        @this.on('showToast', ({ type, message }) => {
             Swal.fire({
                 toast: true,
                 position: 'top-end',
@@ -793,19 +650,35 @@
 
         // Print due payments table
         Livewire.on('print-due-payments', function() {
-            const printWindow = window.open('', '_blank', 'width=1000,height=700');
-            const tableElement = document.querySelector('.table.table-hover').cloneNode(true);
-            const actionColumnIndex = 5;
-            const headerRow = tableElement.querySelector('thead tr');
+            const tableElement = document.querySelector('.table.table-hover');
+            if (!tableElement || tableElement.querySelectorAll('tbody tr').length === 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'No Data to Print',
+                    text: 'No due payments are available to print.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#1e40af',
+                });
+                return;
+            }
+
+            const clonedTable = tableElement.cloneNode(true);
+            const actionColumnIndex = 4; // Corrected index for Actions column
+            const headerRow = clonedTable.querySelector('thead tr');
             const headerCells = headerRow.querySelectorAll('th');
-            headerCells[actionColumnIndex].remove();
-            const rows = tableElement.querySelectorAll('tbody tr');
+            if (headerCells.length > actionColumnIndex) {
+                headerCells[actionColumnIndex].remove();
+            }
+            const rows = clonedTable.querySelectorAll('tbody tr');
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
                 if (cells.length > actionColumnIndex) {
                     cells[actionColumnIndex].remove();
                 }
             });
+
+            // Debug: Log the cloned table HTML
+            console.log('Cloned Table HTML:', clonedTable.outerHTML);
 
             const htmlContent = `
                 <!DOCTYPE html>
@@ -818,23 +691,124 @@
                     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
                     <style>
                         @page { size: landscape; margin: 1cm; }
-                        body { font-family: 'Inter', sans-serif; padding: 20px; font-size: 14px; color: #1f2937; }
-                        .print-container { max-width: 900px; margin: 0 auto; }
-                        .print-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #1e40af; display: flex; justify-content: space-between; align-items: center; }
-                        .print-header h2 { color: #1e40af; font-weight: 700; letter-spacing: -0.025em; }
-                        .print-footer { margin-top: 20px; padding-top: 15px; border-top: 2px solid #e5e7eb; text-align: center; font-size: 12px; color: #6b7280; }
-                        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                        th, td { border: 1px solid #e5e7eb; padding: 12px; text-align: center; vertical-align: middle; }
-                        th { background-color: #eff6ff; font-weight: 600; text-transform: uppercase; color: #1e3a8a; }
-                        tr:nth-child(even) { background-color: #f9fafb; }
-                        tr:hover { background-color: #f1f5f9; }
-                        .badge { padding: 6px 12px; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; color: #ffffff; }
-                        .bg-primary { background-color: #1e40af; }
-                        .bg-info { background-color: #0ea5e9; }
-                        .bg-success { background-color: #22c55e; }
-                        .bg-danger { background-color: #ef4444; }
-                        .bg-warning { background-color: #f59e0b; }
-                        .no-print { display: none; }
+                        body {
+                            font-family: 'Inter', sans-serif;
+                            padding: 20px;
+                            font-size: 15px;
+                            color: #1f2937;
+                            background: #ffffff;
+                        }
+                        .print-container {
+                            max-width: 900px;
+                            margin: 0 auto;
+                        }
+                        .print-header {
+                            margin-bottom: 20px;
+                            padding-bottom: 15px;
+                            border-bottom: 2px solid #1e40af;
+                            text-align: center;
+                            color: #1e40af;
+                            font-weight: 700;
+                            letter-spacing: -0.025em;
+                        }
+                        .print-footer {
+                            margin-top: 20px;
+                            padding-top: 15px;
+                            border-top: 2px solid #e5e7eb;
+                            text-align: center;
+                            font-size: 12px;
+                            color: #6b7280;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: separate;
+                            border-spacing: 0;
+                        }
+                        th, td {
+                            border: 1px solid #e5e7eb;
+                            padding: 12px;
+                            vertical-align: middle;
+                        }
+                        th {
+                            background-color: #eff6ff;
+                            color: #1e3a8a;
+                            text-transform: uppercase;
+                            font-weight: 600;
+                            font-size: 0.75rem;
+                            text-align: center;
+                        }
+                        td {
+                            text-align: center;
+                        }
+                        tr:nth-child(even) {
+                            background-color: #f9fafb;
+                        }
+                        tr:hover {
+                            background-color: #f1f5f9;
+                        }
+                        .invoice-cell {
+                            display: flex;
+                            flex-direction: column;
+                            align-items: center;
+                        }
+                        .customer-cell {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                        .customer-icon {
+                            width: 2.5rem;
+                            height: 2.5rem;
+                            background-color: #1e40af;
+                            color: #ffffff;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 0.5rem;
+                            font-weight: 700;
+                        }
+                        .amount-cell {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                        }
+                        .amount-icon {
+                            width: 1.5rem;
+                            height: 1.5rem;
+                            background-color: #22c55e;
+                            color: #ffffff;
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            margin-right: 0.5rem;
+                        }
+                        .badge {
+                            padding: 6px 12px;
+                            border-radius: 9999px;
+                            font-size: 0.875rem;
+                            font-weight: 600;
+                        }
+                        .bg-info { background-color: #0ea5e9; color: #ffffff; }
+                        .bg-success { background-color: #22c55e; color: #ffffff; }
+                        .bg-danger { background-color: #ef4444; color: #ffffff; }
+                        .bg-warning { background-color: #f59e0b; color: #ffffff; }
+                        .bg-secondary { background-color: #6b7280; color: #ffffff; }
+                        .btn-light {
+                            border-color: #1e3a8a;
+                            background-color:#1e3a8a;
+                            color:#fff;
+                            padding: 6px 15px;
+                            border-radius: 6px;
+                            text-decoration: none;
+                            display: inline-block;
+                        }
+                        
+                        .no-print { 
+                            display: block; 
+                            
+                        }
                         @media print {
                             .no-print { display: none; }
                             thead { display: table-header-group; }
@@ -842,30 +816,34 @@
                             body { padding: 10px; }
                             .print-container { max-width: 100%; }
                             table { -webkit-print-color-adjust: exact; color-adjust: exact; }
+                            .btn-light { display: none; }
                         }
                     </style>
                 </head>
                 <body>
                     <div class="print-container">
                         <div class="print-header">
-                            <h2 class="fw-bold tracking-tight">Customer Due Payments</h2>
-                            <div class="no-print">
-                                <button class="btn btn-light rounded-full px-4" style="background-color:#ffffff;border-color:#ffffff;color:#1e3a8a;" onclick="window.print();">Print</button>
-                                <button class="btn btn-light rounded-full px-4 ms-2" style="background-color:#ffffff;border-color:#ffffff;color:#1e3a8a;" onclick="window.close();">Close</button>
-                            </div>
+                            <h2>Customer Due Payments</h2>
                         </div>
                         <div class="table-responsive">
-                            ${tableElement.outerHTML}
+                            ${clonedTable.outerHTML}
                         </div>
                         <div class="print-footer">
                             <small>Generated on ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Colombo' })}</small><br>
-                            <small>NEW WATCH COMPANY (MR TRADING) | NO 44, DOOLMALA, THIHARIYA | Phone: (033) 228 7437</small>
+                            <p>PLUS</p>
+                            <small>Importers Of Garment Accessories & Machinery</small><br>
+                            <small>20/2/1, 2nd FLOOR,HUNTER BUILDING,BANKSHALLL STREET,COLOMBO-11 | Phone: 011 - 2332786 | Email: plusaccessories.lk@gmail.com</small>
+                            <div class="no-print" style="margin-top: 15px;">
+                                <a href="#" class="btn-light" onclick="window.print(); return false;">Print</a>
+                                <a href="#" class="btn-light" style="margin-left: 10px;" onclick="window.close(); return false;">Close</a>
+                            </div>
                         </div>
                     </div>
                 </body>
                 </html>
             `;
 
+            const printWindow = window.open('', '_blank', 'width=1000,height=700');
             printWindow.document.open();
             printWindow.document.write(htmlContent);
             printWindow.document.close();
