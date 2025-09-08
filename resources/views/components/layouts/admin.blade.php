@@ -338,17 +338,6 @@
                                     <i class="bi bi-credit-card-2-back"></i> <span>View Payments</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.payment-approvals') ? 'active' : '' }}" href="{{ route('admin.payment-approvals') }}">
-                                    <i class="bi bi-shield-check"></i> <span>Payment Approvals</span>
-                                    @php
-                                    $pendingCount = \App\Models\Payment::where('status', 'pending')->where('is_completed', 0)->count();
-                                    @endphp
-                                    @if($pendingCount > 0)
-                                    <span class="badge bg-danger ms-auto rounded-pill">{{ $pendingCount }}</span>
-                                    @endif
-                                </a>
-                            </li>
                         </ul>
                     </div>
                 </li>
