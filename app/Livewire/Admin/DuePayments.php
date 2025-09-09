@@ -251,9 +251,9 @@ class DuePayments extends Component
 
             if ($this->filters['status'] !== '') {
                 if ($this->filters['status'] === 'pending') {
-                    $query->whereIn('status', [null, 'pending']);
+                    $query->whereNull('status');
                 } elseif ($this->filters['status'] === 'paid') {
-                    $query->where('status', 'approved');
+                    $query->where('status', 'Paid');
                 }
             }
 
@@ -270,10 +270,10 @@ class DuePayments extends Component
 
         $duePayments = $query->orderBy('created_at', 'desc')->paginate(10);
 
-        $duePaymentsCount = Cheque::where('status', 'pending')->count();
-        $totalDue = Cheque::where('status', 'pending')->sum('cheque_amount');
-        $todayDuePayments = Cheque::where('status', 'pending')->whereDate('created_at', today())->sum('cheque_amount');
-        $todayDuePaymentsCount = Cheque::where('status', 'pending')->whereDate('created_at', today())->count();
+        $duePaymentsCount = Payment::whereNull('status')->count();
+        $totalDue = Payment::whereNull('status')->sum('amount');
+        $todayDuePayments = Payment::whereNull('status')->whereDate('created_at', today())->sum('amount');
+        $todayDuePaymentsCount = Payment::whereNull('status')->whereDate('created_at', today())->count();
 
         foreach ($duePayments as $payment) {
             if ($payment->status === null || $payment->status === 'pending') {
