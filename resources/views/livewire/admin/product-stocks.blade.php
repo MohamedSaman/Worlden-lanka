@@ -1,20 +1,20 @@
 <div class="container-fluid py-6 transition-colors duration-300">
     <div class="card border-0">
         <!-- Card Header -->
-        <div class="card-header bg-transparent pb-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 border-bottom" style="border-color: #233D7F;">
 
-            <div class="d-flex align-items-center gap-3">
-                <div class="icon-shape icon-lg bg-opacity-25 p-3 d-flex align-items-center justify-content-center">
-                    <i class="bi bi-shield-lock text-black fs-4" aria-hidden="true" style="color:#233D7F;"></i>
-                </div>
-                <div>
-                    <h3 class="mb-1 fw-bold tracking-tight text-black">Product Stock Details</h3>
-                    <p class="text-black opacity-80 mb-0 text-sm">Monitor and manage your product inventory</p>
-                </div>
+        <div class="card-header text-white p-2 rounded-t-4 d-flex align-items-center"
+            style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%); border-radius: 20px 20px 0 0;">
+            <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
+                <i class="bi bi-shield-lock text-white fs-4" aria-hidden="true"></i>
             </div>
-
+            <div>
+                <h3 class="mb-1 fw-bold tracking-tight text-white">Product Stock Details</h3>
+                <p class="text-white opacity-80 mb-0 text-sm">Monitor and manage your product inventorys</p>
+            </div>
+        </div>
+        <div class="card-header bg-transparent pb-4 mt-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 border-bottom" style="border-color: #233D7F;">
             <!-- Middle: Search Bar -->
-            <div class="flex-grow-1 d-flex justify-content-lg-center">
+            <div class="flex-grow-1 d-flex justify-content-lg">
                 <div class="input-group" style="max-width: 400px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
                     <span class="input-group-text bg-gray-100 border-0 px-3">
                         <i class="bi bi-search text-primary"></i>
@@ -119,95 +119,95 @@
         </div>
     </div>
     @push('styles')
-<style>
-    .tracking-tight {
-        letter-spacing: -0.025em;
-    }
+    <style>
+        .tracking-tight {
+            letter-spacing: -0.025em;
+        }
 
-    .transition-all {
-        transition: all 0.3s ease;
-    }
+        .transition-all {
+            transition: all 0.3s ease;
+        }
 
-    .transition-transform {
-        transition: transform 0.2s ease;
-    }
+        .transition-transform {
+            transition: transform 0.2s ease;
+        }
 
-    .hover\:scale-105:hover {
-        transform: scale(1.05);
-    }
+        .hover\:scale-105:hover {
+            transform: scale(1.05);
+        }
 
-    .hover\:scale-110:hover {
-        transform: scale(1.1);
-    }
+        .hover\:scale-110:hover {
+            transform: scale(1.1);
+        }
 
-    .icon-shape {
-        width: 2rem;
-        height: 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+        .icon-shape {
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .icon-shape.icon-lg {
-        width: 3rem;
-        height: 3rem;
-    }
+        .icon-shape.icon-lg {
+            width: 3rem;
+            height: 3rem;
+        }
 
-    .icon-shape.icon-xl {
-        width: 4.5rem;
-        height: 4.5rem;
-    }
+        .icon-shape.icon-xl {
+            width: 4.5rem;
+            height: 4.5rem;
+        }
 
 
-    .image-wrapper {
-        display: inline-block;
-        overflow: hidden;
-        border: 1px solid #e5e7eb;
-        transition: transform 0.2s ease;
-    }
-</style>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-@endpush
+        .image-wrapper {
+            display: inline-block;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            transition: transform 0.2s ease;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    @endpush
 
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    document.addEventListener('livewire:initialized', () => {
-        @this.on('showToast', ({
-            type,
-            message
-        }) => {
-            Swal.fire({
-                toast: true,
-                position: 'top-end',
-                icon: type,
-                title: message,
-                showConfirmButton: false,
-                timer: 3000,
-                timerProgressBar: true,
-                background: '#ffffff',
-                color: '#1f2937',
-                didOpen: (toast) => {
-                    toast.addEventListener('mouseenter', Swal.stopTimer);
-                    toast.addEventListener('mouseleave', Swal.resumeTimer);
-                }
+    @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            @this.on('showToast', ({
+                type,
+                message
+            }) => {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: type,
+                    title: message,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    background: '#ffffff',
+                    color: '#1f2937',
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer);
+                        toast.addEventListener('mouseleave', Swal.resumeTimer);
+                    }
+                });
             });
         });
-    });
 
-    document.addEventListener('DOMContentLoaded', function() {
-        document.getElementById('printButton').addEventListener('click', function() {
-            printProductStockDetails();
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('printButton').addEventListener('click', function() {
+                printProductStockDetails();
+            });
         });
-    });
 
-    function printProductStockDetails() {
-        const tableContent = document.querySelector('.table-responsive')?.cloneNode(true) || '';
-        const printWindow = window.open('', '_blank', 'height=600,width=800');
+        function printProductStockDetails() {
+            const tableContent = document.querySelector('.table-responsive')?.cloneNode(true) || '';
+            const printWindow = window.open('', '_blank', 'height=600,width=800');
 
-        printWindow.document.write(`
+            printWindow.document.write(`
         <!DOCTYPE html>
         <html>
         <head>
@@ -252,10 +252,9 @@
         </html>
     `);
 
-        printWindow.document.close();
-        printWindow.focus();
-    }
-</script>
-@endpush
+            printWindow.document.close();
+            printWindow.focus();
+        }
+    </script>
+    @endpush
 </div>
-

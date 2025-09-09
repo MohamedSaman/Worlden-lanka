@@ -5,7 +5,7 @@
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
                 <!-- Header Content (unchanged) -->
                 <div class="card-header text-white p-2 rounded-t-4 d-flex align-items-center"
-                    style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);">
+                    style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);border-radius: 20px 20px 0 0;">
                     <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
                         <i class="bi bi-cash-stack text-white fs-4" aria-hidden="true"></i>
                     </div>
