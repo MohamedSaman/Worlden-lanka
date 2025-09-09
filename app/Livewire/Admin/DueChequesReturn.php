@@ -29,15 +29,44 @@ class DueChequesReturn extends Component
     // For Complete with Cash
     public $completeCashAmount;
     public $completeNote;
+    public $banks = [];
 
     public function mount()
     {
+
+        $this->loadBanks();
         // Load cheques with customer relationship
         $this->chequeDetails = Cheque::with('customer')
             ->where('status', 'return')
             ->get();
     }
 
+    public function loadBanks()
+    {
+        $this->banks = [
+            'Bank of Ceylon (BOC)',
+            'Commercial Bank of Ceylon (ComBank)',
+            'Hatton National Bank (HNB)',
+            'People\'s Bank',
+            'Sampath Bank',
+            'National Development Bank (NDB)',
+            'DFCC Bank',
+            'Nations Trust Bank (NTB)',
+            'Seylan Bank',
+            'Amana Bank',
+            'Cargills Bank',
+            'Pan Asia Banking Corporation',
+            'Union Bank of Colombo',
+            'Bank of China Ltd',
+            'Citibank, N.A.',
+            'Habib Bank Ltd',
+            'Indian Bank',
+            'Indian Overseas Bank',
+            'MCB Bank Ltd',
+            'Public Bank Berhad',
+            'Standard Chartered Bank',
+        ];
+    }
     // Open modal for re-entry
     public function openReentryModal($chequeId)
     {

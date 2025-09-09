@@ -108,16 +108,17 @@
                 <!-- Search & Filter Bar (unchanged, but added print button wire:click if needed) -->
                 <div class="card-header p-4" style="background-color: #eff6ff;">
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                        <div class="input-group shadow-sm rounded-full overflow-hidden" style="max-width: 400px;">
-                            <span class="input-group-text bg-white border-0">
-                                <i class="bi bi-search text-blue-600" aria-hidden="true"></i>
-                            </span>
-                            <input type="text"
-                                class="form-control border-0 py-2.5 bg-white text-gray-800"
-                                placeholder="Search invoices or customers..."
-                                wire:model.live.debounce.300ms="search"
-                                autocomplete="off"
-                                aria-label="Search invoices or customers">
+                        <div class="flex-grow-1 d-flex justify-content-lg">
+                            <div class="input-group " style="max-width: 600px;">
+                                <span class="input-group-text bg-gray-100 border-0 px-3">
+                                    <i class="bi bi-search text-primary"></i>
+                                </span>
+                                <input type="text"
+                                    class="form-control "
+                                    placeholder="Search invoices or customers..."
+                                    wire:model.live.debounce.300ms="search"
+                                    autocomplete="off">
+                            </div>
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <div class="dropdown">
@@ -220,7 +221,7 @@
                         </table>
                     </div>
                     <div class="px-4 py-3 border-top">
-                        {{ $duePayments->links('pagination::bootstrap-5') }} 
+                        {{ $duePayments->links('pagination::bootstrap-5') }}
                     </div>
                 </div>
             </div>

@@ -17,6 +17,7 @@ class CustomerSaleDetails extends Component
     use WithPagination;
 
     public $modalData = null;
+    public $search = ''; // Added search property
 
     public function viewSaleDetails($customerId)
     {
@@ -158,8 +159,19 @@ class CustomerSaleDetails extends Component
                 DB::raw('SUM(sales.total_amount) as total_sales'),
                 DB::raw('SUM(sales.due_amount) as total_due')
             )
-            ->groupBy('customers.id', 'customers.name', 'customers.email', 'customers.business_name', 'customers.type')
-            ->orderBy('sales.created_at', 'desc')
+            ->groupBy('customers.id', 'customers.name', 'customers.email', 'customers.business_name', 'customers.type');
+
+        // Apply search filter if search term exists
+        if (!empty($this->search)) {
+            $customerSales->where(function ($query) {
+                $query->where('customers.name', 'like', '%' . $this->search . '%')
+                      ->orWhere('customers.email', 'like', '%' . $this->search . '%')
+                      ->orWhere('customers.business_name', 'like', '%' . $this->search . '%')
+                      ->orWhere('customers.type', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        $customerSales = $customerSales->orderBy('sales.created_at', 'desc')
             ->paginate(10);
 
         return view('livewire.admin.customer-sale-details', [
