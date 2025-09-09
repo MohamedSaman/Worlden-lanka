@@ -548,99 +548,136 @@
 
     <!-- View Product Modal -->
     @if ($showViewModal)
-    <div wire:ignore.self class="modal fade show d-block" id="viewProductModal" tabindex="-1" aria-labelledby="viewProductModalLabel" aria-hidden="true" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #233D7F; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
-                <div class="modal-header py-3 px-4" style="background-color: #233D7F; color: white;">
-                    <h5 class="modal-title fw-bold tracking-tight" id="viewProductModalLabel">
-                        <i class="bi bi-box-seam me-2"></i> Product Details - {{ $this->viewProductName ?? 'N/A' }}
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" wire:click="$set('showViewModal', false)" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-5">
+    <div wire:ignore.self
+        class="modal fade show d-block"
+        id="viewProductModal"
+        tabindex="-1"
+        aria-labelledby="viewProductModalLabel"
+        aria-hidden="true"
+        style="background-color: rgba(0, 0, 0, 0.65); backdrop-filter: blur(8px);">
 
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow-xl border-0 overflow-hidden"
+                style="background: #ffffff;">
+
+                <!-- Header -->
+                <div class="modal-header py-4 px-5 border-0"
+                    style="background: linear-gradient(135deg, #233D7F, #1b2655); color: white;">
+                    <h4 class="modal-title fw-bold d-flex align-items-center mb-0" id="viewProductModalLabel">
+                        <i class="bi bi-box-seam me-2"></i>
+                        Product Details – {{ $this->viewProductName ?? 'N/A' }}
+                    </h4>
+                    <button type="button"
+                        class="btn-close btn-close-white"
+                        wire:click="$set('showViewModal', false)"
+                        aria-label="Close"></button>
+                </div>
+
+                <!-- Body -->
+                <div class="modal-body px-5 py-4">
                     <div class="row g-4">
-                        <!-- Product Image and Status -->
-                        <div class="col-md-6">
-                            <div class="card border-0 shadow-sm rounded-3 p-4 transition-all hover:shadow-md">
+
+                        <!-- Left: Product Image & Status -->
+                        <div class="col-md-5">
+                            <div class="card border-0 shadow-sm rounded-4 p-3 h-100 text-center">
                                 @php
-                                $product = \App\Models\ProductDetail::find($this->viewProductCode ? \App\Models\ProductDetail::where('product_code', $this->viewProductCode)->first()->id : null);
+                                $product = \App\Models\ProductDetail::find(
+                                $this->viewProductCode
+                                ? \App\Models\ProductDetail::where('product_code', $this->viewProductCode)->first()->id
+                                : null
+                                );
                                 @endphp
+
                                 @if ($product && $product->image)
                                 <img src="{{ asset('storage/' . $product->image) }}"
                                     alt="{{ $this->viewProductName ?? 'Product Image' }}"
-                                    class="img-fluid rounded-3 mb-3"
-                                    style="width: 100%; max-height: 200px; object-fit: cover;">
+                                    class="img-fluid rounded-3 mb-3 shadow-sm"
+                                    style="max-height: 300px; object-fit: cover; width: 100%;">
                                 @else
-                                <div class="bg-light d-flex flex-column align-items-center justify-content-center mb-3 rounded-3" style="width: 100%; height: 200px;">
-                                    <i class="bi bi-box-seam text-muted" style="font-size: 3rem;"></i>
+                                <div class="bg-light d-flex flex-column align-items-center justify-content-center rounded-3 mb-3 shadow-sm"
+                                    style="height: 300px;">
+                                    <i class="bi bi-image text-muted" style="font-size: 3.5rem;"></i>
                                     <p class="text-muted mt-2">No image available</p>
                                 </div>
                                 @endif
-                                <div class="d-flex align-items-center">
-                                    <i class="bi bi-info-circle text-primary me-2"></i>
-                                    <p class="mb-0"><strong class="text-primary">Status:</strong>
-                                        <span class="badge rounded-pill {{ $this->viewStatus == 'Available' ? 'bg-success' : ($this->viewStatus == 'Low Stock' ? 'bg-warning' : 'bg-danger') }}" aria-label="Product Status: {{ $this->viewStatus ?? 'N/A' }}">
-                                            {{ $this->viewStatus ?? 'N/A' }}
-                                        </span>
-                                    </p>
+
+                                <div class="mt-2">
+                                    <span class="fw-semibold text-secondary me-2">
+                                        <i class="bi bi-info-circle"></i> Status:
+                                    </span>
+                                    <span class="badge fs-6 px-3 py-2 rounded-pill 
+                                    {{ $this->viewStatus == 'Available' ? 'bg-success' : 
+                                       ($this->viewStatus == 'Low Stock' ? 'bg-warning text-dark' : 'bg-danger') }}">
+                                        {{ $this->viewStatus ?? 'N/A' }}
+                                    </span>
                                 </div>
                             </div>
                         </div>
-                        <!-- Product Details -->
-                        <div class="col-md-6">
-                            <div class="card border-0 shadow-sm rounded-3 p-4 transition-all hover:shadow-md">
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="bi bi-tag-fill text-primary me-2"></i>
-                                    <p class="mb-0"><strong class="text-primary">Category:</strong> {{ $this->viewCategoryName ?? 'N/A' }}</p>
-                                </div>
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="bi bi-box-seam text-primary me-2"></i>
-                                    <p class="mb-0"><strong class="text-primary">Product Name:</strong> {{ $this->viewProductName ?? 'N/A' }}</p>
-                                </div>
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="bi bi-tag-fill text-primary me-2"></i>
-                                    <p class="mb-0"><strong class="text-primary">Code:</strong>
-                                        <span class="badge rounded-pill" style="background-color: #f3f4f6; color: #1f2937;" aria-label="Product Code: {{ $this->viewProductCode ?? 'N/A' }}">
+
+                        <!-- Right: Product Details -->
+                        <div class="col-md-7">
+                            <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+                                <h5 class="fw-bold mb-4 text-primary">Product Information</h5>
+                                <div class="row g-3">
+
+                                    <div class="col-12">
+                                        <span class="fw-medium text-secondary"><i class="bi bi-tag-fill text-primary me-2"></i>Category:</span>
+                                        <span class="text-dark">{{ $this->viewCategoryName ?? 'N/A' }}</span>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <span class="fw-medium text-secondary"><i class="bi bi-box-seam text-primary me-2"></i>Name:</span>
+                                        <span class="text-dark">{{ $this->viewProductName ?? 'N/A' }}</span>
+                                    </div>
+
+                                    <div class="col-12">
+                                        <span class="fw-medium text-secondary"><i class="bi bi-upc text-primary me-2"></i>Code:</span>
+                                        <span class="badge rounded-pill bg-light text-dark px-3 py-2">
                                             {{ $this->viewProductCode ?? 'N/A' }}
                                         </span>
-                                    </p>
-                                </div>
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="bi bi-currency-dollar text-primary me-2"></i>
-                                    <p class="mb-0"><strong class="text-primary">Supplier Price:</strong> Rs.{{ number_format($this->viewSupplierPrice ?? 0, 2) }}</p>
-                                </div>
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="bi bi-wallet2 text-primary me-2"></i>
-                                    <p class="mb-0"><strong class="text-primary">Selling Price:</strong> Rs.{{ number_format($this->viewSellingPrice ?? 0, 2) }}</p>
-                                </div>
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="bi bi-box text-primary me-2"></i>
-                                    <p class="mb-0"><strong class="text-primary">Stock Quantity:</strong> {{ $this->viewStockQuantity ?? 0 }}</p>
-                                </div>
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="bi bi-box text-primary me-2"></i>
-                                    <p class="mb-0"><strong class="text-primary">Damage Quantity:</strong> {{ $this->viewDamageQuantity ?? 0 }}</p>
-                                </div>
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="bi bi-cart-check text-primary me-2"></i>
-                                    <p class="mb-0"><strong class="text-primary">Sold Quantity:</strong> {{ $this->viewSoldQuantity ?? 0 }}</p>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <span class="fw-medium text-secondary"><i class="bi bi-currency-dollar text-primary me-2"></i>Supplier Price:</span>
+                                        <span class="fw-semibold text-dark">Rs.{{ number_format($this->viewSupplierPrice ?? 0, 2) }}</span>
+                                    </div>
+
+                                    <div class="col-6">
+                                        <span class="fw-medium text-secondary"><i class="bi bi-wallet2 text-primary me-2"></i>Selling Price:</span>
+                                        <span class="fw-semibold text-dark">Rs.{{ number_format($this->viewSellingPrice ?? 0, 2) }}</span>
+                                    </div>
+
+                                    <div class="col-4">
+                                        <span class="fw-medium text-secondary"><i class="bi bi-box text-primary me-2"></i>Stock:</span>
+                                        <span class="fw-semibold text-dark">{{ $this->viewStockQuantity ?? 0 }}</span>
+                                    </div>
+
+                                    <div class="col-4">
+                                        <span class="fw-medium text-secondary"><i class="bi bi-exclamation-triangle text-danger me-2"></i>Damage:</span>
+                                        <span class="fw-semibold text-dark">{{ $this->viewDamageQuantity ?? 0 }}</span>
+                                    </div>
+
+                                    <div class="col-4">
+                                        <span class="fw-medium text-secondary"><i class="bi bi-cart-check text-primary me-2"></i>Sold:</span>
+                                        <span class="fw-semibold text-dark">{{ $this->viewSoldQuantity ?? 0 }}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <!-- Custom Fields -->
+
+                        <!-- Full Width: Custom Fields -->
                         @if (!empty($this->viewCustomerFields))
                         <div class="col-12">
-                            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
-                                <div class="card-header py-3 px-4" style="background-color: #eff6ff;">
-                                    <h6 class="fw-bold text-uppercase text-muted letter-spacing-1 mb-0">Custom Fields</h6>
+                            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                                <div class="card-header py-3 px-4 bg-light">
+                                    <h6 class="fw-bold text-uppercase text-muted mb-0">Custom Fields</h6>
                                 </div>
                                 <div class="card-body p-0">
                                     <ul class="list-group list-group-flush">
                                         @foreach ($this->viewCustomerFields as $key => $value)
-                                        <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4 transition-all hover:bg-gray-50" aria-labelledby="custom-field-{{ str_slug($key) }}">
-                                            <span class="fw-medium text-gray-700" id="custom-field-{{ str_slug($key) }}">{{ $key }}:</span>
-                                            <span class="text-gray-900">{{ $value ?? '-' }}</span>
+                                        <li class="list-group-item d-flex justify-content-between align-items-center py-3 px-4">
+                                            <span class="fw-medium text-secondary">{{ $key }}:</span>
+                                            <span class="fw-semibold text-dark">{{ $value ?? '-' }}</span>
                                         </li>
                                         @endforeach
                                     </ul>
@@ -648,14 +685,23 @@
                             </div>
                         </div>
                         @endif
-                    </div>
 
+                    </div>
                 </div>
-                <div class="modal-footer py-3 px-4" style="border-top: 1px solid #233D7F; background: #f8f9fa;">
-                    <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" onclick="printProductDetails()" style="background-color: #6B7280; border-color: #6B7280; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#6B7280'; this.style.borderColor='#6B7280';">
-                        <i class="bi bi-printer me-1"></i> Print Details
+
+                <!-- Footer -->
+                <div class="modal-footer py-3 px-5 border-0"
+                    style="background: #f9fafb;">
+                    <button type="button"
+                        class="btn rounded-pill px-4 fw-semibold text-white shadow-sm"
+                        onclick="printProductDetails()"
+                        style="background-color: #233D7F;">
+                        <i class="bi bi-printer me-1"></i> Print
                     </button>
-                    <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="$set('showViewModal', false)" style="background-color: #6B7280; border-color: #6B7280; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#6B7280'; this.style.borderColor='#6B7280';">
+                    <button type="button"
+                        class="btn rounded-pill px-4 fw-semibold text-white shadow-sm"
+                        wire:click="$set('showViewModal', false)"
+                        style="background-color: #6B7280;">
                         Close
                     </button>
                 </div>
@@ -663,6 +709,9 @@
         </div>
     </div>
     @endif
+
+
+
 
 
     @push('script')
