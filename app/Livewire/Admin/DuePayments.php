@@ -354,6 +354,8 @@ class DuePayments extends Component
 
         $duePaymentsCount = $allPayments->where('status', null)->count();
         $totalDue = Payment::whereNull('status')->sum('amount');
+        $todayDuePayments = Payment::whereNull('status')->whereDate('created_at', today())->sum('amount');
+        $todayDuePaymentsCount = Payment::whereNull('status')->whereDate('created_at', today())->count();
 
         foreach ($duePayments as $payment) {
             if ($payment->status === null) {
@@ -372,6 +374,8 @@ class DuePayments extends Component
         return view('livewire.admin.due-payments', [
             'duePayments' => $duePayments,
             'duePaymentsCount' => $duePaymentsCount,
+            'todayDuePayments' => $todayDuePayments,
+            'todayDuePaymentsCount' => $todayDuePaymentsCount,
             'totalDue' => $totalDue,
             'cheques' => $this->cheques,
             'chequeNumber' => $this->chequeNumber,
