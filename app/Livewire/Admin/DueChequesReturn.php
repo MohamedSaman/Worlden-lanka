@@ -8,19 +8,18 @@ use Livewire\Attributes\Layout;
 use App\Models\Cheque;
 
 #[Layout('components.layouts.admin')]
-
-
 #[Title('Due Cheques')]
 
 class DueChequesReturn extends Component
 {
-   public $chequeDetails;
+    public $chequeDetails;
     public $cheques = []; // Temporary array for new cheques
     public $chequeNumber;
     public $bankName;
     public $chequeAmount;
     public $chequeDate;
     public $selectedChequeId;
+    public $customerId;
 
     public function mount()
     {
@@ -44,7 +43,7 @@ class DueChequesReturn extends Component
         $this->validate([
             'chequeNumber' => 'required',
             'bankName' => 'required',
-            'chequeAmount' => 'required|numeric',
+            'chequeAmount' => 'required|numeric|min:0.01',
             'chequeDate' => 'required|date',
         ]);
 
@@ -66,33 +65,52 @@ class DueChequesReturn extends Component
     }
 
     // Save new cheque(s) and update original cheque status
-  public function submitNewCheque()
-{
-    $original = Cheque::find($this->selectedChequeId);
+    public function submitNewCheque()
+    {
+        $originalCheque = Cheque::find($this->selectedChequeId);
 
-    foreach ($this->cheques as $cheque) {
-        // Update the original cheque record
-        $original->update([
-            'cheque_number' => $cheque['number'],
-            'bank_name' => $cheque['bank'],
-            'cheque_amount' => $cheque['amount'],
-            'cheque_date' => $cheque['date'],
-            'status' => 'pending', // mark as pending after re-entry
-        ]);
+        if (!$originalCheque) {
+            $this->dispatch('notify', ['type' => 'error', 'message' => 'Original cheque not found.']);
+            return;
+        }
+
+        // Calculate total amount of new cheques
+        $totalNewChequeAmount = array_sum(array_column($this->cheques, 'amount'));
+
+        // Verify if total new cheque amount matches the original cheque amount
+        if ($totalNewChequeAmount != $originalCheque->cheque_amount) {
+            $this->dispatch('notify', ['type' => 'error', 'message' => 'Total amount of new cheques (' . $totalNewChequeAmount . ') does not match the original cheque amount (' . $originalCheque->cheque_amount . ').']);
+            return;
+        }
+
+        // Save new cheques with payment_id from original cheque
+        foreach ($this->cheques as $cheque) {
+            Cheque::create([
+                'customer_id'     => $originalCheque->customer_id,
+                'cheque_number'   => $cheque['number'],
+                'bank_name'       => $cheque['bank'],
+                'cheque_amount'   => $cheque['amount'],
+                'cheque_date'     => $cheque['date'],
+                'status'          => 'pending',
+                'payment_id'      => $originalCheque->payment_id, // Added payment_id
+            ]);
+        }
+
+        // Update original cheque status to reflect re-entry
+        $originalCheque->update(['status' => 'pending']);
+
+        // Refresh table
+        $this->chequeDetails = Cheque::with('customer')->where('status', 'return')->get();
+
+        // Clear modal and array
+        $this->cheques = [];
+        $this->dispatch('close-reentry-modal');
+
+        $this->dispatch('notify', ['type' => 'success', 'message' => 'New cheque(s) submitted successfully.']);
     }
-
-    // Refresh table
-    $this->chequeDetails = Cheque::with('customer')->where('status', 'return')->get();
-
-    // Close modal
-    $this->dispatch('close-reentry-modal');
-    $this->cheques = [];
-}
-
 
     public function render()
     {
         return view('livewire.admin.due-cheques-return');
     }
-    
 }
