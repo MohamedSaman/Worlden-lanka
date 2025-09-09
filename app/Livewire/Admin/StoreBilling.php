@@ -81,13 +81,42 @@ class StoreBilling extends Component
     public $duePaymentAttachment;
     public $duePaymentAttachmentPreview = null;
 
+    public $banks = [];
+
     protected $listeners = ['quantityUpdated' => 'updateTotals'];
 
     public function mount()
     {
         $this->loadCustomers();
+        $this->loadBanks();
         $this->updateTotals();
         $this->balanceDueDate = date('Y-m-d', strtotime('+7 days'));
+    }
+    public function loadBanks()
+    {
+        $this->banks = [
+            'Bank of Ceylon (BOC)',
+            'Commercial Bank of Ceylon (ComBank)',
+            'Hatton National Bank (HNB)',
+            'People\'s Bank',
+            'Sampath Bank',
+            'National Development Bank (NDB)',
+            'DFCC Bank',
+            'Nations Trust Bank (NTB)',
+            'Seylan Bank',
+            'Amana Bank',
+            'Cargills Bank',
+            'Pan Asia Banking Corporation',
+            'Union Bank of Colombo',
+            'Bank of China Ltd',
+            'Citibank, N.A.',
+            'Habib Bank Ltd',
+            'Indian Bank',
+            'Indian Overseas Bank',
+            'MCB Bank Ltd',
+            'Public Bank Berhad',
+            'Standard Chartered Bank',
+        ];
     }
 
     public function loadCustomers()
@@ -108,50 +137,51 @@ class StoreBilling extends Component
         }
     }
 
+    /**
+     * MODIFIED: This method now adds new items to the top of the cart.
+     */
     public function addToCart($productId)
     {
-        $product = ProductDetail::where('id', $productId)->first();
+        $product = ProductDetail::find($productId);
 
         if (!$product || $product->stock_quantity <= 0) {
-            $this->dispatch('showToast', [
-                'type' => 'warning',
-                'message' => 'This product is out of stock.'
-            ]);
+            $this->dispatch('show-toast', ['type' => 'warning', 'message' => 'This product is out of stock.']);
             return;
         }
 
-        $existingItem = collect($this->cart)->firstWhere('id', $productId);
-
-        if ($existingItem) {
+        if (isset($this->cart[$productId])) {
             if (($this->quantities[$productId] + 1) > $product->stock_quantity) {
-                $this->dispatch('showToast', [
-                    'type' => 'warning',
-                    'message' => "Maximum available quantity is {$product->stock_quantity}"
-                ]);
+                $this->dispatch('show-toast', ['type' => 'warning', 'message' => "Maximum available stock is {$product->stock_quantity}"]);
                 return;
             }
             $this->quantities[$productId]++;
         } else {
-            $discountPrice = $product->discount_price ?? 0;
-
-            $this->cart[$productId] = [
-                'id' => $product->id,
-                'name' => $product->product_name,
-                'code' => $product->product_code,
-                'brand' => $product->brand,
-                'image' => $product->image,
-                'price' => $product->selling_price,
-                'stock_quantity' => $product->stock_quantity,
+            $newItem = [
+                $productId => [
+                    'id' => $product->id,
+                    'name' => $product->product_name,
+                    'code' => $product->product_code,
+                    'brand' => $product->brand->name ?? 'N/A',
+                    'image' => $product->image,
+                    'price' => $product->selling_price,
+                    'stock_quantity' => $product->stock_quantity,
+                ]
             ];
 
+            $this->cart = $newItem + $this->cart; // Prepend new item
             $this->prices[$productId] = $product->selling_price ?? 0;
             $this->quantities[$productId] = 1;
-            $this->discounts[$productId] = $discountPrice;
+            $this->discounts[$productId] = $product->discount_price ?? 0;
         }
 
         $this->search = '';
         $this->searchResults = [];
         $this->updateTotals();
+    }
+
+    public function updatedQuantities($value, $productId)
+    {
+        $this->validateQuantity((int)$productId);
     }
 
     public function validateQuantity($productId)
@@ -160,31 +190,16 @@ class StoreBilling extends Component
             return;
         }
 
-        $productStock = ProductDetail::find($productId);
-        if (!$productStock) {
-            return;
-        }
+        $maxAvailable = $this->cart[$productId]['stock_quantity'];
+        $currentQuantity = filter_var($this->quantities[$productId], FILTER_VALIDATE_INT);
 
-        $soldCount = $productStock->sold ?? 0;
-        $maxAvailable = max(0, $productStock->stock_quantity - $soldCount);
-
-        $currentQuantity = (int)$this->quantities[$productId];
-
-        if ($currentQuantity <= 0) {
+        if ($currentQuantity === false || $currentQuantity < 1) {
             $this->quantities[$productId] = 1;
-            $this->dispatch('showToast', [
-                'type' => 'warning',
-                'message' => 'Minimum quantity is 1'
-            ]);
+            $this->dispatch('show-toast', ['type' => 'warning', 'message' => 'Minimum quantity is 1']);
         } elseif ($currentQuantity > $maxAvailable) {
             $this->quantities[$productId] = $maxAvailable;
-            $this->dispatch('showToast', [
-                'type' => 'warning',
-                'message' => "Maximum available quantity is {$maxAvailable}"
-            ]);
+            $this->dispatch('show-toast', ['type' => 'warning', 'message' => "Maximum stock is {$maxAvailable}"]);
         }
-
-        $this->cart[$productId]['Status'] = $maxAvailable > 0 ? 'Available' : 'Unavailable';
         $this->updateTotals();
     }
 
@@ -200,14 +215,13 @@ class StoreBilling extends Component
             $quantity = 1;
         } elseif ($quantity > $maxAvailable) {
             $quantity = $maxAvailable;
-            $this->dispatch('showToast', [
+            $this->dispatch('show-toast', [
                 'type' => 'warning',
                 'message' => "Maximum available quantity is {$maxAvailable}"
             ]);
         }
 
         $this->quantities[$productId] = $quantity;
-        $this->cart[$productId]['Status'] = $maxAvailable > 0 ? 'Available' : 'Unavailable';
         $this->updateTotals();
     }
 
@@ -265,8 +279,8 @@ class StoreBilling extends Component
 
         foreach ($this->cart as $id => $item) {
             $price = $this->prices[$id] ?? $item['price'] ?? 0;
-            $this->subtotal += $price * $this->quantities[$id];
-            $this->totalDiscount += ($this->discounts[$id] ?? 0) * $this->quantities[$id];
+            $this->subtotal += $price * ($this->quantities[$id] ?? 1);
+            $this->totalDiscount += ($this->discounts[$id] ?? 0) * ($this->quantities[$id] ?? 1);
         }
 
         $this->grandTotal = $this->subtotal - $this->totalDiscount;
@@ -284,6 +298,7 @@ class StoreBilling extends Component
     public function saveCustomer()
     {
         $this->validate([
+            'newCustomerName' => 'required',
             'newCustomerPhone' => 'required',
         ]);
 
@@ -297,6 +312,7 @@ class StoreBilling extends Component
         ]);
 
         $this->loadCustomers();
+        $this->customerId = $customer->id; // Auto-select the newly created customer
 
         $this->newCustomerName = '';
         $this->newCustomerPhone = '';
@@ -426,33 +442,30 @@ class StoreBilling extends Component
                     throw new Exception("Product not found: {$item['name']}");
                 }
 
-                $availableStock = $productStock->stock_quantity ?? 0;
+                $quantityToSell = $this->quantities[$id];
 
-                if ($availableStock < $this->quantities[$id]) {
-                    throw new Exception("Insufficient stock for item: {$item['name']}. Available: {$availableStock}");
+                if ($productStock->stock_quantity < $quantityToSell) {
+                    throw new Exception("Insufficient stock for item: {$item['name']}. Available: {$productStock->stock_quantity}");
                 }
-
-                $soldCount = $productStock->sold ?? 0;
-                $productStock->sold = $soldCount + $this->quantities[$id];
 
                 $price = $this->prices[$id] ?? $item['price'] ?? 0;
                 $itemDiscount = $this->discounts[$id] ?? 0;
-                $total = ($price * $this->quantities[$id]) - ($itemDiscount * $this->quantities[$id]);
+                $total = ($price * $quantityToSell) - ($itemDiscount * $quantityToSell);
 
                 SalesItem::create([
                     'sale_id'    => $sale->id,
                     'product_id' => $item['id'],
-                    'quantity'   => $this->quantities[$id],
+                    'quantity'   => $quantityToSell,
                     'price'      => $price,
                     'discount'   => $itemDiscount,
                     'total'      => $total,
                 ]);
 
-                $productStock->stock_quantity -= $this->quantities[$id];
-                $productStock->sold = $soldCount + $this->quantities[$id];
+                $productStock->stock_quantity -= $quantityToSell;
+                $productStock->sold += $quantityToSell;
                 $productStock->save();
 
-                $totalSoldQty += $this->quantities[$id];
+                $totalSoldQty += $quantityToSell;
                 $totalSoldVal += $total;
             }
 
@@ -463,7 +476,7 @@ class StoreBilling extends Component
 
             if ($this->paymentType == 'full') {
                 if (floatval($this->cashAmount) > 0) {
-                    $payment = Payment::create([
+                    Payment::create([
                         'sale_id'         => $sale->id,
                         'admin_sale_id'   => $adminSale->id,
                         'amount'          => floatval($this->cashAmount),
@@ -497,18 +510,14 @@ class StoreBilling extends Component
                     ]);
                 }
             } else {
-                // Save payment as credit (due) in payments table
                 Payment::create([
                     'sale_id'         => $sale->id,
                     'admin_sale_id'   => $adminSale->id,
                     'amount'          => $this->grandTotal,
                     'payment_method'  => 'credit',
-                    'payment_reference' => null,
-                    'bank_name'       => null,
                     'is_completed'    => false,
-                    'payment_date'    => null,
-                    'status'          => null,
-                    'due_date'        => $this->balanceDueDate ?? null,
+                    'status'          => 'Due',
+                    'due_date'        => $this->balanceDueDate ?? now()->addDays(7),
                 ]);
             }
 
@@ -554,7 +563,7 @@ class StoreBilling extends Component
 
         $this->balanceAmount = 0;
         $this->balancePaymentMethod = '';
-        $this->balanceDueDate = '';
+        $this->balanceDueDate = date('Y-m-d', strtotime('+7 days'));
         $this->balancePaymentReceiptImage = null;
         $this->balancePaymentReceiptImagePreview = null;
         $this->balanceBankName = '';
