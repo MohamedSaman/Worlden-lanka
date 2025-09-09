@@ -256,7 +256,7 @@
                     @if ($selectedPayment)
                     <div class="receipt-container">
                         <div class="text-center mb-4">
-                            <h3 class="mb-0">WORLDEN LANKA GROUP</h3>
+                            <h3 class="mb-0">PLUS</h3>
                             <p class="mb-0 text-muted small">NO 20/2/1, 2nd FLOOR,HUNTER BUILDING,BANKSHALLL STREET,COLOMBO-11</p>
                             <p class="mb-0 text-muted small">Phone: 011 - 2332786 | Email: plusaccessories.lk@gmail.com</p>
                             <h4 class="mt-3 border-bottom border-2 pb-2">PAYMENT RECEIPT</h4>

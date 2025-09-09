@@ -696,9 +696,9 @@
                         <div class="receipt-container">
                             <!-- Receipt Header -->
                             <div class="text-center mb-4">
-                                <h3 class="mb-0">NEW WATCH COMPANY ( MR TRADING )</h3>
-                                <p class="mb-0 text-muted small">NO 44 ,DOOLMALA ,THIHARIYA</p>
-                                <p class="mb-0 text-muted small">Phone: (033) 228 7437 | Email:hakeem9053@gmail.com</p>
+                                <h3 class="mb-0">PLUS</h3>
+                                <p class="mb-0 text-muted small">NO 20/2/1, 2nd FLOOR,HUNTER BUILDING,BANKSHALLL STREET,COLOMBO-11</p>
+                                <p class="mb-0 text-muted small"> Phone: 011 - 2332786 | Email: plusaccessories.lk@gmail.com</p>
                                 <h4 class="mt-3 border-bottom border-2 pb-2">SALES RECEIPT</h4>
                             </div>
 

@@ -687,9 +687,15 @@
                                         <p class="mb-1" style="color: #233D7F;"><strong>Invoice Number:</strong> {{ $receipt->invoice_number }}</p>
                                         <p class="mb-1" style="color: #233D7F;"><strong>Date:</strong> {{ $receipt->created_at->setTimezone('Asia/Colombo')->format('d/m/Y h:i A') }}</p>
                                         <p class="mb-1"><strong>Payment Status:</strong>
+                                            @if(ucfirst($receipt->payment_status) == 'Paid')
                                             <span class="badge" style="background-color: {{ $receipt->payment_status == 'paid' ? '#0F5132' : ($receipt->payment_status == 'partial' ? '#664D03' : '#842029') }}; color: #FFFFFF;">
-                                                {{ ucfirst($receipt->payment_status) }}
+                                                Paid
                                             </span>
+                                            @else
+                                            <span class="badge" style="background-color: {{ $receipt->payment_status == 'paid' ? '#0F5132' : ($receipt->payment_status == 'partial' ? '#664D03' : '#842029') }}; color: #FFFFFF;">
+                                                Credit
+                                            </span>
+                                            @endif
                                         </p>
                                     </div>
                                     <div class="col-md-6">
@@ -710,7 +716,7 @@
                                     <table class="table table-bordered table-sm border-1" style="border-color: #233D7F;">
                                         <thead style="background-color: #233D7F; color: #FFFFFF;">
                                             <tr>
-                                                <th scope="col" class="text-center py-2">#</th>
+                                                <th scope="col" class="text-center py-2">No</th>
                                                 <th scope="col" class="text-center py-2">Item</th>
                                                 <th scope="col" class="text-center py-2">Code</th>
                                                 <th scope="col" class="text-center py-2">Price</th>

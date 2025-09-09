@@ -110,58 +110,54 @@
                 <!-- Search & Filter Bar -->
                 <div class="card-header p-4" style="background-color: #eff6ff;">
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                        <div class="input-group shadow-sm rounded-full overflow-hidden" style="max-width: 400px;">
-                            <span class="input-group-text bg-white border-0">
-                                <i class="bi bi-search text-blue-600" aria-hidden="true"></i>
-                            </span>
-                            <input type="text"
-                                class="form-control border-0 py-2.5 bg-white text-gray-800"
-                                placeholder="Search invoices or customers..."
-                                wire:model.live.debounce.300ms="search"
-                                autocomplete="off"
-                                aria-label="Search invoices or customers">
+                        <div class="flex-grow-1 d-flex justify-content-lg">
+                            <div class="input-group " style="max-width: 600px;">
+                                <span class="input-group-text bg-gray-100 border-0 px-3">
+                                    <i class="bi bi-search text-primary"></i>
+                                </span>
+                                <input type="text"
+                                    class="form-control "
+                                    placeholder="Search customers..."
+                                    wire:model.live.debounce.300ms="search"
+                                    autocomplete="off">
+                            </div>
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <div class="dropdown">
-                                <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                                    type="button" id="filterDropdown" data-bs-toggle="dropdown"
-                                    aria-expanded="false">
+                                <button class="btn btn-light rounded-pill shadow-sm px-4 py-2 transition-all hover:shadow" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #00C8FF; border-color: #00C8FF; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">
                                     <i class="bi bi-funnel me-1"></i> Filters
-                                    @if ($filters['status'] || $filters['dateRange'])
-                                    <span class="badge bg-primary ms-1 rounded-full" style="background-color: #1e40af; color: #ffffff;">!</span>
+                                    @if ($filters['status'] || $filters['dateFrom'] || $filters['dateTo'])
+                                    <span class="badge bg-primary ms-1 rounded-pill" style="background-color: #233D7F; color: #ffffff;">!</span>
                                     @endif
                                 </button>
-                                <div class="dropdown-menu p-4 shadow-lg border-0 rounded-4" style="width: 300px;"
-                                    aria-labelledby="filterDropdown">
-                                    <h6 class="dropdown-header bg-light rounded py-2 mb-3 text-center text-sm fw-semibold" style="color: #1e3a8a;">Filter Options</h6>
+                                <div class="dropdown-menu p-4 shadow-lg border-0 rounded-4" style="width: 300px;" aria-labelledby="filterDropdown">
+                                    <h6 class="dropdown-header bg-light rounded py-2 mb-3 text-center text-sm fw-semibold" style="color: #233D7F;">Filter Options</h6>
                                     <div class="mb-3">
-                                        <label class="form-label text-sm fw-semibold" style="color: #1e3a8a;">Payment Status</label>
-                                        <select class="form-select form-select-sm rounded-full shadow-sm"
-                                            wire:model.live="filters.status">
+                                        <label class="form-label text-sm fw-semibold" style="color: #233D7F;">Payment Status</label>
+                                        <select class="form-select form-select-sm rounded-pill shadow-sm border-2" wire:model.live="filters.status" style="border-color: #233D7F; color: #233D7F;">
                                             <option value="">All Statuses</option>
-                                            <option value="null">Pending Payment</option>
-                                            <option value="pending">Pending Approval</option>
-                                            <option value="approved">Approved</option>
-                                            <option value="rejected">Rejected</option>
+                                            <option value="pending">Pending</option>
+                                            <option value="paid">Paid</option>
                                         </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label text-sm fw-semibold" style="color: #1e3a8a;">Due Date Range</label>
-                                        <input type="text"
-                                            class="form-control form-control-sm rounded-full shadow-sm"
-                                            placeholder="Select date range"
-                                            wire:model.live="filters.dateRange">
+                                        <label class="form-label text-sm fw-semibold" style="color: #233D7F;">Due Date From</label>
+                                        <input type="date" class="form-control form-control-sm rounded-pill shadow-sm border-2" wire:model.live="filters.dateFrom" style="border-color: #233D7F; color: #233D7F;">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-sm fw-semibold" style="color: #233D7F;">Due Date To</label>
+                                        <input type="date" class="form-control form-control-sm rounded-pill shadow-sm border-2" wire:model.live="filters.dateTo" style="border-color: #233D7F; color: #233D7F;">
                                     </div>
                                     <div class="d-grid">
-                                        <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                                            wire:click="resetFilters">
-                                            <i class="bi bi-x-circle me-1"></i> Reset Filters
+                                        <button class="btn btn-secondary rounded-pill shadow-sm px-4 py-2 transition-all hover:shadow" wire:click="resetFilters" style="background-color: #6B7280; border-color: #6B7280; color: white;">
+                                            <i class="bi bi-x-circle me-1"></i>Reset Filters
                                         </button>
                                     </div>
                                 </div>
                             </div>
                             <button wire:click="printDuePayments"
                                 class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
+                                style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F;"
                                 aria-label="Print due payments">
                                 <i class="bi bi-printer me-1" aria-hidden="true"></i> Print
                             </button>
@@ -670,7 +666,10 @@
             modal.hide();
         });
 
-        @this.on('showToast', ({ type, message }) => {
+        @this.on('showToast', ({
+            type,
+            message
+        }) => {
             Swal.fire({
                 toast: true,
                 position: 'top-end',
