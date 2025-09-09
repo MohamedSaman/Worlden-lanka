@@ -135,7 +135,9 @@
         </div>
     </div>
 
-    {{ $products->links() }}
+    <div class="mt-4">
+        {{ $products->links('pagination::bootstrap-5') }}
+    </div>
 
     <!-- Add Product Modal -->
     @if ($showAddModal)

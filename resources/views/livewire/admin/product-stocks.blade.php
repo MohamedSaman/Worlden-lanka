@@ -118,9 +118,7 @@
 
         </div>
     </div>
-</div>
-
-@push('styles')
+    @push('styles')
 <style>
     .tracking-tight {
         letter-spacing: -0.025em;
@@ -259,3 +257,5 @@
     }
 </script>
 @endpush
+</div>
+
