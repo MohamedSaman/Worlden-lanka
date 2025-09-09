@@ -157,7 +157,7 @@
                                     id="category_id"
                                     wire:model="category_id"
                                     class="form-select border-2 shadow-sm"
-                                    style="border-color: #233D7F; color: #233D7F;">
+                                    style=" color: #233D7F;">
                                     <option value="">Select a category</option>
                                     @foreach ($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -172,20 +172,20 @@
                                     id="product_name"
                                     wire:model="product_name"
                                     class="form-control border-2 shadow-sm"
-                                    style="border-color: #233D7F; color: #233D7F;">
+                                    style=" color: #233D7F;">
                                 @error('product_name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
 
                             <div class="col-md-6">
                                 <label for="supplier_price" class="form-label fw-medium" style="color: #233D7F;">Supplier Price</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-white border-2 border-end-0" style="border-color: #233D7F;">Rs.</span>
+                                    <span class="input-group-text bg-white border-2 border-end-0" >Rs.</span>
                                     <input
                                         type="number"
                                         id="supplier_price"
                                         wire:model="supplier_price"
                                         class="form-control border-2 shadow-sm"
-                                        style="border-color: #233D7F; color: #233D7F;"
+                                        style=" color: #233D7F;"
                                         step="0.01">
                                 </div>
                                 @error('supplier_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
@@ -193,13 +193,13 @@
                             <div class="col-md-6">
                                 <label for="selling_price" class="form-label fw-medium" style="color: #233D7F;">Selling Price</label>
                                 <div class="input-group">
-                                    <span class="input-group-text bg-white border-2 border-end-0" style="border-color: #233D7F;">Rs.</span>
+                                    <span class="input-group-text bg-white border-2 border-end-0" >Rs.</span>
                                     <input
                                         type="number"
                                         id="selling_price"
                                         wire:model="selling_price"
                                         class="form-control border-2 shadow-sm"
-                                        style="border-color: #233D7F; color: #233D7F;"
+                                        style=" color: #233D7F;"
                                         step="0.01">
                                 </div>
                                 @error('selling_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
@@ -211,7 +211,7 @@
                                     id="stock_quantity"
                                     wire:model="stock_quantity"
                                     class="form-control border-2 shadow-sm"
-                                    style="border-color: #233D7F; color: #233D7F;"
+                                    style=" color: #233D7F;"
                                     min="0" step="1">
                                 @error('stock_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
@@ -222,7 +222,7 @@
                                     id="damage_quantity"
                                     wire:model="damage_quantity"
                                     class="form-control border-2 shadow-sm"
-                                    style="border-color: #233D7F; color: #233D7F;"
+                                    style=" color: #233D7F;"
                                     min="0" step="1">
                                 @error('damage_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
@@ -239,7 +239,7 @@
                                         id="customer_field_{{ $key }}"
                                         wire:model="customer_fields.{{ $loop->index }}.value"
                                         class="form-control border-2 shadow-sm"
-                                        style="border-color: #233D7F; color: #233D7F;"
+                                        style="color: #233D7F;"
                                         placeholder="Enter {{ $key }}">
                                     @error('customer_fields.' . $loop->index . '.value') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
@@ -276,7 +276,7 @@
                                     id="edit_category_id"
                                     wire:model="category_id"
                                     class="form-select border-2 shadow-sm"
-                                    style="border-color: #233D7F; color: #233D7F;">
+                                    style=" color: #233D7F;">
                                     <option value="">Select a category</option>
                                     @foreach ($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -291,20 +291,20 @@
                                     id="edit_product_name"
                                     wire:model="product_name"
                                     class="form-control border-2 shadow-sm"
-                                    style="border-color: #233D7F; color: #233D7F;">
+                                    style=" color: #233D7F;">
                                 @error('product_name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-4">
                                     <label for="edit_supplier_price" class="form-label fw-medium" style="color: #233D7F;">Supplier Price</label>
                                     <div class="input-group">
-                                        <span class="input-group-text bg-white border-2 border-end-0" style="border-color: #233D7F;">Rs.</span>
+                                        <span class="input-group-text bg-white border-2 border-end-0" style="">Rs.</span>
                                         <input
                                             type="number"
                                             id="edit_supplier_price"
                                             wire:model="supplier_price"
                                             class="form-control border-2 shadow-sm"
-                                            style="border-color: #233D7F; color: #233D7F;"
+                                            style=" color: #233D7F;"
                                             step="0.01">
                                     </div>
                                     @error('supplier_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
@@ -314,13 +314,13 @@
                                 <div class="mb-4">
                                     <label for="edit_selling_price" class="form-label fw-medium" style="color: #233D7F;">Selling Price</label>
                                     <div class="input-group">
-                                        <span class="input-group-text bg-white border-2 border-end-0" style="border-color: #233D7F;">Rs.</span>
+                                        <span class="input-group-text bg-white border-2 border-end-0" style="">Rs.</span>
                                         <input
                                             type="number"
                                             id="edit_selling_price"
                                             wire:model="selling_price"
                                             class="form-control border-2 shadow-sm"
-                                            style="border-color: #233D7F; color: #233D7F;"
+                                            style=" color: #233D7F;"
                                             step="0.01">
                                     </div>
                                     @error('selling_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
@@ -334,7 +334,7 @@
                                         id="edit_stock_quantity"
                                         wire:model="stock_quantity"
                                         class="form-control border-2 shadow-sm"
-                                        style="border-color: #233D7F; color: #233D7F;"
+                                        style=" color: #233D7F;"
                                         min="0" step="1">
                                     @error('stock_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
@@ -347,7 +347,7 @@
                                         id="edit_damage_quantity"
                                         wire:model="damage_quantity"
                                         class="form-control border-2 shadow-sm"
-                                        style="border-color: #233D7F; color: #233D7F;"
+                                        style=" color: #233D7F;"
                                         min="0" step="1">
                                     @error('damage_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
@@ -359,7 +359,7 @@
                                     id="edit_sold_quantity"
                                     wire:model="sold"
                                     class="form-control border-2 shadow-sm"
-                                    style="border-color: #233D7F; color: #233D7F;"
+                                    style=" color: #233D7F;"
                                     min="0" step="1">
                                 @error('sold') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
@@ -369,7 +369,7 @@
                                     id="status"
                                     wire:model="status"
                                     class="form-select border-2 shadow-sm"
-                                    style="border-color: #233D7F; color: #233D7F;">
+                                    style=" color: #233D7F;">
                                     <option value="">Select Status</option>
                                     <option value="Available">Available</option>
                                     <option value="Unavailable">Unavailable</option>
@@ -394,7 +394,7 @@
                                         placeholder="Enter {{ $labelKey }}"
                                         wire:model="customer_fields.{{ $index }}.value"
                                         class="form-control border-2 shadow-sm"
-                                        style="border-color: #233D7F; color: #233D7F;">
+                                        style=" color: #233D7F;">
                                     @error('customer_fields.' . $index . '.value') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
                                 @endforeach
@@ -448,7 +448,7 @@
                 <!-- Modal Body -->
                 <div class="modal-body p-5">
                     <!-- Input for new fields -->
-                    <input wire:model="newFieldKey" class="form-control border-2 shadow-sm mb-3" placeholder="Enter field names" style="border-color: #233D7F; color: #233D7F; " />
+                    <input wire:model="newFieldKey" class="form-control border-2 shadow-sm mb-3" placeholder="Enter field names" style=" color: #233D7F; " />
                     @error('newFieldKey') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
 
                     <!-- Display all fields (existing + newly added) -->

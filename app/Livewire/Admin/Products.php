@@ -10,6 +10,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 use TheSeer\Tokenizer\Exception;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[Layout('components.layouts.admin')]
 #[Title('Product Management')]
@@ -197,7 +198,7 @@ class Products extends Component
         }
 
         try {
-            $totalQuantity = $this->stock_quantity ;
+            $totalQuantity = $this->stock_quantity;
             // Create product without product_code first
             $product = ProductDetail::create([
                 'category_id' => $this->category_id,
@@ -352,6 +353,54 @@ class Products extends Component
         $this->resetValidation();
     }
 
+
+    public function exportToCSV(): StreamedResponse
+    {
+        $fileName = 'products_export_' . now()->format('Y-m-d_H-i-s') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$fileName\"",
+        ];
+
+        $callback = function () {
+            $handle = fopen('php://output', 'w');
+
+            // Define your CSV headers
+            fputcsv($handle, [
+                'Product Code',
+                'Category',
+                'Product Name',
+                'Supplier Price',
+                'Selling Price',
+                'Stock Quantity',
+                'Damage Quantity',
+                'Sold',
+                'Status',
+            ]);
+
+            // Fetch all products with category
+            $products = ProductDetail::with('category')->get();
+
+            foreach ($products as $product) {
+                fputcsv($handle, [
+                    $product->product_code,
+                    $product->category->name ?? 'N/A',
+                    $product->product_name,
+                    $product->supplier_price,
+                    $product->selling_price,
+                    $product->stock_quantity,
+                    $product->damage_quantity,
+                    $product->sold,
+                    $product->status,
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
     public function render()
     {
         $products = ProductDetail::with('category')
