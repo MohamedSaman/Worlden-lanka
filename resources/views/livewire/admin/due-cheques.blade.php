@@ -1,9 +1,9 @@
 <div class="container-fluid py-6 bg-gray-50 min-vh-100 transition-colors duration-300">
-    <!-- Page Header with Stats -->
+    <!-- Page Header with Stats (unchanged) -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
-                <!-- Header Content -->
+                <!-- Header Content (unchanged) -->
                 <div class="card-header text-white p-5 rounded-t-4 d-flex align-items-center"
                     style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);">
                     <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
@@ -15,12 +15,12 @@
                     </div>
                 </div>
 
-                <!-- Stats Cards -->
+                <!-- Stats Cards (unchanged) -->
                 <div class="card-body p-5">
                     <div class="row g-4">
                         <!-- Pending Cheques Card -->
                         <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-sm rounded-4 h-100 transition-all hover:scale-105">
+                            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
                                 <div class="card-body p-4">
                                     <div class="d-flex align-items-center">
                                         <div class="icon-shape icon-md rounded-circle bg-info bg-opacity-10 me-3 text-center">
@@ -38,19 +38,19 @@
                             </div>
                         </div>
 
-                        <!-- Awaiting Approval Card -->
+                        <!-- Complete Cheque Card -->
                         <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-sm rounded-4 h-100 transition-all hover:scale-105">
+                            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
                                 <div class="card-body p-4">
                                     <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-warning bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-clock-history text-warning"></i>
+                                        <div class="icon-shape icon-md rounded-circle bg-success bg-opacity-10 me-3 text-center">
+                                            <i class="bi bi-clock-history text-success"></i>
                                         </div>
                                         <div>
-                                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Awaiting Approval</p>
+                                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Complete Cheque</p>
                                             <div class="d-flex align-items-baseline mt-1">
-                                                <h3 class="mb-0 fw-bold text-gray-800">{{ $awaitingApprovalCount }}</h3>
-                                                <span class="badge bg-warning bg-opacity-10 text-warning ms-2 rounded-full" style="padding: 6px 12px;">In Review</span>
+                                                <h3 class="mb-0 fw-bold text-gray-800">{{ $completeChequeCount }}</h3>
+                                                <span class="badge bg-success bg-opacity-10 text-success ms-2 rounded-full" style="padding: 6px 12px;">Complete</span>
                                             </div>
                                         </div>
                                     </div>
@@ -60,7 +60,7 @@
 
                         <!-- Return Cheques Card -->
                         <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-sm rounded-4 h-100 transition-all hover:scale-105">
+                            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
                                 <div class="card-body p-4">
                                     <div class="d-flex align-items-center">
                                         <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
@@ -80,16 +80,16 @@
 
                         <!-- Total Due Amount Card -->
                         <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-sm rounded-4 h-100 transition-all hover:scale-105">
+                            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
                                 <div class="card-body p-4">
                                     <div class="d-flex align-items-center">
                                         <div class="icon-shape icon-md rounded-circle bg-success bg-opacity-10 me-3 text-center">
                                             <i class="bi bi-currency-dollar text-success"></i>
                                         </div>
                                         <div>
-                                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Total Due</p>
+                                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Total Cheque Due</p>
                                             <div class="d-flex align-items-baseline mt-1">
-                                                <h4 class="mb-0 fw-bold text-gray-800">Rs.{{ number_format($totalDueAmount, 0) }}</h4>
+                                                <h4 class="mb-0 fw-bold text-gray-800">Rs.{{ number_format($totalDueAmount, 2) }}</h4>
                                             </div>
                                         </div>
                                     </div>
@@ -105,7 +105,7 @@
     <div class="row">
         <div class="col-12">
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
-                <!-- Search & Filter Bar -->
+                <!-- Search & Filter Bar (unchanged, but added print button wire:click if needed) -->
                 <div class="card-header p-4" style="background-color: #eff6ff;">
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                         <div class="input-group shadow-sm rounded-full overflow-hidden" style="max-width: 400px;">
@@ -174,118 +174,53 @@
                             <thead style="background-color: #eff6ff;">
                                 <tr>
                                     <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Invoice</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3" style="color: #1e3a8a;">Customer</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Customer</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Cheque Number</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Amount</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Due Date</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Cheque Date</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Status</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($duePayments as $payment)
-                                <tr class="border-bottom transition-all hover:bg-[#f1f5f9] {{ $loop->iteration % 2 == 0 ? 'bg-[#f9fafb]' : '' }} {{ now()->gt($payment->due_date) && $payment->status === null ? 'bg-danger bg-opacity-10' : '' }}">
-                                    <td class="ps-4" data-label="Invoice">
-                                        <div class="d-flex flex-column">
-                                            <h6 class="mb-0 text-sm fw-semibold text-gray-800">{{ $payment->sale->invoice_number }}</h6>
-                                            <p class="text-xs text-gray-600 mb-0">{{ $payment->sale->created_at->format('d M Y') }}</p>
-                                        </div>
-                                    </td>
-                                    <td data-label="Customer">
-                                        <div class="d-flex align-items-center">
-                                            <div class="icon-shape icon-md rounded-circle bg-primary bg-opacity-10 me-2 d-flex align-items-center justify-content-center">
-                                                <span class="text-primary fw-bold">{{ substr($payment->sale->customer->name, 0, 1) }}</span>
-                                            </div>
-                                            <div>
-                                                <p class="text-sm fw-semibold text-gray-800 mb-0">{{ $payment->sale->customer->name }}</p>
-                                                <p class="text-xs text-gray-600 mb-0">{{ $payment->sale->customer->phone }}</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-center" data-label="Amount">
-                                        <div class="d-flex align-items-center justify-content-center">
-                                            <div class="icon-shape icon-xs rounded-circle bg-success bg-opacity-10 me-2 text-center">
-                                                <i class="bi bi-currency-dollar text-success"></i>
-                                            </div>
-                                            <span class="text-sm fw-semibold text-gray-800">Rs.{{ number_format($payment->amount, 2) }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="text-center" data-label="Due Date">
-                                        <div class="d-flex align-items-center justify-content-center">
-                                            <div class="icon-shape icon-xs rounded-circle 
-                                                {{ now()->gt($payment->due_date) || now()->diffInDays($payment->due_date) <= 3 ? 'bg-danger bg-opacity-10' : 'bg-info bg-opacity-10' }} 
-                                                me-2 text-center">
-                                                <i class="bi bi-calendar-date {{ now()->gt($payment->due_date) || now()->diffInDays($payment->due_date) <= 3 ? 'text-danger' : 'text-info' }}"></i>
-                                            </div>
-                                            <span class="text-sm {{ now()->gt($payment->due_date) || now()->diffInDays($payment->due_date) <= 3 ? 'text-danger fw-bold' : 'text-gray-800' }}">
-                                                {{ $payment->due_date ? $payment->due_date->format('d M Y') : 'N/A' }}
-                                            </span>
-                                        </div>
-                                        @if (now()->gt($payment->due_date))
-                                        <span class="badge text-xs mt-1" style="background-color: #ef4444; color: #ffffff; padding: 6px 12px; border-radius: 9999px;">
-                                            {{ now()->diffForHumans($payment->due_date, ['parts' => 1]) }} overdue
+                                @forelse($duePayments as $cheque)
+                                <tr>
+                                    <td class="text-center fw-bold">{{ $cheque->payment->sale->invoice_number ?? 'N/A' }}</td>
+                                    <td class="text-center">{{ $cheque->customer->name ?? 'N/A' }}</td>
+                                    <td class="text-center">{{ $cheque->cheque_number ?? 'N/A' }}</td>
+                                    <td class="text-center">Rs. {{ number_format($cheque->cheque_amount ?? 0, 2) }}</td>
+                                    <td class="text-center">{{ $cheque->cheque_date?->format('d/m/Y') ?? 'N/A' }}</td>
+                                    <td class="text-center">
+                                        <span class="px-3 py-1 fw-semibold {{ $cheque->status === 'pending' ? 'text-warning' : ($cheque->status === 'complete' ? 'text-success' : 'text-danger ') }}">
+                                            {{ ucfirst($cheque->status ?? 'Pending') }}
                                         </span>
-                                        @elseif(now()->diffInDays($payment->due_date) <= 3)
-                                            <span class="badge  text-xs mt-1" style="background-color: #ef4444; color: #ffffff; padding: 6px 12px; border-radius: 9999px;">
-                                            Due in {{ now()->diffForHumans($payment->due_date, ['parts' => 1]) }}
-                                            </span>
-                                            @else
-                                            <span class="badge text-xs mt-1" style="background-color: #0ea5e9; color: #ffffff; padding: 6px 12px; border-radius: 9999px;">
-                                                Due in {{ now()->diffForHumans($payment->due_date, ['parts' => 1]) }}
-                                            </span>
-                                            @endif
                                     </td>
-                                    <td class="text-center" data-label="Status">
-                                        {!! $payment->status_badge !!}
-                                    </td>
-                                    <td class="text-center" data-label="Actions">
-                                        @if ($payment->status === null)
-                                        <div class="btn-group">
-                                            <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                                                wire:click="getPaymentDetails({{ $payment->id }})">
-                                                <i class="bi bi-currency-dollar me-1"></i> Receive
-                                            </button>
-                                            <button class="btn btn-light rounded-full shadow-sm px-4 py-2 ms-2 transition-transform hover:scale-105"
-                                                wire:click="openExtendDueModal({{ $payment->id }})">
-                                                <i class="bi bi-calendar-plus me-1"></i> Extend Due
-                                            </button>
-                                            <button class="btn btn-light rounded-full shadow-sm px-4 py-2 ms-2 transition-transform hover:scale-105"
-                                                wire:click="returnCheque({{ $payment->id }})"
-                                                style="background-color: #f59e0b; color: #ffffff;">
-                                                <i class="bi bi-arrow-return-left me-1"></i> Return Cheque
-                                            </button>
+
+                                    <td class="text-center">
+                                        @if($cheque->status == 'pending')
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <button wire:click="completePaymentDetails({{ $cheque->id }})" class="btn btn-sm btn-success rounded-pill">Complete</button>
+                                            <button wire:click="returnCheque({{ $cheque->id }})" class="btn btn-sm btn-danger rounded-pill">Return</button>
                                         </div>
-                                        @elseif($payment->status === 'pending')
-                                        <span class="btn btn-light rounded-full shadow-sm px-4 py-2 disabled opacity-75">
-                                            <i class="bi bi-hourglass-split me-1"></i> Awaiting
-                                        </span>
-                                        @elseif($payment->status === 'rejected')
-                                        <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                                            wire:click="getPaymentDetails({{ $payment->id }})">
-                                            <i class="bi bi-arrow-repeat me-1"></i> Resubmit
-                                        </button>
+                                        @elseif($cheque->status == 'return')
+                                        <div class="d-flex justify-content-center gap-2">
+                                            <button wire:click="refundCheque({{ $cheque->id }})" class="btn btn-sm btn-warning rounded-pill">Refund</button>
+                                        </div>
                                         @else
-                                        <span class="btn btn-light rounded-full shadow-sm px-4 py-2 disabled opacity-75">
-                                            <i class="bi bi-check-circle me-1"></i> Complete
-                                        </span>
+                                        <span class="text-success">completed</span>
                                         @endif
                                     </td>
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="6" class="text-center py-6">
-                                        <div style="width:72px;height:72px;background-color:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;margin-bottom:12px;">
-                                            <i class="bi bi-cash-coin text-gray-600 fs-3"></i>
-                                        </div>
-                                        <h5 class="text-gray-600 fw-normal">No Due Cheque Payments Found</h5>
-                                        <p class="text-sm text-gray-500 mb-0">All cheque payments are completed or no matching results found.</p>
-                                    </td>
+                                    <td colspan="7" class="text-center py-4 text-gray-600">No due cheque payments found.</td>
                                 </tr>
                                 @endforelse
                             </tbody>
                         </table>
                     </div>
                     <div class="px-4 py-3 border-top">
-                        {{ $duePayments->links() }}
+                        {{ $duePayments->links() }} <!-- Add pagination -->
                     </div>
                 </div>
             </div>
