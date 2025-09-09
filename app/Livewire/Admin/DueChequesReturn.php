@@ -20,6 +20,7 @@ class DueChequesReturn extends Component
     public $chequeDate;
     public $selectedChequeId;
     public $customerId;
+    public $originalCheque; // Store original cheque details for modal
 
     public function mount()
     {
@@ -33,6 +34,7 @@ class DueChequesReturn extends Component
     public function openReentryModal($chequeId)
     {
         $this->selectedChequeId = $chequeId;
+        $this->originalCheque = Cheque::with('customer')->find($chequeId);
         $this->reset(['chequeNumber', 'bankName', 'chequeAmount', 'chequeDate', 'cheques']);
         $this->dispatch('open-reentry-modal'); // Livewire 3 event
     }
@@ -79,7 +81,7 @@ class DueChequesReturn extends Component
 
         // Verify if total new cheque amount matches the original cheque amount
         if ($totalNewChequeAmount != $originalCheque->cheque_amount) {
-            $this->dispatch('notify', ['type' => 'error', 'message' => 'Total amount of new cheques (' . $totalNewChequeAmount . ') does not match the original cheque amount (' . $originalCheque->cheque_amount . ').']);
+            $this->dispatch('notify', ['type' => 'error', 'message' => 'Total amount of new cheques (' . number_format($totalNewChequeAmount, 2) . ') does not match the original cheque amount (' . number_format($originalCheque->cheque_amount, 2) . ').']);
             return;
         }
 
@@ -92,11 +94,11 @@ class DueChequesReturn extends Component
                 'cheque_amount'   => $cheque['amount'],
                 'cheque_date'     => $cheque['date'],
                 'status'          => 'pending',
-                'payment_id'      => $originalCheque->payment_id, // Added payment_id
+                'payment_id'      => $originalCheque->payment_id,
             ]);
         }
 
-        // Update original cheque status to reflect re-entry
+        // Update original cheque status to processed
         $originalCheque->update(['status' => 'pending']);
 
         // Refresh table
@@ -104,6 +106,7 @@ class DueChequesReturn extends Component
 
         // Clear modal and array
         $this->cheques = [];
+        $this->originalCheque = null;
         $this->dispatch('close-reentry-modal');
 
         $this->dispatch('notify', ['type' => 'success', 'message' => 'New cheque(s) submitted successfully.']);

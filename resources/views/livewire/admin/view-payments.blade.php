@@ -3,7 +3,7 @@
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
-                    <div class="card-header text-white p-5 rounded-t-4 d-flex align-items-center"
+                    <div class="card-header text-white p-2 rounded-t-4 d-flex align-items-center"
                         style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);">
                         <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
                             <i class="bi bi-card-list text-white fs-4" aria-hidden="true"></i>
@@ -232,7 +232,7 @@
                     </table>
                 </div>
                  <div class="px-4 py-3 border-top">
-                    {{ $payments->links() }}
+                    {{ $payments->links('pagination::bootstrap-5') }}
                 </div>
             </div>
         </div>

@@ -4,7 +4,7 @@
         <div class="col-12">
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
                 <!-- Header Content (unchanged) -->
-                <div class="card-header text-white p-5 rounded-t-4 d-flex align-items-center"
+                <div class="card-header text-white p-2 rounded-t-4 d-flex align-items-center"
                     style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);">
                     <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
                         <i class="bi bi-cash-stack text-white fs-4" aria-hidden="true"></i>
@@ -788,7 +788,7 @@
                         </div>
                         <div class="print-footer">
                             <small>Generated on ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Colombo' })}</small><br>
-                            <small>NEW WATCH COMPANY (MR TRADING) | NO 44, DOOLMALA, THIHARIYA | Phone: (033) 228 7437</small>
+                            <p>PLUS <br> NO 20/2/1, 2nd FLOOR,HUNTER BUILDING,BANKSHALLL STREET,COLOMBO-11 | Phone: 011 - 2332786 <br> Email: plusaccessories.lk@gmail.com</p>
                         </div>
                     </div>
                 </body>

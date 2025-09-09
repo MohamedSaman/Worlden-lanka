@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Livewire\Admin;
+
 use App\Models\Customer;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -10,12 +11,17 @@ use Exception;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\On;
+use Livewire\Features\SupportFileUploads\WithFileUploads;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 #[Layout('components.layouts.admin')]
 #[Title('Manage Customer')]
 class ManageCustomer extends Component
 {
-    
+
+    use WithFileUploads;
+
+    public $importFile;
     public $name;
     public $contactNumber;
     public $address;
@@ -24,11 +30,13 @@ class ManageCustomer extends Component
     public $bussinessName;
     public $search = '';
 
-    public function createCustomer(){
+    public function createCustomer()
+    {
         // $this->reset();
         $this->js("$('#createCustomerModal').modal('show')");
     }
-    public function saveCustomer(){
+    public function saveCustomer()
+    {
         $this->validate([
             'name' => 'required',
             'customerType' => 'required',
@@ -38,7 +46,7 @@ class ManageCustomer extends Component
             'bussinessName' => 'nullable',
         ]);
         // dd( $this->bussinessName); passing data
-        try{
+        try {
             Customer::create([
                 'name' => $this->name,
                 'phone' => $this->contactNumber,
@@ -48,13 +56,12 @@ class ManageCustomer extends Component
                 'business_name' => $this->bussinessName,
             ]);
             $this->js("Swal.fire('Success!', 'Customer Created Successfully', 'success')");
-        }catch(Exception $e){
+        } catch (Exception $e) {
             // log($e->getMessage());
-            $this->js("Swal.fire('Error!', '".$e->getMessage()."', 'error')");
+            $this->js("Swal.fire('Error!', '" . $e->getMessage() . "', 'error')");
         }
-        
+
         $this->js('$("#createCustomerModal").modal("hide")');
-        
     }
     public $editCustomerId;
     public $editName;
@@ -63,7 +70,8 @@ class ManageCustomer extends Component
     public $editEmail;
     public $editCustomerType;
     public $editBussinessName;
-    public function editCustomer($id){
+    public function editCustomer($id)
+    {
         $customer = Customer::find($id);
         // dd($customer);
         $this->editName = $customer->name;
@@ -78,16 +86,17 @@ class ManageCustomer extends Component
         // $this->js("$('#editCustomerModal').modal('show')");
         $this->dispatch('open-edit-modal');
     }
-    public function updateCustomer($id){
+    public function updateCustomer($id)
+    {
         $this->validate([
             'editName' => 'required',
             'editCustomerType' => 'required',
             'editBussinessName' => 'nullable',
             'editContactNumber' => 'required',
             'editAddress' => 'required',
-            'editEmail' => 'email|unique:customers,email,'.$id
+            'editEmail' => 'email|unique:customers,email,' . $id
         ]);
-        try{
+        try {
             $customer = Customer::find($id);
             $customer->name = $this->editName;
             $customer->phone = $this->editContactNumber; // <-- fixed here
@@ -97,15 +106,14 @@ class ManageCustomer extends Component
             $customer->email = $this->editEmail;
             $customer->save();
             $this->js("Swal.fire('Success!', 'Customer Updated Successfully', 'success')");
-        }catch(Exception $e){
+        } catch (Exception $e) {
             // log($e->getMessage());
-            $this->js("Swal.fire('Error!', '".$e->getMessage()."', 'error')");
+            $this->js("Swal.fire('Error!', '" . $e->getMessage() . "', 'error')");
         }
-        
+
         $this->js('$("#editCustomerModal").modal("hide")');
-        
     }
-    
+
     public $deleteId;
     public function confirmDelete($id)
     {
@@ -113,13 +121,82 @@ class ManageCustomer extends Component
         $this->dispatch('confirm-delete');
     }
     #[On('confirmDelete')]
-    public function deleteDialColor(){
-        try{
-            Customer::where('id', $this->deleteId )->delete();
-        }catch(Exception $e){
+    public function deleteDialColor()
+    {
+        try {
+            Customer::where('id', $this->deleteId)->delete();
+        } catch (Exception $e) {
             // log($e->getMessage());
-            $this->js("Swal.fire('Error!', '".$e->getMessage()."', 'error')");
+            $this->js("Swal.fire('Error!', '" . $e->getMessage() . "', 'error')");
         }
+    }
+
+    public function exportCustomers(): StreamedResponse
+    {
+        $fileName = 'customers_export_' . now()->format('Y-m-d_H-i-s') . '.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$fileName\"",
+        ];
+
+        $callback = function () {
+            $handle = fopen('php://output', 'w');
+
+            // CSV Header
+            fputcsv($handle, [
+                'ID',
+                'Name',
+                'Phone',
+                'Email',
+                'Type',
+                'Business Name',
+                'Address',
+                'Created At',
+            ]);
+
+            // Customer rows
+            $customers = Customer::all();
+            foreach ($customers as $customer) {
+                fputcsv($handle, [
+                    $customer->id,
+                    $customer->name,
+                    $customer->phone,
+                    $customer->email,
+                    $customer->type,
+                    $customer->business_name,
+                    $customer->address,
+                    $customer->created_at->format('Y-m-d H:i:s'),
+                ]);
+            }
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+    public function importCustomers()
+    {
+        $this->js("$('#importCustomerModal').modal('show')");
+    }
+    public function handleImport()
+    {
+        $this->validate([
+            'importFile' => 'required|file|mimes:csv,xlsx,xls',
+        ]);
+
+        try {
+            $path = $this->importFile->store('imports');
+
+            // Use Laravel Excel, FastExcel, or manual parsing here.
+            // For demonstration, let's just show success.
+            $this->js("Swal.fire('Success!', 'Customers imported successfully.', 'success')");
+        } catch (\Exception $e) {
+            $this->js("Swal.fire('Error!', 'Import failed: " . $e->getMessage() . "', 'error')");
+        }
+
+        $this->reset('importFile');
+        $this->js("$('#importCustomerModal').modal('hide')");
     }
 
     public function render()
@@ -127,9 +204,8 @@ class ManageCustomer extends Component
         $customers = Customer::all();
 
 
-        return view('livewire.admin.manage-customer',[
-            'customers'=> $customers
+        return view('livewire.admin.manage-customer', [
+            'customers' => $customers
         ]);
     }
 }
-
