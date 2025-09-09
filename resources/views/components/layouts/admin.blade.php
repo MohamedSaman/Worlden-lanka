@@ -334,7 +334,7 @@
                                 </a>
                             </li>
                                <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.due-cheques-return') ? 'active' : '' }}" href="{{ route('admin.due-cheques') }}">
+                                <a class="nav-link py-2 {{ request()->routeIs('admin.due-cheques-return') ? 'active' : '' }}" href="{{ route('admin.due-cheques-return') }}">
                                     <i class="bi bi-cash-coin"></i> <span>Cheque Return</span>
                                 </a>
                             </li>
