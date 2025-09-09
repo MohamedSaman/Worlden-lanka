@@ -119,36 +119,36 @@
                 <div class="modal-body p-5">
                     <div class="row g-4">
                         <div class="col-12 col-md-6">
-                            <label for="customerName" class="form-label fw-medium" style="color: #233D7F;">Customer Name</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="customerName" wire:model="name" placeholder="Enter customer name" style="border-color: #233D7F; color: #233D7F;">
+                            <label for="customerName" class="form-label fw-medium" style="color: #233D7F;">Customer Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control border-2 shadow-sm" id="customerName" wire:model="name" placeholder="Enter customer name" style="color: #233D7F;">
                             @error('name')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="contactNumber" class="form-label fw-medium" style="color: #233D7F;">Contact Number</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="contactNumber" wire:model="contactNumber" placeholder="Enter contact number" style="border-color: #233D7F; color: #233D7F;">
+                            <input type="text" class="form-control border-2 shadow-sm" id="contactNumber" wire:model="contactNumber" placeholder="Enter contact number" style=" color: #233D7F;">
                             @error('contactNumber')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="email" class="form-label fw-medium" style="color: #233D7F;">Email</label>
-                            <input type="email" class="form-control border-2 shadow-sm" id="email" wire:model="email" placeholder="Enter email" style="border-color: #233D7F; color: #233D7F;">
+                            <input type="email" class="form-control border-2 shadow-sm" id="email" wire:model="email" placeholder="Enter email" style=" color: #233D7F;">
                             @error('email')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="businessName" class="form-label fw-medium" style="color: #233D7F;">Business Name</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="businessName" wire:model="bussinessName" placeholder="Enter business name" style="border-color: #233D7F; color: #233D7F;">
+                            <input type="text" class="form-control border-2 shadow-sm" id="businessName" wire:model="bussinessName" placeholder="Enter business name" style=" color: #233D7F;">
                             @error('businessName')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="customerType" class="form-label fw-medium" style="color: #233D7F;">Customer Type</label>
-                            <select class="form-select border-2 shadow-sm" id="customerType" wire:model="customerType" style="border-color: #233D7F; color: #233D7F;">
+                            <select class="form-select border-2 shadow-sm" id="customerType" wire:model="customerType" style=" color: #233D7F;">
                                 <option value="">Select customer type</option>
                                 <option value="retail">Retail</option>
                                 <option value="wholesale">Wholesale</option>
@@ -159,7 +159,7 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="address" class="form-label fw-medium" style="color: #233D7F;">Address</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="address" wire:model="address" placeholder="Enter address" style="border-color: #233D7F; color: #233D7F;">
+                            <input type="text" class="form-control border-2 shadow-sm" id="address" wire:model="address" placeholder="Enter address" style=" color: #233D7F;">
                             @error('address')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
@@ -168,7 +168,7 @@
                 </div>
                 <div class="modal-footer py-3 px-4 flex-column flex-sm-row gap-2" style="border-top: 1px solid #233D7F; background: #f8f9fa;">
                     <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow  w-sm-auto" data-bs-dismiss="modal" style="background-color: #6B7280; border-color: #6B7280; color: white;">Close</button>
-                    <button type="button" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow w-sm-auto" wire:click="saveCustomer" style="background-color: #00C8FF; border-color: #00C8FF; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">Add Customer</button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow w-sm-auto" wire:click="saveCustomer" style="background-color: #00C8FF; border-color: #00C8FF; color: white;">Add Customer</button>
                 </div>
             </div>
         </div>
@@ -186,35 +186,35 @@
                     <div class="row g-4">
                         <div class="col-12 col-md-6">
                             <label for="editName" class="form-label fw-medium" style="color: #233D7F;">Customer Name</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="editName" wire:model="editName" style="border-color: #233D7F; color: #233D7F;">
+                            <input type="text" class="form-control border-2 shadow-sm" id="editName" wire:model="editName" style=" color: #233D7F;">
                             @error('editName')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="editContactNumber" class="form-label fw-medium" style="color: #233D7F;">Contact Number</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="editContactNumber" wire:model="editContactNumber" style="border-color: #233D7F; color: #233D7F;">
+                            <input type="text" class="form-control border-2 shadow-sm" id="editContactNumber" wire:model="editContactNumber" style=" color: #233D7F;">
                             @error('editContactNumber')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="editEmail" class="form-label fw-medium" style="color: #233D7F;">Email</label>
-                            <input type="email" class="form-control border-2 shadow-sm" id="editEmail" wire:model="editEmail" style="border-color: #233D7F; color: #233D7F;">
+                            <input type="email" class="form-control border-2 shadow-sm" id="editEmail" wire:model="editEmail" style=" color: #233D7F;">
                             @error('editEmail')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="editBusinessName" class="form-label fw-medium" style="color: #233D7F;">Business Name</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="editBusinessName" wire:model="editBussinessName" style="border-color: #233D7F; color: #233D7F;">
+                            <input type="text" class="form-control border-2 shadow-sm" id="editBusinessName" wire:model="editBussinessName" style=" color: #233D7F;">
                             @error('editBusinessName')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="editCustomerType" class="form-label fw-medium" style="color: #233D7F;">Customer Type</label>
-                            <select class="form-select border-2 shadow-sm" id="editCustomerType" wire:model="editCustomerType" style="border-color: #233D7F; color: #233D7F;">
+                            <select class="form-select border-2 shadow-sm" id="editCustomerType" wire:model="editCustomerType" style=" color: #233D7F;">
                                 <option value="retail">Retail</option>
                                 <option value="wholesale">Wholesale</option>
                             </select>
@@ -224,7 +224,7 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="editAddress" class="form-label fw-medium" style="color: #233D7F;">Address</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="editAddress" wire:model="editAddress" style="border-color: #233D7F; color: #233D7F;">
+                            <input type="text" class="form-control border-2 shadow-sm" id="editAddress" wire:model="editAddress" style=" color: #233D7F;">
                             @error('editAddress')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror

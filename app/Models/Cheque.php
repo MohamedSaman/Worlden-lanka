@@ -27,6 +27,7 @@ class Cheque extends Model
         'bank_name',
         'cheque_amount',
         'status',
+        'note',
         'customer_id',
         'payment_id',
     ];

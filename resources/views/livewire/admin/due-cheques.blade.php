@@ -220,7 +220,7 @@
                         </table>
                     </div>
                     <div class="px-4 py-3 border-top">
-                        {{ $duePayments->links() }} <!-- Add pagination -->
+                        {{ $duePayments->links('pagination::bootstrap-5') }} 
                     </div>
                 </div>
             </div>

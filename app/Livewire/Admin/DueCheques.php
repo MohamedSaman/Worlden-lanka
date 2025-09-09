@@ -195,7 +195,7 @@ class DueCheques extends Component
         }
 
         // ❗️ Only include cheques with status 'pending'
-        $filteredQuery->whereIn('status', ['pending','complete']);
+        $filteredQuery->whereIn('status', ['pending', 'complete']);
 
         // Date range filter
         if ($this->filters['dateRange']) {
@@ -203,7 +203,11 @@ class DueCheques extends Component
             $filteredQuery->whereBetween('cheque_date', [$startDate, $endDate]);
         }
 
-        $duePayments = $filteredQuery->orderBy('cheque_date', 'asc')->paginate(10);
+        $duePayments = $filteredQuery
+            ->orderByRaw("CASE WHEN status = 'pending' THEN 0 ELSE 1 END")
+            ->orderBy('cheque_date', 'asc')
+            ->paginate(10);
+
 
         return view('livewire.admin.due-cheques', [
             'duePayments' => $duePayments,

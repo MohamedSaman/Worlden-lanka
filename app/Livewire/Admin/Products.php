@@ -257,12 +257,6 @@ class Products extends Component
     public function update()
     {
         $this->rules['product_code'] = 'required|string|max:255|unique:product_details,product_code,' . $this->editingProductId;
-        $this->validate(
-            [],
-            [
-                'status.required' => 'Please select product status.',
-            ]
-        );
 
         $customerField = [];
         foreach ($this->customer_fields as $field) {

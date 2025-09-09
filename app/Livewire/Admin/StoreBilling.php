@@ -29,6 +29,7 @@ class StoreBilling extends Component
     public $quantities = [];
     public $discounts = [];
     public $prices = [];
+    public $quantityTypes = [];
     public $productDetails = null;
     public $subtotal = 0;
     public $totalDiscount = 0;
@@ -36,12 +37,12 @@ class StoreBilling extends Component
 
     public $customers = [];
     public $customerId = null;
-    public $customerType = 'retail';
+    public $customerType = 'wholesale';
 
     public $newCustomerName = '';
     public $newCustomerPhone = '';
     public $newCustomerEmail = '';
-    public $newCustomerType = 'retail';
+    public $newCustomerType = 'wholesale';
     public $newCustomerAddress = '';
     public $newCustomerNotes = '';
 
@@ -82,6 +83,7 @@ class StoreBilling extends Component
     public $duePaymentAttachmentPreview = null;
 
     public $banks = [];
+    public $availableQuantityTypes = [];
 
     protected $listeners = ['quantityUpdated' => 'updateTotals'];
 
@@ -89,6 +91,7 @@ class StoreBilling extends Component
     {
         $this->loadCustomers();
         $this->loadBanks();
+        $this->loadQuantityTypes();
         $this->updateTotals();
         $this->balanceDueDate = date('Y-m-d', strtotime('+7 days'));
     }
@@ -116,6 +119,17 @@ class StoreBilling extends Component
             'MCB Bank Ltd',
             'Public Bank Berhad',
             'Standard Chartered Bank',
+        ];
+    }
+    public function loadQuantityTypes()
+    {
+        $this->availableQuantityTypes = [
+            'pcs' => 'Pieces',
+            'box' => 'Box',
+            'pack' => 'Pack',
+            'set' => 'Set',
+            'doz' => 'Dozen',
+            'roll' => 'Roll',
         ];
     }
 
@@ -172,6 +186,7 @@ class StoreBilling extends Component
             $this->prices[$productId] = $product->selling_price ?? 0;
             $this->quantities[$productId] = 1;
             $this->discounts[$productId] = $product->discount_price ?? 0;
+            $this->quantityTypes[$productId] = ''; // Initialize quantity type
         }
 
         $this->search = '';
@@ -179,9 +194,29 @@ class StoreBilling extends Component
         $this->updateTotals();
     }
 
-    public function updatedQuantities($value, $productId)
+    public function updatedQuantities($value, $key)
     {
-        $this->validateQuantity((int)$productId);
+        $this->validateQuantity((int)$key);
+    }
+
+    public function updatedPrices($value, $key)
+    {
+        $value = max(0, floatval($value));
+        $this->prices[$key] = $value;
+
+        // Update max discount if needed
+        if (isset($this->discounts[$key]) && $this->discounts[$key] > $value) {
+            $this->discounts[$key] = $value;
+        }
+
+        $this->updateTotals();
+    }
+
+    public function updatedDiscounts($value, $key)
+    {
+        $price = $this->prices[$key] ?? $this->cart[$key]['price'] ?? 0;
+        $this->discounts[$key] = max(0, min(floatval($value), $price));
+        $this->updateTotals();
     }
 
     public function validateQuantity($productId)
@@ -251,6 +286,7 @@ class StoreBilling extends Component
         unset($this->quantities[$productId]);
         unset($this->discounts[$productId]);
         unset($this->prices[$productId]);
+        unset($this->quantityTypes[$productId]);
         $this->updateTotals();
     }
 
@@ -279,8 +315,10 @@ class StoreBilling extends Component
 
         foreach ($this->cart as $id => $item) {
             $price = $this->prices[$id] ?? $item['price'] ?? 0;
-            $this->subtotal += $price * ($this->quantities[$id] ?? 1);
-            $this->totalDiscount += ($this->discounts[$id] ?? 0) * ($this->quantities[$id] ?? 1);
+            $qty = $this->quantities[$id] ?? 1;
+            $discount = $this->discounts[$id] ?? 0;
+            $this->subtotal += $price * $qty;
+            $this->totalDiscount += $discount * $qty;
         }
 
         $this->grandTotal = $this->subtotal - $this->totalDiscount;
@@ -292,6 +330,7 @@ class StoreBilling extends Component
         $this->quantities = [];
         $this->discounts = [];
         $this->prices = [];
+        $this->quantityTypes = [];
         $this->updateTotals();
     }
 
@@ -299,7 +338,6 @@ class StoreBilling extends Component
     {
         $this->validate([
             'newCustomerName' => 'required',
-            'newCustomerPhone' => 'required',
         ]);
 
         $customer = Customer::create([
@@ -450,12 +488,15 @@ class StoreBilling extends Component
 
                 $price = $this->prices[$id] ?? $item['price'] ?? 0;
                 $itemDiscount = $this->discounts[$id] ?? 0;
+                $qtyType = $this->quantityTypes[$id] ?? '';
                 $total = ($price * $quantityToSell) - ($itemDiscount * $quantityToSell);
 
+                // dd($qtyType);
                 SalesItem::create([
                     'sale_id'    => $sale->id,
                     'product_id' => $item['id'],
                     'quantity'   => $quantityToSell,
+                    'quantity_type' => $qtyType,
                     'price'      => $price,
                     'discount'   => $itemDiscount,
                     'total'      => $total,
@@ -516,7 +557,7 @@ class StoreBilling extends Component
                     'amount'          => $this->grandTotal,
                     'payment_method'  => 'credit',
                     'is_completed'    => false,
-                    'status'          => 'Due',
+                    'status'          => null,
                     'due_date'        => $this->balanceDueDate ?? now()->addDays(7),
                 ]);
             }

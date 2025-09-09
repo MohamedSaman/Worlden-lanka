@@ -63,7 +63,7 @@
         }
     </style>
     @endpush
-    
+
     <div class="container-fluid py-4">
         <div class="row">
             <div class="col-12">
@@ -87,6 +87,7 @@
                                 <div class="search-results-container position-absolute mt-1 w-50 bg-white shadow-lg rounded"
                                     style="max-height: 350px; overflow-y: auto; z-index: 1000;">
                                     @foreach ($searchResults as $result)
+                                    @if($result->status== 'Available')
                                     <div class="search-result-item p-2 border-bottom d-flex align-items-center"
                                         wire:key="result-{{ $result->id }}">
 
@@ -127,11 +128,12 @@
                                             <button class="btn btn-sm btn-primary"
                                                 wire:click="addToCart({{ $result->id }})" {{ $result->stock_quantity <=
                                                     0 ? 'disabled' : '' }}>
-                                                    <i class="fas fa-plus"></i> Add
+                                                <i class="fas fa-plus"></i> Add
                                             </button>
                                         </div>
 
                                     </div>
+                                    @endif
                                     @endforeach
                                 </div>
                                 @elseif($search && count($searchResults) == 0)
@@ -158,7 +160,9 @@
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Quantity</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Discount (per unit)</th>
+                                            Quantity Type</th>
+                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Discount</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Total</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
@@ -212,7 +216,17 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="input-group input-group-sm" style="width: 100px;">
+                                            <select class="form-select form-select-sm"
+                                                wire:model="quantityTypes.{{ $id }}">
+                                                <option value="">Select</option>
+                                                @foreach($availableQuantityTypes as $key => $label)
+                                                <option value="{{ $key }}">{{ $label }}</option>
+                                                @endforeach
+                                            </select>   
+                                        </td>
+
+                                        <td>
+                                            <div class="input-group input-group-sm" style="width: 150px;">
                                                 <span class="input-group-text">Rs.</span>
                                                 <input type="number" class="form-control form-control-sm"
                                                     value="{{ $discounts[$id] ?? 0 }}" min="0"
@@ -227,10 +241,10 @@
                                             </p>
                                         </td>
                                         <td>
-                                            <button class="btn btn-link btn-sm text-info rounded-circle "
+                                            <!-- <button class="btn btn-link btn-sm text-info rounded-circle "
                                                 wire:click="showDetail({{ $id }})">
                                                 <i class="bi bi-eye"></i>
-                                            </button>
+                                            </button> -->
                                             <button class="btn btn-link btn-sm text-danger rounded-circle "
                                                 wire:click="removeFromCart({{ $id }})">
                                                 <i class="bi bi-trash"></i>
@@ -250,8 +264,6 @@
                                 </tbody>
                             </table>
                         </div>
-
-                        @if (!empty($cart))
                         <div class="row mt-4">
                             <div class="col-md-6">
                                 <div class="card">
@@ -345,16 +357,16 @@
                                                                 placeholder="Enter cheque number"
                                                                 wire:model="newCheque.number">
                                                         </div>
-<div class="col-md-6">
-    <label class="form-label small fw-bold">Bank Name</label>
-    <select class="form-select" wire:model="newCheque.bank">
-        <option value="">-- Select a bank --</option>
-        @foreach($banks as $bank)
-            <option value="{{ $bank }}">{{ $bank }}</option>
-        @endforeach
-    </select>
-    @error('newCheque.bank') <span class="text-danger small">{{ $message }}</span> @enderror
-</div>
+                                                        <div class="col-md-6">
+                                                            <label class="form-label small fw-bold">Bank Name</label>
+                                                            <select class="form-select" wire:model="newCheque.bank">
+                                                                <option value="">-- Select a bank --</option>
+                                                                @foreach($banks as $bank)
+                                                                <option value="{{ $bank }}">{{ $bank }}</option>
+                                                                @endforeach
+                                                            </select>
+                                                            @error('newCheque.bank') <span class="text-danger small">{{ $message }}</span> @enderror
+                                                        </div>
                                                         <div class="col-md-6">
                                                             <label class="form-label small fw-bold">Cheque Date</label>
                                                             <input type="date" class="form-control"
@@ -469,10 +481,12 @@
                                 </div>
                             </div>
                         </div>
-                        @endif
+
                     </div>
                 </div>
             </div>
+
+
             <div wire:ignore.self class="modal fade" id="viewDetailModal" tabindex="-1"
                 aria-labelledby="viewDetailModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -609,6 +623,8 @@
                     </div>
                 </div>
             </div>
+
+
             <div wire:ignore.self class="modal fade" id="addCustomerModal" tabindex="-1"
                 aria-labelledby="addCustomerModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
@@ -627,14 +643,15 @@
                                         <div class="d-flex">
                                             <div class="form-check me-4">
                                                 <input class="form-check-input" type="radio" name="newCustomerType"
-                                                    id="newRetail" value="retail" wire:model="newCustomerType" checked>
-                                                <label class="form-check-label" for="newRetail">Retail</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="newCustomerType"
-                                                    id="newWholesale" value="wholesale" wire:model="newCustomerType">
+                                                    id="newWholesale" value="wholesale" wire:model="newCustomerType" checked>
                                                 <label class="form-check-label" for="newWholesale">Wholesale</label>
                                             </div>
+                                            <div class="form-check ">
+                                                <input class="form-check-input" type="radio" name="newCustomerType"
+                                                    id="newRetail" value="retail" wire:model="newCustomerType" >
+                                                <label class="form-check-label" for="newRetail">Retail</label>
+                                            </div>
+                                            
                                         </div>
                                     </div>
 
@@ -650,12 +667,11 @@
                                         @enderror
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">Phone Number <span
-                                                class="text-danger">*</span></label>
+                                        <label class="form-label">Phone Number</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="bi bi-telephone"></i></span>
                                             <input type="text" class="form-control" placeholder="Enter phone number"
-                                                wire:model="newCustomerPhone" required>
+                                                wire:model="newCustomerPhone">
                                         </div>
                                         @error('newCustomerPhone')
                                         <small class="text-danger">{{ $message }}</small>
@@ -782,6 +798,7 @@
                                                 <th scope="col" class="text-center py-2">Code</th>
                                                 <th scope="col" class="text-center py-2">Price</th>
                                                 <th scope="col" class="text-center py-2">Qty</th>
+                                                <th scope="col" class="text-center py-2">Qty Type</th>
                                                 <th scope="col" class="text-center py-2">Discount</th>
                                                 <th scope="col" class="text-center py-2">Total</th>
                                             </tr>
@@ -797,6 +814,7 @@
                                                 <td class="text-center py-2">Rs.{{ number_format($item->price, 2) }}
                                                 </td>
                                                 <td class="text-center py-2">{{ $item->quantity }}</td>
+                                                <td class="text-center py-2">{{ ucfirst($item->quantity_type) }}</td>
                                                 <td class="text-center py-2">Rs.{{ number_format($item->discount *
                                                     $item->quantity, 2) }}</td>
                                                 <td class="text-center py-2">Rs.{{ number_format(($item->price *
@@ -907,7 +925,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const printButton = document.getElementById('printButton');
-            if(printButton) {
+            if (printButton) {
                 printButton.addEventListener('click', function() {
                     printSalesReceipt();
                 });
@@ -938,7 +956,7 @@
 
             printWindow.document.close();
             printWindow.focus();
-            
+
             // Use a timeout to ensure content is loaded before printing
             setTimeout(() => {
                 printWindow.print();
@@ -957,7 +975,7 @@
             // Listener for closing modals from the backend
             window.addEventListener('closeModal', event => {
                 const modal = bootstrap.Modal.getInstance(document.getElementById(event.detail[0].modalId));
-                if(modal) {
+                if (modal) {
                     modal.hide();
                 }
             });
@@ -980,10 +998,3 @@
     </script>
     @endpush
 </div>
-
-
-
-
-
-
-
