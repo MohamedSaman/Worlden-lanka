@@ -29,7 +29,7 @@ use App\Http\Controllers\WatchesExportController;
 use App\Livewire\Admin\Category;
 use App\Livewire\Admin\DueCheques;
 use App\Livewire\Admin\Products;
-
+use App\Livewire\Admin\DueChequesReturn;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -71,6 +71,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('/categories', Category::class)->name('categories');
         Route::get('/products', Products::class)->name('products');
         Route::get('/due-cheques', DueCheques::class)->name('due-cheques');
+        Route::get('/due-cheques-return', DueChequesReturn::class)->name('due-cheques-return');
+        
         Route::get('/product-stocks', \App\Livewire\Admin\ProductStocks::class)->name('product-stocks');
 
     });
