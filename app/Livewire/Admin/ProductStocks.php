@@ -44,13 +44,13 @@ class ProductStocks extends Component
             });
 
         $products = $query->orderBy('product_name')->paginate(10);
-        $hasStock = $products->sum(function ($product) {
-            return $product->sold + $product->available + $product->damage;
-        }) > 0;
+        // $hasStock = $products->sum(function ($product) {
+        //     return $product->sold + $product->available + $product->damage;
+        // }) > 0;
 
         return view('livewire.admin.product-stocks', [
             'products' => $products,
-            'hasStock' => $hasStock
+            // 'hasStock' => $hasStock
         ]);
     }
 }

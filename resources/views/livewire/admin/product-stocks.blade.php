@@ -1,5 +1,5 @@
-<div class="container py-6 min-vh-100 transition-colors duration-300">
-    <div class="card border-0  ">
+<div class="container-fluid py-6 transition-colors duration-300">
+    <div class="card border-0">
         <!-- Card Header -->
         <div class="card-header bg-transparent pb-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 border-bottom" style="border-color: #233D7F;">
 
@@ -47,20 +47,20 @@
         <div class="card-body p-1  pt-5 bg-transparent">
 
             <!-- Stock Table or Empty State -->
-            @if($hasStock)
+
             <div class="table-responsive shadow-sm rounded-2 overflow-hidden">
                 <table class="table table-sm ">
                     <thead>
                         <tr>
                             <th class="text-center py-3 ps-4">ID</th>
-                            <th class=" text-center py-3" >Image</th>
-                            <th class="text-center py-3" >Product Name</th>
-                            <th class="text-center py-3" >Product Code</th>
-                            <th class="text-center py-3" >Category</th>
-                            <th class="text-center py-3" >Sold</th>
-                            <th class="text-center py-3" >Available</th>
-                            <th class="text-center py-3" >Damage</th>
-                            <th class="text-center py-3" >Total</th>
+                            <th class=" text-center py-3">Image</th>
+                            <th class="text-center py-3">Product Name</th>
+                            <th class="text-center py-3">Product Code</th>
+                            <th class="text-center py-3">Category</th>
+                            <th class="text-center py-3">Sold</th>
+                            <th class="text-center py-3">Available</th>
+                            <th class="text-center py-3">Damage</th>
+                            <th class="text-center py-3">Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -85,10 +85,10 @@
                                 @endif
                             </td>
                             <td class="text-sm text-center py-3">{{ $product->product_name }}</td>
-                            <td class="text-sm text-center py-3" >{{ $product->product_code }}</td>
-                            <td class="text-sm text-center py-3" >{{ $product->category?->name ?? 'N/A' }}</td>
-                            <td class="text-sm text-center py-3" >{{ $product->sold }}</td>
-                            <td class="text-sm text-center py-3" >
+                            <td class="text-sm text-center py-3">{{ $product->product_code }}</td>
+                            <td class="text-sm text-center py-3">{{ $product->category?->name ?? 'N/A' }}</td>
+                            <td class="text-sm text-center py-3">{{ $product->sold }}</td>
+                            <td class="text-sm text-center py-3">
                                 <span class="badge"
                                     style="background-color: {{ $product->stock_quantity > 0 ? '#22c55e' : '#ef4444' }};
                                              color: #ffffff; padding: 6px 12px; border-radius: 9999px; font-weight: 600;">
@@ -96,7 +96,7 @@
                                 </span>
                             </td>
                             <td class="text-sm text-center py-3">{{ $product->damage_quantity }}</td>
-                            <td class="text-sm text-center py-3" >
+                            <td class="text-sm text-center py-3">
                                 {{ $product->sold + $product->stock_quantity + $product->damage_quantity }}
                             </td>
                         </tr>
@@ -111,18 +111,11 @@
                             </td>
                         </tr>
                         @endforelse
-                        </tbody>
+                    </tbody>
                 </table>
             </div>
-            @else
-            <div class="text-center py-6">
-                <div style="width:72px;height:72px;background-color:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;margin-bottom:12px;">
-                    <i class="bi bi-box-seam text-gray-600 fs-3"></i>
-                </div>
-                <h5 class="text-gray-600 fw-normal">No Product Stock Data Found</h5>
-                <p class="text-sm text-gray-500 mb-0">All product stocks are empty.</p>
-            </div>
-            @endif
+
+
         </div>
     </div>
 </div>
@@ -167,14 +160,13 @@
         height: 4.5rem;
     }
 
-    
+
     .image-wrapper {
         display: inline-block;
         overflow: hidden;
         border: 1px solid #e5e7eb;
         transition: transform 0.2s ease;
     }
-
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
