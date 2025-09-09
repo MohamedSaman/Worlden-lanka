@@ -73,11 +73,16 @@ class ViewPayments extends Component
         // Get summary stats
         $totalPayments = Payment::where('is_completed', 1)->sum('amount');
         $pendingPayments = Payment::where('is_completed', 0)->sum('amount');
+        $todayTotalPayments = Payment::whereDate('created_at', now()->toDateString())->where('is_completed', 1)->sum('amount');
+        $todayPendingPayments = Payment::whereDate('created_at', now()->toDateString())->where('is_completed', 0)->sum('amount');
 
         return view('livewire.admin.view-payments', [
             'payments' => $payments,
             'totalPayments' => $totalPayments,
             'pendingPayments' => $pendingPayments,
+            'todayTotalPayments' => $todayTotalPayments,
+            'todayPendingPayments' => $todayPendingPayments
         ]);
     }
 }
+    
