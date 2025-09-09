@@ -10,7 +10,7 @@
                         <i class="bi bi-cash-stack text-white fs-4" aria-hidden="true"></i>
                     </div>
                     <div>
-                        <h3 class="mb-1 fw-bold tracking-tight text-white">Due Cheque Payments</h3>
+                        <h3 class="mb-1 fw-bold tracking-tight text-white">Cheque Payments Details</h3>
                         <p class="text-white opacity-80 mb-0 text-sm">Manage and collect pending cheque payments from customers</p>
                     </div>
                 </div>

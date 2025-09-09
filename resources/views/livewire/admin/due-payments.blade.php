@@ -70,7 +70,7 @@
                                             <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Today Due Payment</p>
                                             <div class="d-flex align-items-baseline mt-1">
                                                 <h4 class="mb-0 fw-bold text-gray-800">
-                                                    Rs.{{ $todayDuePaymentsCount }}
+                                                    {{ $todayDuePaymentsCount }}
                                                 </h4>
                                             </div>
                                         </div>

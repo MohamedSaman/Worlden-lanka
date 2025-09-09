@@ -173,8 +173,6 @@ class DueCheques extends Component
         }
     }
 
-    // ... (Keep other methods unchanged: updatedDuePaymentAttachment, getPaymentDetails, submitPayment, openExtendDueModal, extendDueDate, getFilePreviewInfo, resetFilters)
-
     public function render()
     {
         $baseQuery = Cheque::with(['customer', 'payment.sale'])
@@ -184,6 +182,7 @@ class DueCheques extends Component
 
         $filteredQuery = clone $baseQuery;
 
+        // Search filter
         if ($this->search) {
             $filteredQuery->where(function ($q) {
                 $q->whereHas('payment.sale', function ($q2) {
@@ -195,17 +194,14 @@ class DueCheques extends Component
             });
         }
 
-        if ($this->filters['status'] === 'null') {
-            $filteredQuery->whereNull('status');
-        } elseif ($this->filters['status']) {
-            $filteredQuery->whereIn('status', ['pending', 'return']);
-        }
+        // ❗️ Only include cheques with status 'pending'
+        $filteredQuery->whereIn('status', ['pending','complete']);
 
+        // Date range filter
         if ($this->filters['dateRange']) {
             [$startDate, $endDate] = explode(' to ', $this->filters['dateRange']);
             $filteredQuery->whereBetween('cheque_date', [$startDate, $endDate]);
         }
-
 
         $duePayments = $filteredQuery->orderBy('cheque_date', 'asc')->paginate(10);
 

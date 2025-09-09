@@ -45,7 +45,7 @@
             padding: 10px;
             font-size: 1.4rem;
             font-weight: 700;
-            text-align: center;
+            text-align: left;
             letter-spacing: -0.02em;
             color: #fff;
         }
@@ -278,7 +278,7 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-title">
-                    <img src="{{ asset('images/LOGO.png') }}" alt="Logo" width="200px" height="100px">
+                    <img src="{{ asset('images/plus.png') }}" alt="Logo" width="200px" height="100px">
                 </div>
             </div>
             <ul class="nav flex-column">
@@ -363,8 +363,9 @@
             </button>
 
             <!-- Center Title -->
-            <div class="flex-grow-1 text-center fw-bold" style="color:#233D7F; font-size:18px;">
-                <h2 style="padding: 0;margin:0"><b>WORLDEN LANKA PVT</b></h2>
+            <div class="flex-grow-1 text-center fw-bold my-2" style="color:#233D7F; font-size:18px;">
+                <h2 style="padding: 0;margin:0"><b>PLUS</b></h2>
+                <p style="padding: 0;margin:0; font-size:16px;">Importers Of Garment Accessories & Machinery</p>
             </div>
 
             <!-- Right Dropdown -->
