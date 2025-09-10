@@ -37,6 +37,7 @@
             color: #ffffff;
             position: fixed;
             border-right: none;
+            overflow-y: auto; 
             transition: all 0.3s ease;
             z-index: 1040;
         }

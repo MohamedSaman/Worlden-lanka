@@ -124,8 +124,10 @@
                                             <div class="col-12">
                                                 <label class="form-label fw-medium" style="color: #233D7F; font-size: 0.95rem;">Bank Name</label>
                                                 <div class="input-group">
-                                                    <span class="input-group-text bg-white border-2 border-end-0" style=" color: #233D7F;"><i class="bi bi-bank"></i></span>
-                                                    <select class="form-select" wire:model="newCheque.bank">
+                                                    <span class="input-group-text bg-white border-2 border-end-0" style="color: #233D7F;">
+                                                        <i class="bi bi-bank"></i>
+                                                    </span>
+                                                    <select class="form-select" wire:model="bankName">
                                                         <option value="">-- Select a bank --</option>
                                                         @foreach($banks as $bank)
                                                         <option value="{{ $bank }}">{{ $bank }}</option>
