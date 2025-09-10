@@ -256,7 +256,8 @@ class Products extends Component
 
     public function update()
     {
-        $this->rules['product_code'] = 'required|string|max:255|unique:product_details,product_code,' . $this->editingProductId;
+        $this->rules['product_code'] = 'nullable|string|max:255|unique:product_details,product_code,' . $this->editingProductId;
+        $this->validate();
 
         $customerField = [];
         foreach ($this->customer_fields as $field) {
@@ -266,24 +267,39 @@ class Products extends Component
         }
 
         $product = ProductDetail::findOrFail($this->editingProductId);
+
+        // Generate product code if name/category changed or code is null
+        $generatedCode = $product->product_code; // default = existing
+
+        if (
+            empty($product->product_code) ||
+            $this->product_name !== $product->product_name ||
+            $this->category_id !== $product->category_id
+        ) {
+            $productPrefix = strtoupper(substr($this->product_name, 0, 2));
+            $categoryName = ProductCategory::find($this->category_id)->name ?? 'XX';
+            $categoryPrefix = strtoupper(substr($categoryName, 0, 2));
+            $generatedCode = $productPrefix . $categoryPrefix . '0' . $product->id;
+        }
+
         $product->update([
-            'category_id' => $this->category_id,
-            'product_name' => $this->product_name,
-            'supplier_price' => $this->supplier_price,
-            'selling_price' => $this->selling_price,
-            'stock_quantity' => $this->stock_quantity,
-            'damage_quantity' => $this->damage_quantity,
-            'sold' => $this->sold,
-            'status' => $this->status,
-            'customer_field' => $customerField,
+            'category_id'      => $this->category_id,
+            'product_name'     => $this->product_name,
+            'supplier_price'   => $this->supplier_price,
+            'selling_price'    => $this->selling_price,
+            'stock_quantity'   => $this->stock_quantity,
+            'damage_quantity'  => $this->damage_quantity,
+            'sold'             => $this->sold,
+            'status'           => $this->status,
+            'customer_field'   => $customerField,
+            'product_code'     => $generatedCode,
         ]);
-
-
 
         $this->resetFields();
         $this->showEditModal = false;
         session()->flash('message', 'Product updated successfully!');
     }
+
 
     public function confirmDelete($productId)
     {

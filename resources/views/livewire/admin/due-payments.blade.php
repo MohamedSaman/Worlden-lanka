@@ -406,14 +406,6 @@
                                             <textarea class="form-control rounded-4 shadow-sm" rows="3" wire:model="paymentNote" placeholder="Add any notes about this payment (optional)"></textarea>
                                         </div>
                                     </div>
-
-                                    <div class="alert alert-info bg-info bg-opacity-10 border-0 rounded-4 d-flex align-items-center shadow-sm p-3 mb-4">
-                                        <i class="bi bi-info-circle-fill text-info fs-5 me-3"></i>
-                                        <div>
-                                            <p class="mb-0 text-sm text-gray-800">This payment will be sent for admin approval.</p>
-                                            <p class="mb-0 text-xs text-gray-600">The customer's account will be updated once approved.</p>
-                                        </div>
-                                    </div>
                                 </div>
 
                                 <div class="p-4 bg-white border-top rounded-bottom-end-4">
