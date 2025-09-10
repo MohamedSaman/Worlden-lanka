@@ -37,12 +37,12 @@ class StoreBilling extends Component
 
     public $customers = [];
     public $customerId = null;
-    public $customerType = 'wholesale';
+    public $customerType = '';
 
     public $newCustomerName = '';
     public $newCustomerPhone = '';
     public $newCustomerEmail = '';
-    public $newCustomerType = 'wholesale';
+    public $newCustomerType = '';
     public $newCustomerAddress = '';
     public $newCustomerNotes = '';
 
@@ -450,7 +450,7 @@ class StoreBilling extends Component
                 'invoice_number'   => Sale::generateInvoiceNumber(),
                 'customer_id'      => $this->customerId,
                 'user_id'          => auth()->id(),
-                'customer_type'    => Customer::find($this->customerId)->type,
+                'customer_type'    => Customer::find($this->customerId)->type ?? 'N/A',
                 'subtotal'         => $this->subtotal,
                 'discount_amount'  => $this->totalDiscount,
                 'total_amount'     => $this->grandTotal,
