@@ -37,7 +37,7 @@
             color: #ffffff;
             position: fixed;
             border-right: none;
-            overflow-y: auto; 
+            overflow-y: auto;
             transition: all 0.3s ease;
             z-index: 1040;
         }
@@ -81,6 +81,23 @@
             color: #233D7F;
         }
 
+        /* Collapsed Sidebar */
+        .sidebar.collapsed {
+            width: 80px;
+        }
+
+        /* Adjust text visibility when collapsed */
+        .sidebar.collapsed .nav-link span {
+            display: none;
+            /* hide menu text */
+        }
+
+        .sidebar.collapsed .sidebar-title img {
+            width: 60px;
+            /* shrink logo */
+            height: auto;
+        }
+
         /* Top Bar */
         .top-bar {
             height: 64px;
@@ -90,11 +107,21 @@
             position: fixed;
             top: 0;
             left: 260px;
+            /* Default sidebar expanded */
             right: 0;
             z-index: 1000;
             display: flex;
             align-items: center;
-            transition: all 0.3s ease;
+            transition: left 0.3s ease, width 0.3s ease;
+            width: calc(100% - 260px);
+            /* full width minus sidebar */
+        }
+
+        .top-bar.collapsed {
+            left: 80px;
+            /* match collapsed sidebar */
+            width: calc(100% - 80px);
+            /* adjust width */
         }
 
         .top-bar .btn {
@@ -171,8 +198,8 @@
         }
 
         .main-content.collapsed {
-            margin-left: 70px;
-            width: calc(100% - 70px);
+            margin-left: 80px;
+            width: calc(100% - 80px);
         }
 
         /* Card Styles */
@@ -334,7 +361,7 @@
                                     <i class="bi bi-cash-coin"></i> <span>Cheque Details</span>
                                 </a>
                             </li>
-                               <li class="nav-item">
+                            <li class="nav-item">
                                 <a class="nav-link py-2 {{ request()->routeIs('admin.due-cheques-return') ? 'active' : '' }}" href="{{ route('admin.due-cheques-return') }}">
                                     <i class="bi bi-cash-coin"></i> <span>Cheque Return</span>
                                 </a>
