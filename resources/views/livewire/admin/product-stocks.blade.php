@@ -114,7 +114,10 @@
                     </tbody>
                 </table>
             </div>
-
+            <!-- Pagination -->
+            <div class="d-flex justify-content-end mt-4">
+                {{ $products->links('pagination::bootstrap-5') }}
+            </div>
 
         </div>
     </div>

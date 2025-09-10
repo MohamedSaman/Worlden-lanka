@@ -8,13 +8,7 @@
     <title>{{ $title ?? 'Page Title' }}</title>
 
     <!-- jQuery first -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-    <!-- Then Livewire/Alpine -->
-    <script src="livewire.js?id=df3a17f2"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+   
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -441,8 +435,12 @@
         </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     @livewireScripts
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Then Livewire/Alpine -->
+    <script src="livewire.js?id=df3a17f2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const sidebarToggler = document.getElementById('sidebarToggler');

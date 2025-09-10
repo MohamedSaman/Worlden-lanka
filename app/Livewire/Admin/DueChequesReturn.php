@@ -163,19 +163,19 @@ class DueChequesReturn extends Component
             }
 
             // If cash amount is provided, create a new cash payment
-            if ($this->cashAmount > 0) {
-                $originalPayment = Payment::find($originalCheque->payment_id);
-                Payment::create([
-                    'sale_id'         => $originalPayment->sale_id,
-                    'admin_sale_id'   => $originalPayment->admin_sale_id,
-                    'amount'          => $this->cashAmount,
-                    'payment_method'  => 'cash',
-                    'is_completed'    => true,
-                    'payment_date'    => now(),
-                    'status'          => 'Paid',
-                    'notes'           => $this->note,
-                ]);
-            }
+            // if ($this->cashAmount > 0) {
+            //     $originalPayment = Payment::find($originalCheque->payment_id);
+            //     Payment::create([
+            //         'sale_id'         => $originalPayment->sale_id,
+            //         'admin_sale_id'   => $originalPayment->admin_sale_id,
+            //         'amount'          => $this->cashAmount,
+            //         'payment_method'  => 'cash',
+            //         'is_completed'    => true,
+            //         'payment_date'    => now(),
+            //         'status'          => 'Paid',
+            //         'notes'           => $this->note,
+            //     ]);
+            // }
 
             // Update original cheque status to 'cancel'
             $originalCheque->update([

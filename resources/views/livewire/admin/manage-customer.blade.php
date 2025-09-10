@@ -74,8 +74,8 @@
                         @foreach ($customers as $customer)
                         <tr class="transition-all hover:bg-gray-50">
                             <td class="text-sm text-center  ps-4 py-3">{{$loop->iteration }}</td>
-                            <td class="text-sm text-center py-3 ">{{ $customer->name ?? '-' }}</td>
-                            <td class="text-sm text-center py-3 ">{{ $customer->business_name ?? '-' }}</td>
+                            <td class="text-sm py-3 ">{{ $customer->name ?? '-' }}</td>
+                            <td class="text-sm py-3 ">{{ $customer->business_name ?? '-' }}</td>
                             <td class="text-sm text-center py-3 ">{{ $customer->phone ?? '-' }}</td>
                             <td class="text-sm text-center py-3 ">{{ $customer->email ?? '-' }}</td>
                             <td class="text-sm text-center py-3 ">{{ ucfirst($customer->type) ?? '-' }}</td>
@@ -104,6 +104,9 @@
                         @endif
                     </tbody>
                 </table>
+            </div>
+            <div class="d-flex justify-content-end mt-4">
+                {{ $customers->links('pagination::bootstrap-5') }}
             </div>
         </div>
     </div>

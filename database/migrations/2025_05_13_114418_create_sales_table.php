@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('invoice_number')->unique();
             $table->foreignId('customer_id')->nullable()->constrained()->nullOnDelete();
-            $table->enum('customer_type', ['retail', 'wholesale'])->default('retail');
+            $table->string('customer_type');
             $table->decimal('subtotal', 10, 2);
             $table->decimal('discount_amount', 10, 2)->default(0);
             $table->decimal('total_amount', 10, 2);

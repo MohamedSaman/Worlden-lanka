@@ -50,7 +50,7 @@ class ManageCustomer extends Component
             'name' => 'required|string|max:255',
             'contactNumber' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255|unique:customers,email',
-            'customerType' => 'required|in:retail,wholesale',
+            'customerType' => 'nullable',
             'businessName' => 'nullable|string|max:255',
             'address' => 'nullable|string|max:500',
         ]);
@@ -94,7 +94,7 @@ class ManageCustomer extends Component
             'editName' => 'required|string|max:255',
             'editContactNumber' => 'nullable|string|max:20',
             'editEmail' => 'nullable|email|max:255|unique:customers,email,' . $this->editCustomerId,
-            'editCustomerType' => 'required|in:retail,wholesale',
+            'editCustomerType' => 'nullable',
             'editBusinessName' => 'nullable|string|max:255',
             'editAddress' => 'nullable|string|max:500',
         ]);
