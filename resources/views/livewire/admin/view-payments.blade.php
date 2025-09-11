@@ -264,7 +264,7 @@
                         </div>
 
                         <div class="row">
-                            <div class="mb-4 col-md-6">
+                            <div class="mb-1 col-md-6">
                                 <h6 class="text-muted mb-2" style="font-size: 1rem;">CUSTOMER INFORMATION</h6>
                                 <div class="card border-0 shadow-sm">
                                     <div class="card-body p-3">
@@ -279,7 +279,7 @@
                                 </div>
                             </div>
 
-                            <div class="mb-4 col-md-6">
+                            <div class="mb-1 col-md-6">
                                 <h6 class="text-muted mb-2" style="font-size: 1rem;">STAFF INFORMATION</h6>
                                 <div class="card border-0 shadow-sm">
                                     <div class="card-body p-3">
@@ -297,7 +297,7 @@
                             <table class="table table-bordered table-sm">
                                 <thead class="table-light">
                                     <tr>
-                                        <th style="font-size: 0.9rem;">#</th>
+                                        <th style="font-size: 0.9rem;">ID</th>
                                         <th style="font-size: 0.9rem;">Item</th>
                                         <th style="font-size: 0.9rem;">Code</th>
                                         <th style="font-size: 0.9rem;">Price</th>
@@ -323,7 +323,7 @@
                         </div>
 
                         <div class="row">
-                            <div class="mb-4 col-md-6">
+                            <div class="mb-1 col-md-6">
                                 <h6 class="text-muted mb-2" style="font-size: 1rem;">PAYMENT INFORMATION</h6>
                                 <div class="card border-0 shadow-sm mb-3">
                                     <div class="card-body p-3">
@@ -346,7 +346,7 @@
                                 </div>
                             </div>
 
-                            <div class="mb-4 col-md-6">
+                            <div class="mb-1 col-md-6">
                                 <h6 class="text-muted mb-2" style="font-size: 1rem;">INVOICE INFORMATION</h6>
                                 <div class="card border-0 shadow-sm mb-3">
                                     <div class="card-body p-3">
@@ -522,151 +522,20 @@
             <head>
                 <title>Print Payment Receipt</title>
                 <style>
-                    body {
-                        font-family: 'Arial', sans-serif;
-                        margin: 1.5cm;
-                        font-size: 14px;
-                        line-height: 1.5;
-                        color: #333;
-                    }
-                    .receipt-container {
-                        max-width: 800px;
-                        margin: auto;
-                        padding: 20px;
-                        border: 1px solid #ccc;
-                        border-radius: 8px;
-                    }
-                    .text-center {
-                        text-align: center;
-                    }
-                    .row {
-                        display: flex;
-                        flex-wrap: wrap;
-                        margin: 0 -10px;
-                        width: 100%;
-                    }
-                    .col-md-6 {
-                        flex: 0 0 45%;
-                        max-width: 45%;
-                        padding: 0 10px;
-                    }
-                    .card {
-                        border: 1px solid #ddd;
-                        border-radius: 6px;
-                        margin-bottom: 5px;
-                    }
-                    .card-body {
-                        padding: 12px;
-                    }
-                    .table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-bottom: 20px;
-                    }
-                    .table th, .table td {
-                        border: 1px solid #ccc;
-                        padding: 8px;
-                        text-align: left;
-                        font-size: 13px;
-                    }
-                    .table thead th {
-                        background-color: #f0f0f0;
-                        font-weight: bold;
-                    }
-                    h3 {
-                        font-size: 22px;
-                        font-weight: bold;
-                        margin-bottom: 10px;
-                    }
-                    h4 {
-                        font-size: 18px;
-                        font-weight: 600;
-                        margin: 15px 0;
-                        border-bottom: 2px solid #ccc;
-                        padding-bottom: 5px;
-                    }
-                    h6 {
-                        font-size: 14px;
-                        font-weight: 600;
-                        margin-bottom: 10px;
-                        color: #555;
-                    }
-                    p {
-                        margin: 0 0 5px;
-                        font-size: 13px;
-                    }
-                    .small {
-                        font-size: 12px;
-                    }
-                    .badge {
-                        padding: 4px 8px;
-                        border-radius: 12px;
-                        font-size: 12px;
-                    }
-                    .bg-success {
-                        background-color: #28a745;
-                        color: white;
-                    }
-                    .bg-warning {
-                        background-color: #ffc107;
-                        color: #333;
-                    }
-                    .bg-danger {
-                        background-color: #dc3545;
-                        color: white;
-                    }
-                    .bg-secondary {
-                        background-color: #6c757d;
-                        color: white;
-                    }
-                    .border-top {
-                        border-top: 1px solid #ccc !important;
-                    }
-                    .pt-3 {
-                        padding-top: 12px !important;
-                    }
-                    .mt-4 {
-                        margin-top: 20px !important;
-                    }
-                    .mb-4 {
-                        margin-bottom: 20px !important;
-                    }
-                    .mb-0 {
-                        margin-bottom: 0 !important;
-                    }
-                    .mb-1 {
-                        margin-bottom: 5px !important;
-                    }
-                    .mb-2 {
-                        margin-bottom: 8px !important;
-                    }
-                    @media print {
-                        body {
-                            margin: 0;
-                            padding: 0;
-                        }
-                        .receipt-container {
-                            border: none;
-                            padding: 0;
-                        }
-                        .card {
-                            box-shadow: none;
-                            border: 1px solid #ccc;
-                        }
-                        .no-print {
-                            display: none;
-                        }
-                        .row {
-                            display: flex;
-                            flex-wrap: wrap;
-                            margin: 0 -10px;
-                        }
-                        .col-md-6 {
-                            flex: 0 0 50%;
-                            max-width: 50%;
-                            padding: 0 10px;
-                        }
-                    }
+                    body { font-family: Arial, sans-serif; margin: 20px; font-size: 14px; }
+                    .receipt-container { max-width: 800px; margin: auto; }
+                    .row { display: flex; flex-wrap: wrap; margin: 0 -15px; }
+                    .col-md-6 { flex: 0 0 45%; max-width: 45%; padding: 0 15px; }
+                    .card { border: 1px solid #eee; border-radius: 8px; margin-bottom: 15px; }
+                    .card-body { padding: 15px; }
+                    .table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+                    .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    .table thead th { background-color: #f5f5f5; }
+                    .text-center { text-align: center; } .border-top { border-top: 1px solid #dee2e6 !important; }
+                    .pt-3 { padding-top: 1rem !important; } .mt-4 { margin-top: 1.5rem !important; }
+                    .mb-4 { margin-bottom: 1.5rem !important; } .mb-0 { margin-bottom: 0 !important; }
+                    .mb-1 { margin-bottom: 0.25rem !important; } .mb-2 { margin-bottom: 0.5rem !important; }
+                    h3,h4,h6,p,strong { margin:0; padding:0; }
                 </style>
             </head>
             <body>${printContent.innerHTML}</body>

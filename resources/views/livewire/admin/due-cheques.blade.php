@@ -120,7 +120,7 @@
                                     autocomplete="off">
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
+                        {{-- <div class="d-flex align-items-center gap-2">
                             <div class="dropdown">
                                 <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
                                     type="button" id="filterDropdown" data-bs-toggle="dropdown"
@@ -164,7 +164,7 @@
                                 aria-label="Print due cheque payments">
                                 <i class="bi bi-printer me-1" aria-hidden="true"></i> Print
                             </button>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
 
