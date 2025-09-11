@@ -140,7 +140,7 @@ class StoreBilling extends Component
 
     public function updatedSearch()
     {
-        if (strlen($this->search) >= 2) {
+        if (strlen($this->search) >= 1) {
             $this->searchResults = ProductDetail::join('product_categories', 'product_categories.id', '=', 'product_details.category_id')
                 ->where('product_details.product_name', 'LIKE', '%' . $this->search . '%')
                 ->orWhere('product_details.product_code', 'LIKE', '%' . $this->search . '%')

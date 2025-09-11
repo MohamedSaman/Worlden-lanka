@@ -87,7 +87,7 @@
                                 <div class="search-results-container position-absolute mt-1 w-50 bg-white shadow-lg rounded"
                                     style="max-height: 350px; overflow-y: auto; z-index: 1000;">
                                     @foreach ($searchResults as $result)
-                                    @if($result->status== 'Available')
+                                    @if($result->status== 'Active')
                                     <div class="search-result-item p-2 border-bottom d-flex align-items-center"
                                         wire:key="result-{{ $result->id }}">
 
@@ -128,7 +128,7 @@
                                             <button class="btn btn-sm btn-primary"
                                                 wire:click="addToCart({{ $result->id }})" {{ $result->stock_quantity <=
                                                     0 ? 'disabled' : '' }}>
-                                                <i class="fas fa-plus"></i> Add
+                                                    <i class="fas fa-plus"></i> Add
                                             </button>
                                         </div>
 
@@ -206,7 +206,8 @@
                                         </td>
                                         <td>
                                             <div style="width: 100px;">
-                                                {{-- FIXED: Removed wire:change and other attributes to simplify and prevent conflicts --}}
+                                                {{-- FIXED: Removed wire:change and other attributes to simplify and
+                                                prevent conflicts --}}
                                                 <input type="number"
                                                     class="form-control form-control-sm text-center quantity-input"
                                                     value="{{ $quantities[$id] }}" min="1"
@@ -222,16 +223,15 @@
                                                 @foreach($availableQuantityTypes as $key => $label)
                                                 <option value="{{ $key }}">{{ $label }}</option>
                                                 @endforeach
-                                            </select>   
+                                            </select>
                                         </td>
 
                                         <td>
                                             <div class="input-group input-group-sm" style="width: 150px;">
                                                 <span class="input-group-text">Rs.</span>
                                                 <input type="number" class="form-control form-control-sm"
-                                                    value="{{ $discounts[$id] ?? 0 }}" min="0"
-                                                    max="{{ $prices[$id] }}" step="0.01"
-                                                    wire:model.blur="discounts.{{ $id }}">
+                                                    value="{{ $discounts[$id] ?? 0 }}" min="0" max="{{ $prices[$id] }}"
+                                                    step="0.01" wire:model.blur="discounts.{{ $id }}">
                                             </div>
                                         </td>
                                         <td>
@@ -365,7 +365,8 @@
                                                                 <option value="{{ $bank }}">{{ $bank }}</option>
                                                                 @endforeach
                                                             </select>
-                                                            @error('newCheque.bank') <span class="text-danger small">{{ $message }}</span> @enderror
+                                                            @error('newCheque.bank') <span class="text-danger small">{{
+                                                                $message }}</span> @enderror
                                                         </div>
                                                         <div class="col-md-6">
                                                             <label class="form-label small fw-bold">Cheque Date</label>
@@ -643,15 +644,16 @@
                                         <div class="d-flex">
                                             <div class="form-check me-4">
                                                 <input class="form-check-input" type="radio" name="newCustomerType"
-                                                    id="newWholesale" value="wholesale" wire:model="newCustomerType" checked>
+                                                    id="newWholesale" value="wholesale" wire:model="newCustomerType"
+                                                    checked>
                                                 <label class="form-check-label" for="newWholesale">Wholesale</label>
                                             </div>
                                             <div class="form-check ">
                                                 <input class="form-check-input" type="radio" name="newCustomerType"
-                                                    id="newRetail" value="retail" wire:model="newCustomerType" >
+                                                    id="newRetail" value="retail" wire:model="newCustomerType">
                                                 <label class="form-check-label" for="newRetail">Retail</label>
                                             </div>
-                                            
+
                                         </div>
                                     </div>
 
@@ -849,12 +851,14 @@
                                             @endif
                                             @if ($payment->payment_date)
                                             <p class="mb-0" style="color: #233D7F;">
-                                                <strong>Date:</strong> {{ \Carbon\Carbon::parse($payment->payment_date)->format('d/m/Y') }}
+                                                <strong>Date:</strong> {{
+                                                \Carbon\Carbon::parse($payment->payment_date)->format('d/m/Y') }}
                                             </p>
                                             @endif
                                             @if ($payment->due_date)
                                             <p class="mb-0" style="color: #233D7F;">
-                                                <strong>Due Date:</strong> {{ \Carbon\Carbon::parse($payment->due_date)->format('d/m/Y') }}
+                                                <strong>Due Date:</strong> {{
+                                                \Carbon\Carbon::parse($payment->due_date)->format('d/m/Y') }}
                                             </p>
                                             @endif
                                         </div>
