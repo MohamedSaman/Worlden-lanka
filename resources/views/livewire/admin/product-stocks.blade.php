@@ -48,7 +48,7 @@
 
             <!-- Stock Table or Empty State -->
 
-            <div class="table-responsive shadow-sm rounded-2 overflow-hidden">
+            <div class="table-responsive shadow-sm rounded-2 overflow-auto">
                 <table class="table table-sm ">
                     <thead>
                         <tr>
@@ -84,7 +84,7 @@
                                 </div>
                                 @endif
                             </td>
-                            <td class="text-sm text-center py-3">{{ $product->product_name }}</td>
+                            <td class="text-sm text-center  py-3">{{ $product->product_name }}</td>
                             <td class="text-sm text-center py-3">{{ $product->product_code }}</td>
                             <td class="text-sm text-center py-3">{{ $product->category?->name ?? 'N/A' }}</td>
                             <td class="text-sm text-center py-3">{{ $product->sold }}</td>

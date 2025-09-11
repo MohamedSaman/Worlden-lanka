@@ -55,7 +55,7 @@
 
 
         <div class="card-body p-1  pt-5 bg-transparent">
-            <div class="table-responsive  shadow-sm rounded-2 overflow-hidden">
+            <div class="table-responsive  shadow-sm rounded-2 overflow-auto">
                 <table class="table table-sm ">
                     <thead>
                         <tr>

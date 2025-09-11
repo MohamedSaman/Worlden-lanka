@@ -49,7 +49,7 @@
 
             <!-- Sales Table or Empty State -->
             @if($customerSales->count())
-            <div class="table-responsive  shadow-sm rounded-2 overflow-hidden">
+            <div class="table-responsive  shadow-sm rounded-2 overflow-auto">
                 <table class="table table-sm">
                     <thead>
                         <tr>

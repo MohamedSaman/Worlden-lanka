@@ -54,7 +54,7 @@
 
     <!-- Products Table -->
     <div class="card-body py-0 px-1  bg-transparent">
-        <div class="table-responsive shadow-sm rounded-2 overflow-hidden">
+        <div class="table-responsive shadow-sm rounded-2 overflow-auto">
             <table class="table table-sm">
                 <thead>
                     <tr>
@@ -65,7 +65,7 @@
                         <th class="py-3">Supplier Price</th>
                         <th class="py-3">Selling Price</th>
 
-                        <th class="py-3">Total Quantity</th>
+                        <th class="py-3">Quantity Inhand</th>
                         <th class="py-3">Sold</th>
                         <th class="py-3 text-center">Stock</th>
 
@@ -352,7 +352,7 @@
                                     @error('damage_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            {{-- <div class="col-md-6">
                                 <label class="form-label fw-medium" style="color: #233D7F;">Sold Quantity</label>
                                 <input
                                     type="number"
@@ -360,9 +360,9 @@
                                     wire:model="sold"
                                     class="form-control border-2 shadow-sm"
                                     style=" color: #233D7F;"
-                                    min="0" step="1">
+                                    min="0" step="1" readonly>
                                 @error('sold') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                            </div>
+                            </div> --}}
                             <div class="col-md-6">
                                 <label for="status" class="form-label fw-medium" style="color: #233D7F;">Status</label>
                                 <select

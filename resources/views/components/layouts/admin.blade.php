@@ -8,7 +8,7 @@
     <title>{{ $title ?? 'Page Title' }}</title>
 
     <!-- jQuery first -->
-   
+
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -258,7 +258,7 @@
         }
 
         /* Responsive Styles */
-        @media (max-width: 767.98px) {
+        @media (max-width: 930px) {
             .sidebar {
                 transform: translateX(-100%);
                 width: 250px;
@@ -274,7 +274,12 @@
             }
 
             .top-bar {
+                width: 100%;
                 left: 0;
+            }
+
+            .top-bar .title {
+                display: none;
             }
 
             .main-content {
@@ -305,24 +310,28 @@
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"
+                        href="{{ route('admin.dashboard') }}">
                         <i class="bi bi-bar-chart-line"></i> <span>Overview</span>
                     </a>
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link dropdown-toggle" href="#inventorySubmenu" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="inventorySubmenu">
+                    <a class="nav-link dropdown-toggle" href="#inventorySubmenu" data-bs-toggle="collapse" role="button"
+                        aria-expanded="false" aria-controls="inventorySubmenu">
                         <i class="bi bi-box-seam"></i> <span>Inventory</span>
                     </a>
                     <div class="collapse" id="inventorySubmenu">
                         <ul class="nav flex-column ms-3">
                             <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.products') ? 'active' : '' }}" href="{{ route('admin.products') }}">
+                                <a class="nav-link py-2 {{ request()->routeIs('admin.products') ? 'active' : '' }}"
+                                    href="{{ route('admin.products') }}">
                                     <i class="bi bi-box-fill"></i> <span>Product Details</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.categories') ? 'active' : '' }}" href="{{ route('admin.categories') }}">
+                                <a class="nav-link py-2 {{ request()->routeIs('admin.categories') ? 'active' : '' }}"
+                                    href="{{ route('admin.categories') }}">
                                     <i class="bi bi-collection"></i> <span>Product Category</span>
                                 </a>
                             </li>
@@ -330,38 +339,45 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link py-2 {{ request()->routeIs('admin.manage-customer') ? 'active' : '' }}" href="{{ route('admin.manage-customer') }}">
+                    <a class="nav-link py-2 {{ request()->routeIs('admin.manage-customer') ? 'active' : '' }}"
+                        href="{{ route('admin.manage-customer') }}">
                         <i class="bi bi-people"></i> <span>Manage Customer</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link dropdown-toggle" href="#salesSubmenu" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="salesSubmenu">
+                    <a class="nav-link dropdown-toggle" href="#salesSubmenu" data-bs-toggle="collapse" role="button"
+                        aria-expanded="false" aria-controls="salesSubmenu">
                         <i class="bi bi-cart"></i> <span>Sales</span>
                     </a>
                     <div class="collapse" id="salesSubmenu">
                         <ul class="nav flex-column ms-3">
                             <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.customer-sale-details') ? 'active' : '' }}" href="{{ route('admin.customer-sale-details') }}">
+                                <a class="nav-link py-2 {{ request()->routeIs('admin.customer-sale-details') ? 'active' : '' }}"
+                                    href="{{ route('admin.customer-sale-details') }}">
                                     <i class="bi bi-people"></i> <span>Customer Sales</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.due-payments') ? 'active' : '' }}" href="{{ route('admin.due-payments') }}">
+                                <a class="nav-link py-2 {{ request()->routeIs('admin.due-payments') ? 'active' : '' }}"
+                                    href="{{ route('admin.due-payments') }}">
                                     <i class="bi bi-cash-coin"></i> <span>Due Payments</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.due-cheques') ? 'active' : '' }}" href="{{ route('admin.due-cheques') }}">
+                                <a class="nav-link py-2 {{ request()->routeIs('admin.due-cheques') ? 'active' : '' }}"
+                                    href="{{ route('admin.due-cheques') }}">
                                     <i class="bi bi-cash-coin"></i> <span>Cheque Details</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.due-cheques-return') ? 'active' : '' }}" href="{{ route('admin.due-cheques-return') }}">
+                                <a class="nav-link py-2 {{ request()->routeIs('admin.due-cheques-return') ? 'active' : '' }}"
+                                    href="{{ route('admin.due-cheques-return') }}">
                                     <i class="bi bi-cash-coin"></i> <span>Cheque Return</span>
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.view-payments') ? 'active' : '' }}" href="{{ route('admin.view-payments') }}">
+                                <a class="nav-link py-2 {{ request()->routeIs('admin.view-payments') ? 'active' : '' }}"
+                                    href="{{ route('admin.view-payments') }}">
                                     <i class="bi bi-credit-card-2-back"></i> <span>View Payments</span>
                                 </a>
                             </li>
@@ -369,12 +385,14 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link py-2 {{ request()->routeIs('admin.product-stocks') ? 'active' : '' }}" href="{{ route('admin.product-stocks') }}">
+                    <a class="nav-link py-2 {{ request()->routeIs('admin.product-stocks') ? 'active' : '' }}"
+                        href="{{ route('admin.product-stocks') }}">
                         <i class="bi bi-shield-lock"></i> <span>Product Stock</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->routeIs('admin.store-billing') ? 'active' : '' }}" href="{{ route('admin.store-billing') }}">
+                    <a class="nav-link {{ request()->routeIs('admin.store-billing') ? 'active' : '' }}"
+                        href="{{ route('admin.store-billing') }}">
                         <i class="bi bi-cash"></i> <span>Store Billing</span>
                     </a>
                 </li>
@@ -390,7 +408,7 @@
             </button>
 
             <!-- Center Title -->
-            <div class="flex-grow-1 text-center fw-bold my-2" style="color:#233D7F; font-size:18px;">
+            <div class="flex-grow-1 text-center fw-bold my-2 title" style="color:#233D7F; font-size:18px;">
                 <h2 style="padding: 0;margin:0"><b>PLUS</b></h2>
                 <p style="padding: 0;margin:0; font-size:16px;">Importers Of Garment Accessories & Machinery</p>
             </div>
@@ -436,7 +454,7 @@
     </div>
 
     @livewireScripts
-     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <!-- Then Livewire/Alpine -->
     <script src="livewire.js?id=df3a17f2"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -455,7 +473,7 @@
                     topBar.classList.add('collapsed');
                     mainContent.classList.add('collapsed');
                 }
-                if (window.innerWidth < 768) {
+                if (window.innerWidth < 930) {
                     sidebar.classList.remove('show');
                     topBar.classList.remove('collapsed');
                     mainContent.classList.remove('collapsed');
@@ -466,7 +484,7 @@
                 if (event) {
                     event.stopPropagation();
                 }
-                if (window.innerWidth < 768) {
+                if (window.innerWidth < 930) {
                     sidebar.classList.toggle('show');
                 } else {
                     sidebar.classList.toggle('collapsed');
@@ -480,7 +498,7 @@
                 initializeSidebar();
                 sidebarToggler.addEventListener('click', toggleSidebar);
                 document.addEventListener('click', function(event) {
-                    if (window.innerWidth < 768 &&
+                    if (window.innerWidth < 930 &&
                         sidebar.classList.contains('show') &&
                         !sidebar.contains(event.target) &&
                         !sidebarToggler.contains(event.target)) {
@@ -488,7 +506,7 @@
                     }
                 });
                 window.addEventListener('resize', function() {
-                    if (window.innerWidth >= 768) {
+                    if (window.innerWidth >= 930) {
                         sidebar.classList.remove('show');
                         const sidebarCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
                         if (sidebarCollapsed) {
