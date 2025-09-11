@@ -94,7 +94,7 @@
 
         /* Top Bar */
         .top-bar {
-            height: 64px;
+            height: 70px;
             background: #ffffff;
             border-bottom: 1px solid #e5e7eb;
             padding: 0 25px;
