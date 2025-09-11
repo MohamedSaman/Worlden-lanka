@@ -337,7 +337,12 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label text-xs fw-semibold">Bank Name <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control form-control-sm rounded-3 shadow-sm" wire:model="bankName" placeholder="Bank Name">
+                                                <select class="form-control form-control-sm rounded-3 shadow-sm" wire:model="bankName">
+                                                        <option value="">-- Select a bank --</option>
+                                                        @foreach($banks as $bank)
+                                                        <option value="{{ $bank }}">{{ $bank }}</option>
+                                                        @endforeach
+                                                    </select>
                                                 @error('bankName') <span class="text-danger text-xs">{{ $message }}</span> @enderror
                                             </div>
                                             <div class="col-md-6">
