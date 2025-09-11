@@ -207,7 +207,7 @@ class Products extends Component
                 'selling_price' => $this->selling_price,
                 'stock_quantity' => $totalQuantity - $this->damage_quantity,
                 'damage_quantity' => $this->damage_quantity,
-                'status' => 'Available',
+                'status' => 'Active',
                 'customer_field' => $customerField,
             ]);
 
