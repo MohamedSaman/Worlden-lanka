@@ -371,8 +371,8 @@
                                     class="form-select border-2 shadow-sm"
                                     style=" color: #233D7F;">
                                     <option value="">Select Status</option>
-                                    <option value="Available">Available</option>
-                                    <option value="Unavailable">Unavailable</option>
+                                    <option value="Active">Active</option>
+                                    <option value="Inactive">Inactive</option>
                                 </select>
                                 @error('status') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
