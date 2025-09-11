@@ -214,7 +214,7 @@ class ManageCustomer extends Component
                     ->orWhere('email', 'like', '%' . $this->search . '%')
                     ->orWhere('business_name', 'like', '%' . $this->search . '%');
             })
-            ->orderBy('name')
+            ->orderBy('id')
             ->paginate(10);
 
         return view('livewire.admin.manage-customer', [
