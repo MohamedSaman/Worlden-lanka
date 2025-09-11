@@ -552,6 +552,8 @@
                 }
                 setTimeout(() => document.body.removeChild(iframe), 1000);
             };
+
+            window.postMessage('electron-print', '*');
         };
 
         function openFullImage(imageUrl) {
