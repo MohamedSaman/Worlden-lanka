@@ -323,7 +323,7 @@ class Products extends Component
 
     public function viewProduct($productId)
     {
-        $product = ProductDetail::with('category')->findOrFail($productId);
+        $product = ProductDetail::with('category')->findOrFail($productId)->paginationate(10);
 
         $this->viewProductCode = $product->product_code;
         $this->viewCategoryName = $product->category->name ?? 'N/A';
