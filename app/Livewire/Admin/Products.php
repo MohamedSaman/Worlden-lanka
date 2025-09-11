@@ -323,7 +323,7 @@ class Products extends Component
 
     public function viewProduct($productId)
     {
-        $product = ProductDetail::with('category')->findOrFail($productId)->paginationate(10);
+        $product = ProductDetail::with('category')->findOrFail($productId);
 
         $this->viewProductCode = $product->product_code;
         $this->viewCategoryName = $product->category->name ?? 'N/A';
@@ -416,8 +416,8 @@ class Products extends Component
         $products = ProductDetail::with('category')
             ->where('product_code', 'like', '%' . $this->search . '%')
             ->orWhere('product_name', 'like', '%' . $this->search . '%')
-            ->orderBy('created_at', 'asc')
-            ->paginate(10);
+            ->orderBy('id', 'asc')
+            ->paginationate(10);
 
         return view('livewire.admin.products', [
             'products' => $products
