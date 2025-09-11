@@ -102,7 +102,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td class="text-sm text-center py-3">
+                            <td class="text-sm text-center py-3 w-100" colspan="9">
                                 <div style="width:72px;height:72px;background-color:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;margin-bottom:12px;">
                                     <i class="bi bi-box-seam text-gray-600 fs-3"></i>
                                 </div>
