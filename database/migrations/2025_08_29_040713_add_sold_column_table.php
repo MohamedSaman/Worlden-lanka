@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('product_details', function (Blueprint $table) {
             $table->integer('sold')->default(0);
-            $table->enum('status', ['Available', 'Unavailable'])->default('Available');
+            $table->enum('status', ['Active', 'Inactive'])->default('Active')->after('sold');
         });
     }
 
