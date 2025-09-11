@@ -547,7 +547,7 @@
                     }
                     .col-md-6 {
                         flex: 0 0 45%;
-                        max-width: 50%;
+                        max-width: 45%;
                         padding: 0 10px;
                     }
                     .card {

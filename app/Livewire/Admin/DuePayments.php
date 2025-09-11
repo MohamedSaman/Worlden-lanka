@@ -150,7 +150,7 @@ class DuePayments extends Component
                 'amount' => $totalPaid,
                 'due_payment_method' => $cashAmount > 0 && $chequeTotal > 0 ? 'cash+cheque' : ($chequeTotal > 0 ? 'cheque' : 'cash'),
                 'due_payment_attachment' => $attachmentPath,
-                'status' => 'approved', // Changed to 'approved' for "Paid" status
+                'status' => 'Paid', 
                 'is_completed' => true,
                 'payment_date' => now(),
             ]);
