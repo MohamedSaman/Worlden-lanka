@@ -3,7 +3,7 @@
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card border-0 shadow-lg overflow-hidden bg-white">
-                    <div class="card-header text-white p-2 d-flex align-items-center" style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%); border-radius: 20px 20px 0 0;">
+                    <div class="card-header text-white p-2 d-flex align-items-center" style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%); border-radius: 20px 20px 0 0;">
                         <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
                             <i class="bi bi-arrow-counterclockwise text-white fs-4" aria-hidden="true"></i>
                         </div>
@@ -20,7 +20,7 @@
             <div class="col-12">
                 <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
                     <div class="card-header p-4" style="background-color: #f8f9fa;">
-                        <h5 class="mb-0 fw-bold" style="color: #233D7F;">Returned Cheque List</h5>
+                        <h5 class="mb-0 fw-bold" style="color: #9d1c20;">Returned Cheque List</h5>
                     </div>
 
                     <div class="card-body p-5">
@@ -28,13 +28,12 @@
                             <table class="table table-hover align-middle mb-0">
                                 <thead style="background-color: #f8f9fa;">
                                     <tr>
-                                        <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #233D7F;">Cheque No</th>
-                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #233D7F;">Bank</th>
-                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #233D7F;">Customer Name</th>
-                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #233D7F;">Amount</th>
-                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #233D7F;">Cheque Date</th>
-                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #233D7F;">Status</th>
-                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #233D7F;">Action</th>
+                                        <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Cheque No</th>
+                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Bank</th>
+                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Customer Name</th>
+                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Amount</th>
+                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Cheque Date</th>
+                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -52,7 +51,7 @@
                                         </td>
                                         <td class="text-center d-flex justify-content-center gap-2">
                                             @if($cheque->status === 'return')
-                                            <button wire:click="openReentryModal({{ $cheque->id }})" class="btn btn-sm btn-primary rounded-pill px-3 transition-all hover:shadow" style="background-color: #00C8FF; border-color: #00C8FF; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">
+                                            <button wire:click="openReentryModal({{ $cheque->id }})" class="btn btn-sm btn-primary rounded-pill px-3 transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
                                                 <i class="bi bi-redo me-1"></i>Re-entry
                                             </button>
                                             <button wire:click="openCompleteModal({{ $cheque->id }})" class="btn btn-sm btn-success rounded-pill px-3 transition-all hover:shadow" style="background-color: #28a745; border-color: #28a745; color: white;" onmouseover="this.style.backgroundColor='#1e7e34'; this.style.borderColor='#1e7e34';" onmouseout="this.style.backgroundColor='#28a745'; this.style.borderColor='#28a745';">
@@ -79,8 +78,8 @@
         <!-- Re-entry Cheque Modal -->
         <div wire:ignore.self class="modal fade" id="reentry-modal" tabindex="-1" aria-labelledby="reentry-modal-label" aria-hidden="true" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
             <div class="modal-dialog modal-lg modal-dialog-centered" style="max-width: 1200px;">
-                <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #233D7F; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
-                    <div class="modal-header py-3 px-4" style="background-color: #233D7F; color: white;">
+                <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                    <div class="modal-header py-3 px-4" style="background-color: #9d1c20; color: white;">
                         <h5 class="modal-title fw-bold tracking-tight" id="reentry-modal-label" style="font-size: 1.5rem; font-weight: 600;">
                             <i class="bi bi-journal-plus me-2"></i>New Cheque Re-entry
                         </h5>
@@ -91,9 +90,9 @@
                             <!-- Original Cheque Details Column -->
                             <div class="col-md-3">
                                 @if($originalCheque)
-                                <div class="card border-0 shadow-sm rounded-4" style="background-color: #e6f3ff; border: 1px solid #233D7F;">
+                                <div class="card border-0 shadow-sm rounded-4" style="background-color: #e6f3ff; border: 1px solid #9d1c20;">
                                     <div class="card-body p-4">
-                                        <h6 class="fw-bold mb-3" style="color: #233D7F; font-size: 1.25rem;">Original Cheque Details</h6>
+                                        <h6 class="fw-bold mb-3" style="color: #9d1c20; font-size: 1.25rem;">Original Cheque Details</h6>
                                         <div style="font-size: 0.95rem; line-height: 1.6;">
                                             <p class="mb-2"><strong>Customer:</strong> {{ $originalCheque->customer ? $originalCheque->customer->name : 'N/A' }}</p>
                                             <p class="mb-2"><strong>Cheque Number:</strong> {{ $originalCheque->cheque_number }}</p>
@@ -110,21 +109,21 @@
                             <div class="col-md-6">
                                 <div class="card border-0 shadow-sm rounded-4 mb-4" style="background-color: #f8f9fa; border: 1px solid #233D7F;">
                                     <div class="card-body p-4">
-                                        <h6 class="fw-bold mb-3" style="color: #233D7F; font-size: 1.25rem;">Add New Cheque Details</h6>
+                                        <h6 class="fw-bold mb-3" style="color: #9d1c20; font-size: 1.25rem;">Add New Cheque Details</h6>
                                         <p class="text-sm text-gray-600 mb-4" style="font-size: 0.9rem;">Enter details for new cheques. Total must match Rs. {{ $originalCheque ? number_format($originalCheque->cheque_amount, 2) : 'N/A' }}.</p>
                                         <div class="row g-3">
                                             <div class="col-12">
-                                                <label class="form-label fw-medium" style="color: #233D7F; font-size: 0.95rem;">Cheque Number</label>
+                                                <label class="form-label fw-medium" style="color: #9d1c20; font-size: 0.95rem;">Cheque Number</label>
                                                 <div class="input-group">
-                                                    <span class="input-group-text bg-white border-2 border-end-0" style=" color: #233D7F;"><i class="bi bi-hash"></i></span>
-                                                    <input type="text" class="form-control border-2 shadow-sm rounded-4" placeholder="Enter Cheque Number" wire:model="chequeNumber" style=" color: #233D7F; font-size: 0.9rem;">
+                                                    <span class="input-group-text bg-white border-2 border-end-0" style=" color: #9d1c20;"><i class="bi bi-hash"></i></span>
+                                                    <input type="text" class="form-control border-2 shadow-sm rounded-4" placeholder="Enter Cheque Number" wire:model="chequeNumber" style=" color: #9d1c20; font-size: 0.9rem;">
                                                 </div>
                                                 @error('chequeNumber') <div class="text-danger small mt-1" style="font-size: 0.85rem;">{{ $message }}</div> @enderror
                                             </div>
                                             <div class="col-12">
-                                                <label class="form-label fw-medium" style="color: #233D7F; font-size: 0.95rem;">Bank Name</label>
+                                                <label class="form-label fw-medium" style="color: #9d1c20; font-size: 0.95rem;">Bank Name</label>
                                                 <div class="input-group">
-                                                    <span class="input-group-text bg-white border-2 border-end-0" style="color: #233D7F;">
+                                                    <span class="input-group-text bg-white border-2 border-end-0" style="color: #9d1c20;">
                                                         <i class="bi bi-bank"></i>
                                                     </span>
                                                     <select class="form-select" wire:model="bankName">
@@ -137,23 +136,23 @@
                                                 @error('bankName') <div class="text-danger small mt-1" style="font-size: 0.85rem;">{{ $message }}</div> @enderror
                                             </div>
                                             <div class="col-12">
-                                                <label class="form-label fw-medium" style="color: #233D7F; font-size: 0.95rem;">Amount</label>
+                                                <label class="form-label fw-medium" style="color: #9d1c20; font-size: 0.95rem;">Amount</label>
                                                 <div class="input-group">
-                                                    <span class="input-group-text bg-white border-2 border-end-0" style=" color: #233D7F;">Rs.</span>
-                                                    <input type="number" class="form-control border-2 shadow-sm rounded-4" placeholder="Enter Amount" wire:model="chequeAmount" step="0.01" style=" color: #233D7F; font-size: 0.9rem;">
+                                                    <span class="input-group-text bg-white border-2 border-end-0" style=" color: #9d1c20;">Rs.</span>
+                                                    <input type="number" class="form-control border-2 shadow-sm rounded-4" placeholder="Enter Amount" wire:model="chequeAmount" step="0.01" style=" color: #9d1c20; font-size: 0.9rem;">
                                                 </div>
                                                 @error('chequeAmount') <div class="text-danger small mt-1" style="font-size: 0.85rem;">{{ $message }}</div> @enderror
                                             </div>
                                             <div class="col-12">
-                                                <label class="form-label fw-medium" style="color: #233D7F; font-size: 0.95rem;">Cheque Date</label>
+                                                <label class="form-label fw-medium" style="color: #9d1c20; font-size: 0.95rem;">Cheque Date</label>
                                                 <div class="input-group">
-                                                    <span class="input-group-text bg-white border-2 border-end-0" style=" color: #233D7F;"><i class="bi bi-calendar"></i></span>
-                                                    <input type="date" class="form-control border-2 shadow-sm rounded-4" wire:model="chequeDate" style=" color: #233D7F; font-size: 0.9rem;">
+                                                    <span class="input-group-text bg-white border-2 border-end-0" style=" color: #9d1c20;"><i class="bi bi-calendar"></i></span>
+                                                    <input type="date" class="form-control border-2 shadow-sm rounded-4" wire:model="chequeDate" style=" color: #9d1c20; font-size: 0.9rem;">
                                                 </div>
                                                 @error('chequeDate') <div class="text-danger small mt-1" style="font-size: 0.85rem;">{{ $message }}</div> @enderror
                                             </div>
                                             <div class="col-12 text-end">
-                                                <button type="button" wire:click="addCheque" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" style="background-color: #00C8FF; border-color: #00C8FF; color: white; font-size: 0.9rem;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">
+                                                <button type="button" wire:click="addCheque" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white; font-size: 0.9rem;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
                                                     <i class="bi bi-plus-circle me-1"></i>Add Cheque
                                                 </button>
                                             </div>
@@ -161,18 +160,18 @@
                                     </div>
                                 </div>
 
-                                <div class="card border-0 shadow-sm rounded-4" style="background-color: #f8f9fa; border: 1px solid #233D7F;">
+                                <div class="card border-0 shadow-sm rounded-4" style="background-color: #f8f9fa; border: 1px solid #9d1c20;">
                                     <div class="card-body p-4">
-                                        <h6 class="fw-bold mb-3" style="color: #233D7F; font-size: 1.25rem;">Added Cheques</h6>
+                                        <h6 class="fw-bold mb-3" style="color: #9d1c20; font-size: 1.25rem;">Added Cheques</h6>
                                         <div class="table-responsive">
                                             <table class="table table-hover align-middle">
                                                 <thead style="background-color: #f8f9fa;">
                                                     <tr>
-                                                        <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #233D7F; font-size: 0.85rem;">Cheque No</th>
-                                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #233D7F; font-size: 0.85rem;">Bank</th>
-                                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #233D7F; font-size: 0.85rem;">Date</th>
-                                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #233D7F; font-size: 0.85rem;">Amount</th>
-                                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #233D7F; font-size: 0.85rem;">Action</th>
+                                                        <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20; font-size: 0.85rem;">Cheque No</th>
+                                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20; font-size: 0.85rem;">Bank</th>
+                                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20; font-size: 0.85rem;">Date</th>
+                                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20; font-size: 0.85rem;">Amount</th>
+                                                        <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20; font-size: 0.85rem;">Action</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
@@ -200,16 +199,16 @@
 
                             <!-- Cash and Notes Column -->
                             <div class="col-md-3">
-                                <div class="card border-0 shadow-sm rounded-4 mb-4" style="background-color: #f8f9fa; border: 1px solid #233D7F;">
+                                <div class="card border-0 shadow-sm rounded-4 mb-4" style="background-color: #f8f9fa; border: 1px solid #9d1c20;">
                                     <div class="card-body p-4">
-                                        <h6 class="fw-bold mb-3" style="color: #233D7F; font-size: 1.25rem;">Add Cash Payment</h6>
+                                        <h6 class="fw-bold mb-3" style="color: #9d1c20; font-size: 1.25rem;">Add Cash Payment</h6>
                                         <p class="text-sm text-gray-600 mb-4" style="font-size: 0.9rem;">Enter cash amount if applicable. Combined with cheques, total must match original amount.</p>
                                         <div class="row g-3">
                                             <div class="col-12">
-                                                <label class="form-label fw-medium" style="color: #233D7F; font-size: 0.95rem;">Cash Amount</label>
+                                                <label class="form-label fw-medium" style="color: #9d1c20; font-size: 0.95rem;">Cash Amount</label>
                                                 <div class="input-group">
-                                                    <span class="input-group-text bg-white border-2 border-end-0" style=" color: #233D7F;">Rs.</span>
-                                                    <input type="number" class="form-control border-2 shadow-sm rounded-4" placeholder="Enter Cash Amount" wire:model="cashAmount" step="0.01" style=" color: #233D7F; font-size: 0.9rem;">
+                                                    <span class="input-group-text bg-white border-2 border-end-0" style=" color: #9d1c20;">Rs.</span>
+                                                    <input type="number" class="form-control border-2 shadow-sm rounded-4" placeholder="Enter Cash Amount" wire:model="cashAmount" step="0.01" style=" color: #9d1c20; font-size: 0.9rem;">
                                                 </div>
                                                 @error('cashAmount') <div class="text-danger small mt-1" style="font-size: 0.85rem;">{{ $message }}</div> @enderror
                                             </div>
@@ -217,13 +216,13 @@
                                     </div>
                                 </div>
 
-                                <div class="card border-0 shadow-sm rounded-4" style="background-color: #f8f9fa; border: 1px solid #233D7F;">
+                                <div class="card border-0 shadow-sm rounded-4" style="background-color: #f8f9fa; border: 1px solid #9d1c20;">
                                     <div class="card-body p-4">
-                                        <h6 class="fw-bold mb-3" style="color: #233D7F; font-size: 1.25rem;">Notes</h6>
+                                        <h6 class="fw-bold mb-3" style="color: #9d1c20; font-size: 1.25rem;">Notes</h6>
                                         <p class="text-sm text-gray-600 mb-4" style="font-size: 0.9rem;">Add any additional notes for this re-entry.</p>
                                         <div class="row g-3">
                                             <div class="col-12">
-                                                <textarea class="form-control border-2 shadow-sm rounded-4" rows="6" placeholder="Enter notes here" wire:model="note" style="border-color: #233D7F; color: #233D7F; font-size: 0.9rem;"></textarea>
+                                                <textarea class="form-control border-2 shadow-sm rounded-4" rows="6" placeholder="Enter notes here" wire:model="note" style="border-color: #9d1c20; color: #9d1c20; font-size: 0.9rem;"></textarea>
                                                 @error('note') <div class="text-danger small mt-1" style="font-size: 0.85rem;">{{ $message }}</div> @enderror
                                             </div>
                                         </div>
@@ -242,11 +241,11 @@
                         </div>
                         @endif
                     </div>
-                    <div class="modal-footer py-3 px-4 d-flex justify-content-end gap-3" style="border-top: 1px solid #233D7F; background: #f8f9fa;">
+                    <div class="modal-footer py-3 px-4 d-flex justify-content-end gap-3" style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
                         <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" data-bs-dismiss="modal" style="background-color: #6B7280; border-color: #6B7280; color: white; font-size: 0.9rem;">
                             <i class="bi bi-x me-1"></i>Cancel
                         </button>
-                        <button type="button" wire:click="submitNewCheque" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" style="background-color: #00C8FF; border-color: #00C8FF; color: white; font-size: 0.9rem;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">
+                        <button type="button" wire:click="submitNewCheque" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white; font-size: 0.9rem;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
                             <i class="bi bi-check2-circle me-1"></i>Save Cheque(s)
                         </button>
                     </div>
@@ -257,8 +256,8 @@
         <!-- Complete with Cash Modal -->
         <div wire:ignore.self class="modal fade" id="complete-modal" tabindex="-1" aria-labelledby="complete-modal-label" aria-hidden="true" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #233D7F; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
-                    <div class="modal-header py-3 px-4" style="background-color: #233D7F; color: white;">
+                <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                    <div class="modal-header py-3 px-4" style="background-color: #9d1c20; color: white;">
                         <h5 class="modal-title fw-bold tracking-tight" id="complete-modal-label">
                             <i class="bi bi-cash-stack me-2"></i>Complete with Cash
                         </h5>
@@ -267,7 +266,7 @@
                     <div class="modal-body p-5">
                         <!-- Original Cheque Details -->
                         @if($originalCheque)
-                        <div class="alert alert-info mb-4" style="background-color: #e6f3ff; border-color: #233D7F; color: #233D7F;">
+                        <div class="alert alert-info mb-4" style="background-color: #e6f3ff; border-color: #9d1c20; color: #9d1c20;">
                             <h6 class="fw-bold mb-2">Original Cheque Details</h6>
                             <p class="mb-1"><strong>Customer:</strong> {{ $originalCheque->customer ? $originalCheque->customer->name : 'N/A' }}</p>
                             <p class="mb-1"><strong>Cheque Number:</strong> {{ $originalCheque->cheque_number }}</p>
@@ -278,21 +277,21 @@
                         @endif
 
                         <div class="mb-4">
-                            <label class="form-label fw-medium" style="color: #233D7F;">Cash Amount <span class="text-danger">*</span></label>
+                            <label class="form-label fw-medium" style="color: #9d1c20;">Cash Amount <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <span class="input-group-text bg-white border-2 border-end-0" style="border-color: #233D7F; color: #233D7F;">Rs.</span>
-                                <input type="number" class="form-control border-2 shadow-sm rounded-4" wire:model="completeCashAmount" step="0.01" style="border-color: #233D7F; color: #233D7F;">
+                                <span class="input-group-text bg-white border-2 border-end-0" style="border-color: #9d1c20; color: #9d1c20;">Rs.</span>
+                                <input type="number" class="form-control border-2 shadow-sm rounded-4" wire:model="completeCashAmount" step="0.01" style="border-color: #9d1c20; color: #9d1c20;">
                             </div>
                             @error('completeCashAmount') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                         </div>
 
                         <div class="mb-4">
-                            <label class="form-label fw-medium" style="color: #233D7F;">Note <span class="text-danger">*</span></label>
-                            <textarea class="form-control border-2 shadow-sm rounded-4" rows="3" placeholder="Enter note here" wire:model="completeNote" style="border-color: #233D7F; color: #233D7F;"></textarea>
+                            <label class="form-label fw-medium" style="color: #9d1c20;">Note <span class="text-danger">*</span></label>
+                            <textarea class="form-control border-2 shadow-sm rounded-4" rows="3" placeholder="Enter note here" wire:model="completeNote" style="border-color: #9d1c20; color: #9d1c20;"></textarea>
                             @error('completeNote') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                         </div>
                     </div>
-                    <div class="modal-footer py-3 px-4 d-flex justify-content-end gap-3" style="border-top: 1px solid #233D7F; background: #f8f9fa;">
+                    <div class="modal-footer py-3 px-4 d-flex justify-content-end gap-3" style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
                         <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" data-bs-dismiss="modal" style="background-color: #6B7280; border-color: #6B7280; color: white;">
                             <i class="bi bi-x me-1"></i>Cancel
                         </button>

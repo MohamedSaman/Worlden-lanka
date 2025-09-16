@@ -5,7 +5,7 @@
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
                 <!-- Header Content (unchanged) -->
                 <div class="card-header text-white p-2 rounded-t-4 d-flex align-items-center"
-                    style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);border-radius: 20px 20px 0 0;">
+                    style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%);border-radius: 20px 20px 0 0;">
                     <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
                         <i class="bi bi-cash-stack text-white fs-4" aria-hidden="true"></i>
                     </div>
@@ -23,14 +23,14 @@
                             <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
                                 <div class="card-body p-4">
                                     <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-info bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-hourglass text-info"></i>
+                                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
+                                            <i class="bi bi-hourglass text-danger"></i>
                                         </div>
                                         <div>
                                             <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Pending Cheques</p>
                                             <div class="d-flex align-items-baseline mt-1">
                                                 <h3 class="mb-0 fw-bold text-gray-800">{{ $pendingChequeCount }}</h3>
-                                                <span class="badge bg-info bg-opacity-10 text-info ms-2 rounded-full" style="padding: 6px 12px;">To Collect</span>
+                                                <span class="badge bg-danger bg-opacity-10 text-danger ms-2 rounded-full" style="padding: 6px 12px;">To Collect</span>
                                             </div>
                                         </div>
                                     </div>
@@ -43,14 +43,14 @@
                             <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
                                 <div class="card-body p-4">
                                     <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-success bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-clock-history text-success"></i>
+                                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
+                                            <i class="bi bi-clock-history text-danger"></i>
                                         </div>
                                         <div>
                                             <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Complete Cheque</p>
                                             <div class="d-flex align-items-baseline mt-1">
                                                 <h3 class="mb-0 fw-bold text-gray-800">{{ $completeChequeCount }}</h3>
-                                                <span class="badge bg-success bg-opacity-10 text-success ms-2 rounded-full" style="padding: 6px 12px;">Complete</span>
+                                                <span class="badge bg-danger bg-opacity-10 text-danger ms-2 rounded-full" style="padding: 6px 12px;">Complete</span>
                                             </div>
                                         </div>
                                     </div>
@@ -83,8 +83,8 @@
                             <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
                                 <div class="card-body p-4">
                                     <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-success bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-currency-dollar text-success"></i>
+                                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
+                                            <i class="bi bi-currency-dollar text-danger"></i>
                                         </div>
                                         <div>
                                             <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Total Cheque Due</p>
@@ -111,7 +111,7 @@
                         <div class="flex-grow-1 d-flex justify-content-lg">
                             <div class="input-group " style="max-width: 600px;">
                                 <span class="input-group-text bg-gray-100 border-0 px-3">
-                                    <i class="bi bi-search text-primary"></i>
+                                    <i class="bi bi-search text-danger"></i>
                                 </span>
                                 <input type="text"
                                     class="form-control "
@@ -127,14 +127,14 @@
                                     aria-expanded="false">
                                     <i class="bi bi-funnel me-1"></i> Filters
                                     @if ($filters['status'] || $filters['dateRange'])
-                                    <span class="badge bg-primary ms-1 rounded-full" style="background-color: #1e40af; color: #ffffff;">!</span>
+                                    <span class="badge bg-primary ms-1 rounded-full" style="background-color: #9d1c20; color: #ffffff;">!</span>
                                     @endif
                                 </button>
                                 <div class="dropdown-menu p-4 shadow-lg border-0 rounded-4" style="width: 300px;"
                                     aria-labelledby="filterDropdown">
-                                    <h6 class="dropdown-header bg-light rounded py-2 mb-3 text-center text-sm fw-semibold" style="color: #1e3a8a;">Filter Options</h6>
+                                    <h6 class="dropdown-header bg-light rounded py-2 mb-3 text-center text-sm fw-semibold" style="color: #9d1c20;">Filter Options</h6>
                                     <div class="mb-3">
-                                        <label class="form-label text-sm fw-semibold" style="color: #1e3a8a;">Payment Status</label>
+                                        <label class="form-label text-sm fw-semibold" style="color: #9d1c20;">Payment Status</label>
                                         <select class="form-select form-select-sm rounded-full shadow-sm"
                                             wire:model.live="filters.status">
                                             <option value="">All Statuses</option>
@@ -145,7 +145,7 @@
                                         </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label text-sm fw-semibold" style="color: #1e3a8a;">Due Date Range</label>
+                                        <label class="form-label text-sm fw-semibold" style="color: #9d1c20;">Due Date Range</label>
                                         <input type="text"
                                             class="form-control form-control-sm rounded-full shadow-sm"
                                             placeholder="Select date range"
@@ -174,13 +174,13 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead style="background-color: #eff6ff;">
                                 <tr>
-                                    <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Invoice</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Customer</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Cheque Number</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Amount</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Cheque Date</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Status</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Actions</th>
+                                    <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Invoice</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Customer</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Cheque Number</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Amount</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Cheque Date</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Status</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>

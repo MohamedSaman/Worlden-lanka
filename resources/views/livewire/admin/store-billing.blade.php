@@ -11,7 +11,7 @@
         }
 
         input[type="number"].is-invalid {
-            border-color: #dc3545;
+            border-color: #9d1c20;
         }
 
         .tracking-tight {
@@ -36,7 +36,7 @@
 
         .table-bordered th,
         .table-bordered td {
-            border: 1px solid #233D7F;
+            border: 1px solid #9d1c20;
         }
 
         @media (max-width: 767.98px) {
@@ -69,14 +69,14 @@
             <div class="col-12">
                 <div class="card mb-4">
                     <div class="card-header pb-0">
-                        <h6>Billing System</h6>
+                        <h6 style="color: #9d1c20;">Billing System</h6>
                     </div>
                     <div class="card-body">
                         <div class="row mb-4">
                             <div class="col-md-6 mx-auto">
                                 <div class="input-group">
                                     <span class="input-group-text">
-                                        <i class="bi bi-search"></i>
+                                        <i class="bi bi-search text-denger"></i>
                                     </span>
                                     <input type="text" class="form-control"
                                         placeholder="Search by code, model, barcode, brand or name..."
@@ -267,7 +267,7 @@
                         <div class="row mt-4">
                             <div class="col-md-6">
                                 <div class="card">
-                                    <div class="card-header pb-0 bg-primary">
+                                    <div class="card-header pb-0 " style="background-color: #9d1c20;">
                                         <h6 class="text-white">Customer & Payment Information</h6>
                                     </div>
                                     <div class="card-body" style="height: 500px; overflow-y: auto;">
@@ -288,7 +288,8 @@
                                                     </select>
 
                                                 </div>
-                                                <button class="btn btn-primary d-flex align-items-center"
+                                                <button class="btn  d-flex align-items-center"
+                                                style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';"
                                                     data-bs-toggle="modal" data-bs-target="#addCustomerModal">
                                                     <i class="bi bi-plus-circle me-1"></i>ADD
                                                 </button>
@@ -385,7 +386,8 @@
                                                         </div>
                                                     </div>
                                                     <div class="text-end mt-3">
-                                                        <button type="submit" class="btn btn-sm btn-primary">
+                                                        <button type="submit" class="btn btn-sm "
+                                                        style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
                                                             <i class="fas fa-plus me-1"></i> Add Cheque
                                                         </button>
                                                     </div>
@@ -471,7 +473,8 @@
                                         </div>
 
                                         <div class="d-flex mt-4">
-                                            <button class="btn btn-danger me-2" wire:click="clearCart">
+                                            <button class="btn btn-danger me-2" wire:click="clearCart"
+                                            style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
                                                 <i class="fas fa-times me-2"></i>Clear
                                             </button>
                                             <button class="btn btn-success flex-grow-1" wire:click="completeSale">

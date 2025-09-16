@@ -27,7 +27,7 @@
         .sidebar {
             width: 260px;
             height: 100vh;
-            background: linear-gradient(180deg, #233D7F 0%, #1e3266 100%);
+            background: linear-gradient(180deg, #b5171a 0%, #9d1c20 100%);
             color: #ffffff;
             position: fixed;
             border-right: none;
@@ -46,7 +46,7 @@
         }
 
         .nav-link {
-            color: #d1d5db;
+            color: #fff;
             padding: 12px 20px;
             border-radius: 10px;
             margin: 4px 5px;
@@ -67,12 +67,12 @@
 
         .nav-link.active {
             background: #ffffff;
-            color: #233D7F;
+            color: #b5171a;
             font-weight: 600;
         }
 
         .nav-link.active i {
-            color: #233D7F;
+            color: #b5171a;
         }
 
         /* Collapsed Sidebar */
@@ -140,7 +140,7 @@
             width: 38px;
             height: 38px;
             border-radius: 50%;
-            background: #233D7F;
+            background: #b5171a;
             color: white;
             display: flex;
             align-items: center;
@@ -150,7 +150,7 @@
 
         .admin-name {
             font-weight: 500;
-            color: #111827;
+            color: #b5171a;
         }
 
         /* Dropdown Menu Styles */
@@ -173,7 +173,7 @@
 
         .dropdown-item:hover {
             background-color: #dcf1f8ff;
-            color: #00C8FF;
+            color: #b5171a;
         }
 
         .dropdown-item i {
@@ -241,13 +241,13 @@
 
         /* Modal Styles */
         .modal-content {
-            border: 2px solid #233D7F;
+            border: 2px solid #b5171a;
             border-radius: 10px;
             background: linear-gradient(145deg, #ffffff, #f8f9fa);
         }
 
         .modal-header {
-            background-color: #233D7F;
+            background-color: #b5171a;
             color: white;
             border-bottom: 1px solid #dee2e6;
         }
@@ -403,12 +403,12 @@
         <nav class="top-bar d-flex align-items-center px-3">
             <!-- Sidebar Toggle -->
             <button id="sidebarToggler" class="btn btn-light rounded-pill me-3 transition-all hover:shadow"
-                style="border-color: #233D7F;">
-                <i class="bi bi-list fs-5" style="color: #233D7F;"></i>
+                style="border-color: #b5171a;">
+                <i class="bi bi-list fs-5" style="color: #b5171a;"></i>
             </button>
 
             <!-- Center Title -->
-            <div class="flex-grow-1 text-center fw-bold my-2 title" style="color:#233D7F; font-size:18px;">
+            <div class="flex-grow-1 text-center fw-bold my-2 title" style="color:#b5171a; font-size:18px;">
                 <h2 style="padding: 0;margin:0"><b>PLUS</b></h2>
                 <p style="padding: 0;margin:0; font-size:16px;">Importers Of Garment Accessories & Machinery</p>
             </div>

@@ -2,7 +2,7 @@
 
     <!-- Header Section -->
     <div class="card-header text-white p-2  d-flex align-items-center"
-        style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%); border-radius: 20px 20px 0 0;">
+        style="background: linear-gradient(90deg, #b5171a 0%, #d34d51ff 100%); border-radius: 20px 20px 0 0;">
         <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
             <i class="bi bi-box-seam fs-4 text-white" aria-hidden="true"></i>
         </div>
@@ -15,8 +15,8 @@
         <!-- Middle: Search Bar -->
         <div class="flex-grow-1 d-flex justify-content-lg">
             <div class="input-group" style="max-width: 600px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
-                <span class="input-group-text bg-gray-100 border-0 px-3">
-                    <i class="bi bi-search text-primary"></i>
+                <span class="input-group-text bg-gray-100 border-0 px-3" >
+                    <i class="bi bi-search text-danger" ></i>
                 </span>
                 <input type="text"
                     class="form-control"
@@ -30,13 +30,13 @@
         <div class="d-flex gap-2 flex-shrink-0 justify-content-lg-end">
             <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform btn-create"
                 wire:click="toggleAddModal"
-                style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F;transition: all 0.3s ease; hover: transform: scale(1.05)">
+                style="color: #fff; background-color: #b5171a; border: 1px solid #b5171a;transition: all 0.3s ease; hover: transform: scale(1.05)">
                 <i class="bi bi-plus-circle me-2"></i> Add Product
             </button>
             <button wire:click="exportToCSV"
                 class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform "
                 aria-label="Export stock details to CSV"
-                style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F; transition: all 0.3s ease; hover: transform: scale(1.05)">
+                style="color: #fff; background-color:  #b5171a; border: 1px solid #b5171a; transition: all 0.3s ease; hover: transform: scale(1.05)">
                 <i class="bi bi-download me-1" aria-hidden="true"></i> Export CSV
             </button>
 
@@ -47,7 +47,7 @@
         <button
             class="btn btn-primary rounded-full mt-2 px-4 mb-4 fw-medium transition-all hover:shadow "
             wire:click="$set('showAddFieldModal', true)"
-            style="background-color: #233D7F; border-color: #233D7F; color: white;">
+            style="background-color:  #b5171a; border: 1px solid #b5171a; color: white;">
             <i class="bi bi-plus-circle me-2"></i>Add Field
         </button>
     </div>
@@ -125,7 +125,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="{{ 9 + count($fieldKeys) }}" class="text-center py-4" style="color: #233D7F;">
+                        <td colspan="{{ 9 + count($fieldKeys) }}" class="text-center py-4" style="color: #d34d51ff;">
                             <i class="bi bi-exclamation-circle me-2"></i>No products found.
                         </td>
                     </tr>
@@ -143,8 +143,8 @@
     @if ($showAddModal)
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
         <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 900px;">
-            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #233D7F; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
-                <div class="modal-header py-3 px-4" style="background-color: #233D7F; color: white;">
+            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                <div class="modal-header py-3 px-4" style="background-color: #9d1c20; color: white;">
                     <h5 class="modal-title fw-bold tracking-tight">Add New Product</h5>
                     <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" wire:click="toggleAddModal" aria-label="Close"></button>
                 </div>
@@ -152,12 +152,12 @@
                     <div class="modal-body p-5">
                         <div class="row g-4">
                             <div class="col-md-6">
-                                <label for="category_id" class="form-label fw-medium" style="color: #233D7F;">Category</label>
+                                <label for="category_id" class="form-label fw-medium" style="color: #9d1c20;">Category</label>
                                 <select
                                     id="category_id"
                                     wire:model="category_id"
                                     class="form-select border-2 shadow-sm"
-                                    style=" color: #233D7F;">
+                                    style=" color: #9d1c20;">
                                     <option value="">Select a category</option>
                                     @foreach ($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -166,18 +166,18 @@
                                 @error('category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
                             <div class="col-md-6">
-                                <label for="product_name" class="form-label fw-medium" style="color: #233D7F;">Product Name</label>
+                                <label for="product_name" class="form-label fw-medium" style="color: #9d1c20;">Product Name</label>
                                 <input
                                     type="text"
                                     id="product_name"
                                     wire:model="product_name"
                                     class="form-control border-2 shadow-sm"
-                                    style=" color: #233D7F;">
+                                    style=" color: #9d1c20;">
                                 @error('product_name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
 
                             <div class="col-md-6">
-                                <label for="supplier_price" class="form-label fw-medium" style="color: #233D7F;">Supplier Price</label>
+                                <label for="supplier_price" class="form-label fw-medium" style="color: #9d1c20;">Supplier Price</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-2 border-end-0">Rs.</span>
                                     <input
@@ -185,13 +185,13 @@
                                         id="supplier_price"
                                         wire:model="supplier_price"
                                         class="form-control border-2 shadow-sm"
-                                        style=" color: #233D7F;"
+                                        style=" color: #9d1c20;"
                                         step="0.01">
                                 </div>
                                 @error('supplier_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
                             <div class="col-md-6">
-                                <label for="selling_price" class="form-label fw-medium" style="color: #233D7F;">Selling Price</label>
+                                <label for="selling_price" class="form-label fw-medium" style="color: #9d1c20;">Selling Price</label>
                                 <div class="input-group">
                                     <span class="input-group-text bg-white border-2 border-end-0">Rs.</span>
                                     <input
@@ -199,30 +199,30 @@
                                         id="selling_price"
                                         wire:model="selling_price"
                                         class="form-control border-2 shadow-sm"
-                                        style=" color: #233D7F;"
+                                        style=" color: #9d1c20;"
                                         step="0.01">
                                 </div>
                                 @error('selling_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
                             <div class="col-md-6">
-                                <label for="stock_quantity" class="form-label fw-medium" style="color: #233D7F;">Total Quantity</label>
+                                <label for="stock_quantity" class="form-label fw-medium" style="color: #9d1c20;">Total Quantity</label>
                                 <input
                                     type="number"
                                     id="stock_quantity"
                                     wire:model="stock_quantity"
                                     class="form-control border-2 shadow-sm"
-                                    style=" color: #233D7F;"
+                                    style=" color: #9d1c20;"
                                     min="0" step="1">
                                 @error('stock_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
                             <div class="col-md-6">
-                                <label for="damage_quantity" class="form-label fw-medium" style="color: #233D7F;">Damage Quantity</label>
+                                <label for="damage_quantity" class="form-label fw-medium" style="color: #9d1c20;">Damage Quantity</label>
                                 <input
                                     type="number"
                                     id="damage_quantity"
                                     wire:model="damage_quantity"
                                     class="form-control border-2 shadow-sm"
-                                    style=" color: #233D7F;"
+                                    style=" color: #9d1c20;"
                                     min="0" step="1">
                                 @error('damage_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
@@ -233,13 +233,13 @@
                             <div class="row g-4">
                                 @foreach ($fieldKeys as $key)
                                 <div class="col-md-6 mb-3">
-                                    <label for="customer_field_{{ $key }}" class="form-label fw-medium" style="color: #233D7F;">{{ $key }}</label>
+                                    <label for="customer_field_{{ $key }}" class="form-label fw-medium" style="color: #9d1c20;">{{ $key }}</label>
                                     <input
                                         type="text"
                                         id="customer_field_{{ $key }}"
                                         wire:model="customer_fields.{{ $loop->index }}.value"
                                         class="form-control border-2 shadow-sm"
-                                        style="color: #233D7F;"
+                                        style="color: #9d1c20;"
                                         placeholder="Enter {{ $key }}">
                                     @error('customer_fields.' . $loop->index . '.value') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
@@ -248,9 +248,9 @@
                         </div>
 
                     </div>
-                    <div class="modal-footer py-3 px-4 d-flex justify-content-end gap-3" style="border-top: 1px solid #233D7F; background: #f8f9fa;">
+                    <div class="modal-footer py-3 px-4 d-flex justify-content-end gap-3" style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
                         <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="toggleAddModal" style="background-color: #6B7280; border-color: #6B7280; color: white;">Cancel</button>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" style="background-color: #00C8FF; border-color: #00C8FF; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">Save Product</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">Save Product</button>
                     </div>
                 </form>
             </div>
@@ -262,8 +262,8 @@
     @if ($showEditModal)
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #233D7F; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
-                <div class="modal-header py-3 px-4" style="background-color: #233D7F; color: white;">
+            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                <div class="modal-header py-3 px-4" style="background-color: #9d1c20; color: white;">
                     <h5 class="modal-title fw-bold tracking-tight">Edit Product</h5>
                     <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" wire:click="toggleEditModal" aria-label="Close"></button>
                 </div>
@@ -271,12 +271,12 @@
                     <div class="modal-body p-5">
                         <div class="row g-4">
                             <div class="col-md-6">
-                                <label for="edit_category_id" class="form-label fw-medium" style="color: #233D7F;">Category</label>
+                                <label for="edit_category_id" class="form-label fw-medium" style="color: #9d1c20;">Category</label>
                                 <select
                                     id="edit_category_id"
                                     wire:model="category_id"
                                     class="form-select border-2 shadow-sm"
-                                    style=" color: #233D7F;">
+                                    style=" color: #9d1c20;">
                                     <option value="">Select a category</option>
                                     @foreach ($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
@@ -285,18 +285,18 @@
                                 @error('category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
                             <div class="col-md-6">
-                                <label for="edit_product_name" class="form-label fw-medium" style="color: #233D7F;">Product Name</label>
+                                <label for="edit_product_name" class="form-label fw-medium" style="color: #9d1c20;">Product Name</label>
                                 <input
                                     type="text"
                                     id="edit_product_name"
                                     wire:model="product_name"
                                     class="form-control border-2 shadow-sm"
-                                    style=" color: #233D7F;">
+                                    style=" color: #9d1c20;">
                                 @error('product_name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-4">
-                                    <label for="edit_supplier_price" class="form-label fw-medium" style="color: #233D7F;">Supplier Price</label>
+                                    <label for="edit_supplier_price" class="form-label fw-medium" style="color: #9d1c20;">Supplier Price</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white border-2 border-end-0" style="">Rs.</span>
                                         <input
@@ -304,7 +304,7 @@
                                             id="edit_supplier_price"
                                             wire:model="supplier_price"
                                             class="form-control border-2 shadow-sm"
-                                            style=" color: #233D7F;"
+                                            style=" color: #9d1c20;"
                                             step="0.01">
                                     </div>
                                     @error('supplier_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
@@ -312,7 +312,7 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-4">
-                                    <label for="edit_selling_price" class="form-label fw-medium" style="color: #233D7F;">Selling Price</label>
+                                    <label for="edit_selling_price" class="form-label fw-medium" style="color: #9d1c20;">Selling Price</label>
                                     <div class="input-group">
                                         <span class="input-group-text bg-white border-2 border-end-0" style="">Rs.</span>
                                         <input
@@ -320,7 +320,7 @@
                                             id="edit_selling_price"
                                             wire:model="selling_price"
                                             class="form-control border-2 shadow-sm"
-                                            style=" color: #233D7F;"
+                                            style=" color: #9d1c20;"
                                             step="0.01">
                                     </div>
                                     @error('selling_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
@@ -328,38 +328,38 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-4">
-                                    <label for="edit_stock_quantity" class="form-label fw-medium" style="color: #233D7F;">Stock Quantity</label>
+                                    <label for="edit_stock_quantity" class="form-label fw-medium" style="color: #9d1c20;">Stock Quantity</label>
                                     <input
                                         type="number"
                                         id="edit_stock_quantity"
                                         wire:model="stock_quantity"
                                         class="form-control border-2 shadow-sm"
-                                        style=" color: #233D7F;"
+                                        style=" color: #9d1c20;"
                                         min="0" step="1">
                                     @error('stock_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-4">
-                                    <label for="edit_damage_quantity" class="form-label fw-medium" style="color: #233D7F;">Damage Quantity</label>
+                                    <label for="edit_damage_quantity" class="form-label fw-medium" style="color: #9d1c20;">Damage Quantity</label>
                                     <input
                                         type="number"
                                         id="edit_damage_quantity"
                                         wire:model="damage_quantity"
                                         class="form-control border-2 shadow-sm"
-                                        style=" color: #233D7F;"
+                                        style=" color: #9d1c20;"
                                         min="0" step="1">
                                     @error('damage_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
                             </div>
                             {{-- <div class="col-md-6">
-                                <label class="form-label fw-medium" style="color: #233D7F;">Sold Quantity</label>
+                                <label class="form-label fw-medium" style="color: #9d1c20;">Sold Quantity</label>
                                 <input
                                     type="number"
                                     id="edit_sold_quantity"
                                     wire:model="sold"
                                     class="form-control border-2 shadow-sm"
-                                    style=" color: #233D7F;"
+                                    style=" color: #9d1c20;"
                                     min="0" step="1" readonly>
                                 @error('sold') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div> --}}
@@ -369,7 +369,7 @@
                                     id="status"
                                     wire:model="status"
                                     class="form-select border-2 shadow-sm"
-                                    style=" color: #233D7F;">
+                                    style=" color: #9d1c20;">
                                     <option value="">Select Status</option>
                                     <option value="Active">Active</option>
                                     <option value="Inactive">Inactive</option>
@@ -381,20 +381,20 @@
 
                         <!-- customer Fields -->
                         <div class="mb-4">
-                            <label class="form-label fw-medium" style="color: #233D7F;">Customer Fields</label>
+                            <label class="form-label fw-medium" style="color: #9d1c20;">Customer Fields</label>
                             <div class="row g-3">
                                 @foreach ($customer_fields as $index => $field)
                                 @php
                                 $labelKey = ucwords(strtolower($field['key']));
                                 @endphp
                                 <div class="col-md-6">
-                                    <label class="form-label fw-medium" style="color: #233D7F;">{{ $labelKey }}</label>
+                                    <label class="form-label fw-medium" style="color: #9d1c20;">{{ $labelKey }}</label>
                                     <input
                                         type="text"
                                         placeholder="Enter {{ $labelKey }}"
                                         wire:model="customer_fields.{{ $index }}.value"
                                         class="form-control border-2 shadow-sm"
-                                        style=" color: #233D7F;">
+                                        style=" color: #9d1c20;">
                                     @error('customer_fields.' . $index . '.value') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
                                 @endforeach
@@ -402,9 +402,9 @@
                         </div>
 
                     </div>
-                    <div class="modal-footer py-3 px-4" style="border-top: 1px solid #233D7F; background: #f8f9fa;">
+                    <div class="modal-footer py-3 px-4" style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
                         <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="toggleEditModal" style="background-color: #6B7280; border-color: #6B7280; color: white;">Cancel</button>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" style="background-color: #00C8FF; border-color: #00C8FF; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">Update Product</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">Update Product</button>
                     </div>
                 </form>
             </div>
@@ -416,15 +416,15 @@
     @if ($showDeleteModal)
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #233D7F; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
-                <div class="modal-header py-3 px-4" style="background-color: #233D7F; color: white;">
+            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                <div class="modal-header py-3 px-4" style="background-color: #9d1c20; color: white;">
                     <h5 class="modal-title fw-bold tracking-tight">Confirm Deletion</h5>
                     <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" wire:click="toggleDeleteModal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-5" style="color: #233D7F;">
+                <div class="modal-body p-5" style="color: #9d1c20;">
                     <p class="mb-0">Are you sure you want to delete the product "<strong>{{ $deletingProductName }}</strong>"? This action cannot be undone.</p>
                 </div>
-                <div class="modal-footer py-3 px-4" style="border-top: 1px solid #233D7F; background: #f8f9fa;">
+                <div class="modal-footer py-3 px-4" style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
                     <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="toggleDeleteModal" style="background-color: #6B7280; border-color: #6B7280; color: white;">Cancel</button>
                     <button type="button" class="btn btn-danger rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="delete" style="background-color: #EF4444; border-color: #EF4444; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#EF4444'; this.style.borderColor='#EF4444';">Delete</button>
                 </div>
@@ -437,10 +437,10 @@
     @if ($showAddFieldModal)
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #233D7F; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
 
                 <!-- Modal Header -->
-                <div class="modal-header py-3 px-4" style="background-color: #233D7F; color: white;">
+                <div class="modal-header py-3 px-4" style="background-color: #9d1c20; color: white;">
                     <h5 class="modal-title fw-bold tracking-tight">Add New Fields</h5>
                     <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" wire:click="$set('showAddFieldModal', false)" aria-label="Close"></button>
                 </div>
@@ -448,7 +448,7 @@
                 <!-- Modal Body -->
                 <div class="modal-body p-5">
                     <!-- Input for new fields -->
-                    <input wire:model="newFieldKey" class="form-control border-2 shadow-sm mb-3" placeholder="Enter field names" style=" color: #233D7F; " />
+                    <input wire:model="newFieldKey" class="form-control border-2 shadow-sm mb-3" placeholder="Enter field names" style=" color: #9d1c20; " />
                     @error('newFieldKey') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
 
                     <!-- Display all fields (existing + newly added) -->
@@ -473,9 +473,9 @@
                 </div>
 
                 <!-- Modal Footer -->
-                <div class="modal-footer py-3 px-4" style="border-top: 1px solid #233D7F; background: #f8f9fa;">
+                <div class="modal-footer py-3 px-4" style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
                     <button class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="$set('showAddFieldModal', false)" style="background-color: #6B7280; border-color: #6B7280; color: white;">Cancel</button>
-                    <button class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click.prevent="manageField('add')" style="background-color: #00C8FF; border-color: #00C8FF; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">Add</button>
+                    <button class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click.prevent="manageField('add')" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">Add</button>
                 </div>
             </div>
         </div>
@@ -493,9 +493,9 @@
         @keydown.escape="$wire.set('showDeleteFieldModal', false)">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 shadow-xl overflow-hidden"
-                style="border: 2px solid #233D7F; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
                 <div class="modal-header py-3 px-4"
-                    style="background-color: #233D7F; color: white;">
+                    style="background-color: #9d1c20; color: white;">
                     <h5 class="modal-title fw-bold tracking-tight">Delete Field</h5>
                     <button type="button"
                         class="btn-close btn-close-white opacity-75 hover:opacity-100"
@@ -506,11 +506,11 @@
                 <div class="modal-body p-5">
                     <label for="deleteFieldKey"
                         class="form-label fw-medium"
-                        style="color: #233D7F;">Select a field to delete</label>
+                        style="color: #9d1c20;">Select a field to delete</label>
                     <select wire:model.live="deleteFieldKey"
                         id="deleteFieldKey"
                         class="form-select border-2 shadow-sm"
-                        style="border-color: #233D7F; color: #233D7F;"
+                        style="border-color: #d34d51ff; color: #9d1c20;"
                         wire:loading.attr="disabled">
                         <option value="">Select Field</option>
                         @foreach ($fieldKeys as $key)
@@ -520,7 +520,7 @@
                     @error('deleteFieldKey') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                 </div>
                 <div class="modal-footer py-3 px-4"
-                    style="border-top: 1px solid #233D7F; background: #f8f9fa;">
+                    style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
                     <button class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow"
                         wire:click="$set('showDeleteFieldModal', false)"
                         @click="isOpen = false"
@@ -562,7 +562,7 @@
 
                 <!-- Header -->
                 <div class="modal-header py-4 px-5 border-0"
-                    style="background: linear-gradient(135deg, #233D7F, #1b2655); color: white;">
+                    style="background: linear-gradient(135deg, #9d1c20, #d34d51ff); color: white;">
                     <h4 class="modal-title fw-bold d-flex align-items-center mb-0" id="viewProductModalLabel">
                         <i class="bi bi-box-seam me-2"></i>
                         Product Details – {{ $this->viewProductName ?? 'N/A' }}
@@ -695,7 +695,7 @@
                     <button type="button"
                         class="btn rounded-pill px-4 fw-semibold text-white shadow-sm"
                         onclick="printProductDetails()"
-                        style="background-color: #233D7F;">
+                        style="background-color: #9d1c20;">
                         <i class="bi bi-printer me-1"></i> Print
                     </button>
                     <button type="button"

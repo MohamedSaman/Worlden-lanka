@@ -3,7 +3,7 @@
         <!-- Card Header -->
 
         <div class="card-header text-white p-2 rounded-t-4 d-flex align-items-center"
-            style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%); border-radius: 20px 20px 0 0;">
+            style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%); border-radius: 20px 20px 0 0;">
             <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
                 <i class="bi bi-shield-lock text-white fs-4" aria-hidden="true"></i>
             </div>
@@ -17,7 +17,7 @@
             <div class="flex-grow-1 d-flex justify-content-lg">
                 <div class="input-group" style="max-width: 400px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
                     <span class="input-group-text bg-gray-100 border-0 px-3">
-                        <i class="bi bi-search text-primary"></i>
+                        <i class="bi bi-search text-danger"></i>
                     </span>
                     <input type="text"
                         class="form-control"
@@ -31,13 +31,13 @@
                 <button wire:click="exportToCSV"
                     class="btn text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
                     aria-label="Export stock details to CSV"
-                    style="background-color: #233D7F; border-color: #233D7F; color: white;transition: all 0.3s ease; hover: transform: scale(1.05)">
+                    style="background-color: #9d1c20; border-color: #9d1c20; color: white;transition: all 0.3s ease; transform: scale-(1.05)">
                     <i class="bi bi-download me-1" aria-hidden="true"></i> Export CSV
                 </button>
                 <button id="printButton"
                     class="btn text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
                     aria-label="Print stock details"
-                    style="background-color: #233D7F; border-color: #233D7F; color: white;transition: all 0.3s ease; hover: transform: scale(1.05)">
+                    style="background-color: #9d1c20; border-color: #9d1c20; color: white;transition: all 0.3s ease;  transform: scale-(1.05)">
                     <i class="bi bi-printer me-1" aria-hidden="true"></i> Print
                 </button>
             </div>

@@ -32,18 +32,18 @@
 
         .content-tab:hover {
             background: #f3f4f6;
-            color: #233d7f;
+            color: #b5171a;
         }
 
         .content-tab.active {
-            color: #233d7f;
+            color: #b5171a;
         }
         .content-tab.active::after {
             content: '';
             display: block;
             width: 100%;
             height: 2px;
-            background: #233d7f;
+            background: #b5171a;
             border-radius: 0.75rem 0.75rem 0 0;
             transition: all 0.3s ease;
         }
@@ -110,7 +110,7 @@
             font-size: 1rem;
             font-weight: 600;
             margin-bottom: 0.2rem;
-            color: #233d7f;
+            color: #9d1c20;
         }
 
         .chart-container {
@@ -133,7 +133,7 @@
             width: 40px;
             height: 40px;
             border-radius: 50%;
-            background: #233d7f;
+            background: #b5171a;
             color: #fff;
             display: flex;
             align-items: center;
@@ -145,7 +145,7 @@
 
         .amount {
             font-weight: 600;
-            color: #233d7f;
+            color: #9d1c20;
         }
 
         /* ===== Inventory Widget ===== */
@@ -163,7 +163,7 @@
         .widget-header h6 {
             font-size: 1.1rem;
             font-weight: 600;
-            color: #233d7f;
+            color: #b5171a;
         }
 
         .status-badge {
@@ -190,8 +190,8 @@
 
         /* ===== Buttons ===== */
         .btn-outline-primary {
-            border: 1px solid #233d7f;
-            color: #233d7f;
+            border: 1px solid #b5171a;
+            color: #b5171a;
             font-size: 0.8rem;
             font-weight: 500;
             border-radius: 0.5rem;
@@ -200,7 +200,8 @@
         }
 
         .btn-outline-primary:hover {
-            background: #233d7f;
+            background: #b5171a;
+             border: 1px solid #b5171a;
             color: #fff;
         }
 
@@ -442,7 +443,7 @@
                 <div class="chart-card">
                     <div class="chart-header d-flex justify-content-between align-items-center flex-wrap">
                         <div class="mb-mobile-2">
-                            <h6 class="mb-1 fw-bold tracking-tight" style="color: #233D7F;">Sales Overview</h6>
+                            <h6 class="mb-1 fw-bold tracking-tight" style="color: #b5171a;">Sales Overview</h6>
                             <p class="text-muted mb-0 small">Daily sales trend</p>
                         </div>
                         <select wire:model.live="filter" class="form-select form-select-sm" style="width: 150px;">
@@ -460,7 +461,7 @@
                     <div class="card-body p-3">
                         <div class="d-flex justify-content-between align-items-start flex-wrap mb-3">
                             <div class="mb-2 mb-md-0">
-                                <h6 class="card-title fw-bold tracking-tight" style="color: #233D7F;">Recent Sales</h6>
+                                <h6 class="card-title fw-bold tracking-tight" style="color: #b5171a;">Recent Sales</h6>
                                 <p class="text-muted small mb-0">Latest transactions</p>
                             </div>
                             <a href="{{ route('admin.view-payments') }}" class="btn btn-outline-primary">
@@ -504,7 +505,7 @@
                 <div class="widget-container">
                     <div class="widget-header d-flex justify-content-between align-items-start flex-wrap mb-3">
                         <div class="mb-2 mb-md-0">
-                            <h6 class="fw-bold tracking-tight" style="color: #233D7F;">Inventory Status</h6>
+                            <h6 class="fw-bold tracking-tight" style="color: #b5171a;">Inventory Status</h6>
                             <p class="text-muted small mb-0">Current stock levels and alerts</p>
                         </div>
                         <a href="{{ route('admin.product-stocks') }}" class="btn btn-outline-primary">
@@ -533,7 +534,7 @@
                         </div>
                     </div>
                     @empty
-                    <div class="alert alert-info border-0">No product inventory data available.</div>
+                    <div class="alert alert-danger border-0">No product inventory data available.</div>
                     @endforelse
                 </div>
             </div>
@@ -543,21 +544,21 @@
 
 <!-- Analytics Content -->
 <div id="analytics" class="tab-content">
-    <div class="alert alert-info border-0" style="border-radius: 0.5rem; color: #233D7F; background-color: #F8F9FA;">
+    <div class="alert alert-info border-0" style="border-radius: 0.5rem; color: #9d1c20; background-color: #F8F9FA;">
         Analytics content will appear here when this tab is selected.
     </div>
 </div>
 
 <!-- Reports Content -->
 <div id="reports" class="tab-content">
-    <div class="alert alert-info border-0" style="border-radius: 0.5rem; color: #233D7F; background-color: #F8F9FA;">
+    <div class="alert alert-info border-0" style="border-radius: 0.5rem; color: #9d1c20; background-color: #F8F9FA;">
         Reports content will appear here when this tab is selected.
     </div>
 </div>
 
 <!-- Notifications Content -->
 <div id="notifications" class="tab-content">
-    <div class="alert alert-info border-0" style="border-radius: 0.5rem; color: #233D7F; background-color: #F8F9FA;">
+    <div class="alert alert-info border-0" style="border-radius: 0.5rem; color: #9d1c20; background-color: #F8F9FA;">
         Notifications content will appear here when this tab is selected.
     </div>
 </div>
@@ -598,11 +599,11 @@
                     datasets: [{
                         label: 'Daily Sales',
                         data: totals,
-                        borderColor: '#233D7F',
+                        borderColor: '#d34d51ff',
                         backgroundColor: 'rgba(35, 61, 127, 0.2)',
                         tension: 0.3,
                         fill: true,
-                        pointBackgroundColor: '#233D7F',
+                        pointBackgroundColor: '#d34d51ff',
                         pointRadius: 3
                     }]
                 },
@@ -615,7 +616,7 @@
                         },
                         tooltip: {
                             enabled: true,
-                            backgroundColor: '#233D7F',
+                            backgroundColor: '#d34d51ff',
                             titleColor: '#FFFFFF',
                             bodyColor: '#FFFFFF',
                             displayColors: false,
@@ -633,7 +634,7 @@
                                 color: '#E9ECEF'
                             },
                             ticks: {
-                                color: '#233D7F',
+                                color: '#d34d51ff',
                                 callback: function(value) {
                                     return 'Rs. ' + Number(value).toFixed(2);
                                 }
@@ -644,7 +645,7 @@
                                 display: false
                             },
                             ticks: {
-                                color: '#233D7F',
+                                color: '#d34d51ff',
                                 maxRotation: 45,
                                 minRotation: 45
                             }

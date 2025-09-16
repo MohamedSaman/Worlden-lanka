@@ -4,7 +4,7 @@
         <!-- header  -->
 
         <div class="card-header text-white p-2  d-flex align-items-center"
-            style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%); border-radius: 20px 20px 0 0;">
+            style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%); border-radius: 20px 20px 0 0;">
             <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
                 <i class="bi bi-people fs-4 text-white" aria-hidden="true"></i>
             </div>
@@ -20,7 +20,7 @@
             <div class="flex-grow-1 d-flex justify-content-lg">
                 <div class="input-group " style="max-width: 600px;">
                     <span class="input-group-text bg-gray-100 border-0 px-3">
-                        <i class="bi bi-search text-primary"></i>
+                        <i class="bi bi-search text-danger"></i>
                     </span>
                     <input type="text"
                         class="form-control "
@@ -35,19 +35,19 @@
 
                 <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105 btn-create"
                     wire:click="createCustomer"
-                    style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F;">
+                    style="color: #fff; background-color: #9d1c20; border: 1px solid #9d1c20;">
                     <i class="bi bi-plus-circle me-2"></i> Create Customer
                 </button>
                 <button wire:click="exportCustomers"
                     class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
                     aria-label="Export stock details to CSV"
-                    style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F;">
+                    style="color: #fff; background-color: #9d1c20; border: 1px solid #9d1c20;">
                     <i class="bi bi-download me-1" aria-hidden="true"></i> Export CSV
                 </button>
                 <button wire:click="importCustomers"
                     class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
                     aria-label="Import stock details from CSV"
-                    style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F;">
+                    style="color: #fff; background-color: #9d1c20; border: 1px solid #9d1c20;">
                     <i class="bi bi-upload me-1" aria-hidden="true"></i> Import CSV
                 </button>
             </div>
@@ -97,7 +97,7 @@
                         @endforeach
                         @else
                         <tr>
-                            <td colspan="8" class="text-center py-4" style="color: #233D7F;">
+                            <td colspan="8" class="text-center py-4" style="color: #9d1c20;">
                                 <i class="bi bi-exclamation-circle me-2"></i>No customers found.
                             </td>
                         </tr>
@@ -114,44 +114,44 @@
     {{-- Create Customer Modal --}}
     <div wire:ignore.self class="modal fade" id="createCustomerModal" tabindex="-1" aria-labelledby="createCustomerModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #233D7F; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
-                <div class="modal-header py-3 px-4" style="background-color: #233D7F; color: white;">
+            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                <div class="modal-header py-3 px-4" style="background-color: #9d1c20; color: white;">
                     <h1 class="modal-title fs-5 fw-bold tracking-tight" id="createCustomerModalLabel">Create Customer</h1>
                     <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-5">
                     <div class="row g-4">
                         <div class="col-12 col-md-6">
-                            <label for="customerName" class="form-label fw-medium" style="color: #233D7F;">Customer Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="customerName" wire:model="name" placeholder="Enter customer name" style="color: #233D7F;">
+                            <label for="customerName" class="form-label fw-medium" style="color: #9d1c20;">Customer Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control border-2 shadow-sm" id="customerName" wire:model="name" placeholder="Enter customer name" style="color: #9d1c20;">
                             @error('name')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
-                            <label for="contactNumber" class="form-label fw-medium" style="color: #233D7F;">Contact Number</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="contactNumber" wire:model="contactNumber" placeholder="Enter contact number" style=" color: #233D7F;">
+                            <label for="contactNumber" class="form-label fw-medium" style="color: #9d1c20;">Contact Number</label>
+                            <input type="text" class="form-control border-2 shadow-sm" id="contactNumber" wire:model="contactNumber" placeholder="Enter contact number" style=" color: #9d1c20;">
                             @error('contactNumber')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
-                            <label for="email" class="form-label fw-medium" style="color: #233D7F;">Email</label>
-                            <input type="email" class="form-control border-2 shadow-sm" id="email" wire:model="email" placeholder="Enter email" style=" color: #233D7F;">
+                            <label for="email" class="form-label fw-medium" style="color: #9d1c20;">Email</label>
+                            <input type="email" class="form-control border-2 shadow-sm" id="email" wire:model="email" placeholder="Enter email" style=" color: #9d1c20;">
                             @error('email')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
-                            <label for="businessName" class="form-label fw-medium" style="color: #233D7F;">Business Name</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="businessName" wire:model="bussinessName" placeholder="Enter business name" style=" color: #233D7F;">
+                            <label for="businessName" class="form-label fw-medium" style="color: #9d1c20;">Business Name</label>
+                            <input type="text" class="form-control border-2 shadow-sm" id="businessName" wire:model="bussinessName" placeholder="Enter business name" style=" color: #9d1c20;">
                             @error('businessName')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
-                            <label for="customerType" class="form-label fw-medium" style="color: #233D7F;">Customer Type</label>
-                            <select class="form-select border-2 shadow-sm" id="customerType" wire:model="customerType" style=" color: #233D7F;">
+                            <label for="customerType" class="form-label fw-medium" style="color: #9d1c20;">Customer Type</label>
+                            <select class="form-select border-2 shadow-sm" id="customerType" wire:model="customerType" style=" color: #9d1c20;">
                                 <option value="">Select customer type</option>
                                 <option value="retail">Retail</option>
                                 <option value="wholesale">Wholesale</option>
@@ -161,17 +161,17 @@
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
-                            <label for="address" class="form-label fw-medium" style="color: #233D7F;">Address</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="address" wire:model="address" placeholder="Enter address" style=" color: #233D7F;">
+                            <label for="address" class="form-label fw-medium" style="color: #9d1c20;">Address</label>
+                            <input type="text" class="form-control border-2 shadow-sm" id="address" wire:model="address" placeholder="Enter address" style=" color: #9d1c20;">
                             @error('address')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer py-3 px-4 flex-column flex-sm-row gap-2" style="border-top: 1px solid #233D7F; background: #f8f9fa;">
+                <div class="modal-footer py-3 px-4 flex-column flex-sm-row gap-2" style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
                     <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow  w-sm-auto" data-bs-dismiss="modal" style="background-color: #6B7280; border-color: #6B7280; color: white;">Close</button>
-                    <button type="button" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow w-sm-auto" wire:click="saveCustomer" style="background-color: #00C8FF; border-color: #00C8FF; color: white;">Add Customer</button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow w-sm-auto" wire:click="saveCustomer" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;">Add Customer</button>
                 </div>
             </div>
         </div>
@@ -180,44 +180,44 @@
     {{-- Edit Customer Modal --}}
     <div wire:ignore.self wire:key="edit-modal-{{ $editCustomerId ?? 'new' }}" class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #233D7F; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
-                <div class="modal-header py-3 px-4" style="background-color: #233D7F; color: white;">
+            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                <div class="modal-header py-3 px-4" style="background-color: #9d1c20; color: white;">
                     <h1 class="modal-title fs-5 fw-bold tracking-tight" id="editCustomerModalLabel">Edit Customer</h1>
                     <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-5">
                     <div class="row g-4">
                         <div class="col-12 col-md-6">
-                            <label for="editName" class="form-label fw-medium" style="color: #233D7F;">Customer Name</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="editName" wire:model="editName" style=" color: #233D7F;">
+                            <label for="editName" class="form-label fw-medium" style="color: #9d1c20;">Customer Name</label>
+                            <input type="text" class="form-control border-2 shadow-sm" id="editName" wire:model="editName" style=" color: #9d1c20;">
                             @error('editName')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
-                            <label for="editContactNumber" class="form-label fw-medium" style="color: #233D7F;">Contact Number</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="editContactNumber" wire:model="editContactNumber" style=" color: #233D7F;">
+                            <label for="editContactNumber" class="form-label fw-medium" style="color: #9d1c20;">Contact Number</label>
+                            <input type="text" class="form-control border-2 shadow-sm" id="editContactNumber" wire:model="editContactNumber" style=" color: #9d1c20;">
                             @error('editContactNumber')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
-                            <label for="editEmail" class="form-label fw-medium" style="color: #233D7F;">Email</label>
-                            <input type="email" class="form-control border-2 shadow-sm" id="editEmail" wire:model="editEmail" style=" color: #233D7F;">
+                            <label for="editEmail" class="form-label fw-medium" style="color: #9d1c20;">Email</label>
+                            <input type="email" class="form-control border-2 shadow-sm" id="editEmail" wire:model="editEmail" style=" color: #9d1c20;">
                             @error('editEmail')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
-                            <label for="editBusinessName" class="form-label fw-medium" style="color: #233D7F;">Business Name</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="editBusinessName" wire:model="editBussinessName" style=" color: #233D7F;">
+                            <label for="editBusinessName" class="form-label fw-medium" style="color: #9d1c20;">Business Name</label>
+                            <input type="text" class="form-control border-2 shadow-sm" id="editBusinessName" wire:model="editBussinessName" style=" color: #9d1c20;">
                             @error('editBusinessName')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
-                            <label for="editCustomerType" class="form-label fw-medium" style="color: #233D7F;">Customer Type</label>
-                            <select class="form-select border-2 shadow-sm" id="editCustomerType" wire:model="editCustomerType" style=" color: #233D7F;">
+                            <label for="editCustomerType" class="form-label fw-medium" style="color: #9d1c20;">Customer Type</label>
+                            <select class="form-select border-2 shadow-sm" id="editCustomerType" wire:model="editCustomerType" style=" color: #9d1c20;">
                                 <option value="retail">Retail</option>
                                 <option value="wholesale">Wholesale</option>
                             </select>
@@ -226,17 +226,17 @@
                             @enderror
                         </div>
                         <div class="col-12 col-md-6">
-                            <label for="editAddress" class="form-label fw-medium" style="color: #233D7F;">Address</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="editAddress" wire:model="editAddress" style=" color: #233D7F;">
+                            <label for="editAddress" class="form-label fw-medium" style="color: #9d1c20;">Address</label>
+                            <input type="text" class="form-control border-2 shadow-sm" id="editAddress" wire:model="editAddress" style=" color: #9d1c20;">
                             @error('editAddress')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer py-3 px-4 flex-column flex-sm-row gap-2" style="border-top: 1px solid #233D7F; background: #f8f9fa;">
+                <div class="modal-footer py-3 px-4 flex-column flex-sm-row gap-2" style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
                     <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow  w-sm-auto" data-bs-dismiss="modal" style="background-color: #6B7280; border-color: #6B7280; color: white;">Close</button>
-                    <button type="button" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow w-sm-auto" wire:click="updateCustomer({{ $editCustomerId }})" style="background-color: #00C8FF; border-color: #00C8FF; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">Update Customer</button>
+                    <button type="button" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow w-sm-auto" wire:click="updateCustomer({{ $editCustomerId }})" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">Update Customer</button>
                 </div>
             </div>
         </div>

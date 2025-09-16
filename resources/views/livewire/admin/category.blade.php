@@ -14,7 +14,7 @@
 
     <!-- Header Section -->
      <div class="card-header text-white p-2  d-flex align-items-center"
-            style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%); border-radius: 20px 20px 0 0;">
+            style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%); border-radius: 20px 20px 0 0;">
             <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
                 <i class="bi bi-collection fs-4 text-white" aria-hidden="true"></i>
             </div>
@@ -29,7 +29,7 @@
         <div class="flex-grow-1 d-flex justify-content-lg">
             <div class="input-group" style="max-width: 600px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
                 <span class="input-group-text bg-gray-100 border-0 px-3">
-                    <i class="bi bi-search text-primary"></i>
+                    <i class="bi bi-search text-danger"></i>
                 </span>
                 <input type="text"
                     class="form-control"
@@ -44,7 +44,7 @@
             <button
                 class="btn btn-primary rounded-full px-4 fw-medium transition-all hover:shadow w-100"
                 wire:click="toggleAddModal"
-                style="background-color: #233D7F; border-color: #233D7F; color: white;transition: all 0.3s ease; hover: transform: scale(1.05)">
+                style="background-color: #9d1c20; border-color: #9d1c20; color: white;transition: all 0.3s ease; hover: transform: scale(1.05)">
                 <i class="bi bi-plus-circle me-2"></i>Add Category
             </button>
 
@@ -91,7 +91,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="5" class="text-center py-4" style="color: #233D7F;">
+                        <td colspan="5" class="text-center py-4" style="color: #9d1c20;">
                             <i class="bi bi-exclamation-circle me-2"></i>No categories found.
                         </td>
                     </tr>
@@ -108,27 +108,27 @@
     @if($showAddModal)
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #233D7F; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
-                <div class="modal-header py-3 px-4" style="background-color: #233D7F; color: white;">
+            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                <div class="modal-header py-3 px-4" style="background-color: #9d1c20; color: white;">
                     <h5 class="modal-title fw-bold tracking-tight">Add New Category</h5>
                     <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" wire:click="$set('showAddModal', false)" aria-label="Close"></button>
                 </div>
                 <form wire:submit.prevent="save">
                     <div class="modal-body p-5">
                         <div class="mb-4">
-                            <label for="name" class="form-label fw-medium" style="color: #233D7F;">Category Name</label>
-                            <input type="text" wire:model="name" class="form-control border-2 shadow-sm" style="border-color: #233D7F; color: #233D7F;">
+                            <label for="name" class="form-label fw-medium" style="color: #9d1c20;">Category Name</label>
+                            <input type="text" wire:model="name" class="form-control border-2 shadow-sm" style="border-color: #d34d51ff; color: #9d1c20;">
                             @error('name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="description" class="form-label fw-medium" style="color: #233D7F;">Description</label>
-                            <textarea wire:model="description" class="form-control border-2 shadow-sm" rows="4" style="border-color: #233D7F; color: #233D7F;"></textarea>
+                            <label for="description" class="form-label fw-medium" style="color: #9d1c20;">Description</label>
+                            <textarea wire:model="description" class="form-control border-2 shadow-sm" rows="4" style="border-color: #d34d51ff; color: #9d1c20;"></textarea>
                             @error('description') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                         </div>
                     </div>
-                    <div class="modal-footer py-3 px-4" style="border-top: 1px solid #233D7F; background: #f8f9fa;">
+                    <div class="modal-footer py-3 px-4" style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
                         <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="$set('showAddModal', false)" style="background-color: #6B7280; border-color: #6B7280; color: white;">Cancel</button>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" style="background-color: #00C8FF; border-color: #00C8FF; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">Save</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">Save</button>
                     </div>
                 </form>
             </div>
@@ -140,27 +140,27 @@
     @if($showEditModal)
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #233D7F; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
-                <div class="modal-header py-3 px-4" style="background-color: #233D7F; color: white;">
+            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                <div class="modal-header py-3 px-4" style="background-color: #9d1c20; color: white;">
                     <h5 class="modal-title fw-bold tracking-tight">Edit Category</h5>
                     <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" wire:click="$set('showEditModal', false)" aria-label="Close"></button>
                 </div>
                 <form wire:submit.prevent="update">
                     <div class="modal-body p-5">
                         <div class="mb-4">
-                            <label for="edit-name" class="form-label fw-medium" style="color: #233D7F;">Category Name</label>
-                            <input type="text" wire:model="name" class="form-control border-2 shadow-sm" style="border-color: #233D7F; color: #233D7F;">
+                            <label for="edit-name" class="form-label fw-medium" style="color: #9d1c20;">Category Name</label>
+                            <input type="text" wire:model="name" class="form-control border-2 shadow-sm" style="border-color: #d34d51ff; color: #9d1c20;">
                             @error('name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                         </div>
                         <div class="mb-4">
-                            <label for="edit-description" class="form-label fw-medium" style="color: #233D7F;">Description</label>
-                            <textarea wire:model="description" class="form-control border-2 shadow-sm" rows="4" style="border-color: #233D7F; color: #233D7F;"></textarea>
+                            <label for="edit-description" class="form-label fw-medium" style="color: #9d1c20;">Description</label>
+                            <textarea wire:model="description" class="form-control border-2 shadow-sm" rows="4" style="border-color: #d34d51ff; color: #9d1c20;"></textarea>
                             @error('description') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                         </div>
                     </div>
-                    <div class="modal-footer py-3 px-4" style="border-top: 1px solid #233D7F; background: #f8f9fa;">
+                    <div class="modal-footer py-3 px-4" style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
                         <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="$set('showEditModal', false)" style="background-color: #6B7280; border-color: #6B7280; color: white;">Cancel</button>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" style="background-color: #00C8FF; border-color: #00C8FF; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">Update</button>
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">Update</button>
                     </div>
                 </form>
             </div>
@@ -172,17 +172,17 @@
     @if($showDeleteModal)
     <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #233D7F; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
                 <div class="modal-header py-3 px-4" style="background-color: #EF4444; color: white;">
                     <h5 class="modal-title fw-bold tracking-tight">Confirm Deletion</h5>
                     <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" wire:click="$set('showDeleteModal', false)" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-5" style="color: #233D7F;">
+                <div class="modal-body p-5" style="color: #9d1c20;">
                     <p class="mb-0">Are you sure you want to delete this category? This action cannot be undone.</p>
                 </div>
-                <div class="modal-footer py-3 px-4" style="border-top: 1px solid #233D7F; background: #f8f9fa;">
+                <div class="modal-footer py-3 px-4" style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
                     <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="$set('showDeleteModal', false)" style="background-color: #6B7280; border-color: #6B7280; color: white;">Cancel</button>
-                    <button type="button" class="btn btn-danger rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="delete" style="background-color: #EF4444; border-color: #EF4444; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#EF4444'; this.style.borderColor='#EF4444';">Delete</button>
+                    <button type="button" class="btn btn-danger rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="delete" style="background-color: #EF4444; border-color: #EF4444; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#EF4444'; this.style.borderColor='#EF4444';">Delete</button>
                 </div>
             </div>
         </div>

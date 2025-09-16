@@ -3,7 +3,7 @@
         <!-- Card Header -->
 
         <div class="card-header text-white p-2  d-flex align-items-center"
-            style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%); border-radius: 20px 20px 0 0;">
+            style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%); border-radius: 20px 20px 0 0;">
             <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
                 <i class="bi bi-people fs-4 text-white" aria-hidden="true"></i>
             </div>
@@ -17,7 +17,7 @@
             <div class="flex-grow-1 d-flex justify-content-lg">
                 <div class="input-group " style="max-width: 600px;">
                     <span class="input-group-text bg-gray-100 border-0 px-3">
-                        <i class="bi bi-search text-primary"></i>
+                        <i class="bi bi-search text-danger"></i>
                     </span>
                     <input type="text"
                         class="form-control "
@@ -32,13 +32,13 @@
                 <button wire:click="exportToCSV"
                     class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
                     aria-label="Export customer sales to CSV"
-                    style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F;">
+                    style="color: #fff; background-color: #9d1c20; border: 1px solid #9d1c20;">
                     <i class="bi bi-download me-1" aria-hidden="true"></i> Export CSV
                 </button>
                 <button wire:click="printData"
                     class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
                     aria-label="Print customer sales details"
-                    style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F;">
+                    style="color: #fff; background-color: #9d1c20; border: 1px solid #9d1c20;">
                     <i class="bi bi-printer me-1" aria-hidden="true"></i> Print
                 </button>
             </div>
@@ -133,7 +133,7 @@
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content rounded-4 shadow-lg">
                 <div class="modal-header text-white p-4"
-                    style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);">
+                    style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%);">
                     <h5 class="modal-title fw-bold tracking-tight" id="customerSalesModalLabel">
                         <i class="bi bi-person me-2"></i>
                         {{ $modalData ? $modalData['customer']->name . '\'s Sales History' : 'Sales History' }}
@@ -152,7 +152,7 @@
                                     <p class="mb-2 text-sm text-gray-800"><strong>Phone:</strong> {{ $modalData['customer']->phone }}</p>
                                     <p class="mb-2 text-sm text-gray-800"><strong>Type:</strong>
                                         <span class="badge"
-                                            style="background-color: {{ $modalData['customer']->type == 'wholesale' ? '#1e40af' : '#0ea5e9' }};
+                                            style="background-color: {{ $modalData['customer']->type == 'wholesale' ? '#9d1c20' : '#d34d51ff' }};
                                                      color: #ffffff; padding: 6px 12px; border-radius: 9999px; font-weight: 600;">
                                             {{ ucfirst($modalData['customer']->type) }}
                                         </span>
@@ -171,7 +171,7 @@
                         <div class="col-md-4">
                             <div class="card border-0 shadow-sm rounded-4 h-100">
                                 <div class="card-body text-center p-4">
-                                    <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #1e3a8a;">Total Sales Amount</h6>
+                                    <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #9d1c20;">Total Sales Amount</h6>
                                     <h3 class="fw-bold text-gray-800">Rs.{{ number_format($modalData['salesSummary']->total_amount, 2) }}</h3>
                                     <p class="text-sm text-gray-500 mb-0">Across {{ count($modalData['invoices']) }} invoices</p>
                                 </div>
@@ -209,12 +209,12 @@
                     @endphp
                     <div class="card border-0 shadow-sm rounded-4 mb-4">
                         <div class="card-body p-4">
-                            <p class="fw-bold mb-2 text-sm text-gray-800" style="color: #1e3a8a;">Payment Progress</p>
+                            <p class="fw-bold mb-2 text-sm text-gray-800" style="color: #9d1c20;">Payment Progress</p>
                             <div class="d-flex align-items-center">
                                 <div class="progress flex-grow-1" style="height: 10px;">
                                     <div class="progress-bar"
                                         role="progressbar"
-                                        style="background-color: #1e40af; width: {{ $paymentPercentage }}%;"
+                                        style="background-color: #9d1c20; width: {{ $paymentPercentage }}%;"
                                         aria-valuenow="{{ $paymentPercentage }}"
                                         aria-valuemin="0"
                                         aria-valuemax="100">
@@ -228,21 +228,21 @@
                     <!-- Product-wise Sales Table -->
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-header p-4" style="background-color: #eff6ff;">
-                            <h5 class="card-title mb-0 fw-bold text-sm" style="color: #1e3a8a;">Product-wise Sales</h5>
+                            <h5 class="card-title mb-0 fw-bold text-sm" style="color: #9d1c20;">Product-wise Sales</h5>
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
                                 <table class="table table-hover align-middle mb-0">
                                     <thead class="position-sticky top-0" style="background-color: #eff6ff;">
                                         <tr>
-                                            <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">ID</th>
-                                            <th class="text-uppercase text-xs fw-semibold py-3" style="color: #1e3a8a;">Product</th>
-                                            <th class="text-uppercase text-xs fw-semibold py-3" style="color: #1e3a8a;">Invoice</th>
-                                            <th class="text-uppercase text-xs fw-semibold py-3" style="color: #1e3a8a;">Date</th>
-                                            <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Quantity</th>
-                                            <th class="text-uppercase text-xs fw-semibold py-3 text-end" style="color: #1e3a8a;">Unit Price</th>
-                                            <th class="text-uppercase text-xs fw-semibold py-3 text-end" style="color: #1e3a8a;">Discount</th>
-                                            <th class="text-uppercase text-xs fw-semibold py-3 text-end" style="color: #1e3a8a;">Total</th>
+                                            <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">ID</th>
+                                            <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Product</th>
+                                            <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Invoice</th>
+                                            <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Date</th>
+                                            <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Quantity</th>
+                                            <th class="text-uppercase text-xs fw-semibold py-3 text-end" style="color: #9d1c20;">Unit Price</th>
+                                            <th class="text-uppercase text-xs fw-semibold py-3 text-end" style="color: #9d1c20;">Discount</th>
+                                            <th class="text-uppercase text-xs fw-semibold py-3 text-end" style="color: #9d1c20;">Total</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -256,7 +256,7 @@
                                                         <small class="text-muted d-block">
                                                             {{ $item->product_brand ?? '' }} {{ $item->product_model ?? '' }}
                                                         </small>
-                                                        <span class="badge" style="background-color: #f3f4f6; color: #1f2937; padding: 6px 12px; border-radius: 9999px;">
+                                                        <span class="badge" style="background-color: #f3f4f6; color: #9d1c20; padding: 6px 12px; border-radius: 9999px;">
                                                             {{ $item->product_code }}
                                                         </span>
                                                     </div>
@@ -379,7 +379,7 @@
                         body { font-family: 'Inter', sans-serif; padding: 20px; font-size: 14px; color: #1f2937; }
                         .print-container { max-width: 900px; margin: 0 auto; }
                         .print-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #1e40af; display: flex; justify-content: space-between; align-items: center; }
-                        .print-header h2 { color: #1e40af; font-weight: 700; letter-spacing: -0.025em; }
+                        .print-header h2 { color: #9d1c20; font-weight: 700; letter-spacing: -0.025em; }
                         .print-footer { margin-top: 20px; padding-top: 15px; border-top: 2px solid #e5e7eb; text-align: center; font-size: 12px; color: #6b7280; }
                         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
                         th, td { border: 1px solid #e5e7eb; padding: 12px; text-align: center; vertical-align: middle; }
@@ -387,7 +387,7 @@
                         tr:nth-child(even) { background-color: #f9fafb; }
                         tr:hover { background-color: #f1f5f9; }
                         .badge { padding: 6px 12px; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; color: #ffffff; }
-                        .bg-primary { background-color: #1e40af; }
+                        .bg-primary { background-color: #9d1c20; }
                         .bg-info { background-color: #0ea5e9; }
                         .bg-success { background-color: #22c55e; }
                         .bg-danger { background-color: #ef4444; }

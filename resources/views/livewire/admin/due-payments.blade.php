@@ -5,7 +5,7 @@
             <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
                 <!-- Header Content -->
                 <div class="card-header text-white p-2 rounded-t-4 d-flex align-items-center"
-                    style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);">
+                    style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%);">
                     <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
                         <i class="bi bi-cash-stack text-white fs-4" aria-hidden="true"></i>
                     </div>
@@ -23,14 +23,14 @@
                             <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
                                 <div class="card-body p-4">
                                     <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-info bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-hourglass text-info"></i>
+                                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
+                                            <i class="bi bi-hourglass text-danger"></i>
                                         </div>
                                         <div>
                                             <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Total Due Payments</p>
                                             <div class="d-flex align-items-baseline mt-1">
                                                 <h3 class="mb-0 fw-bold text-gray-800">{{ $duePaymentsCount }}</h3>
-                                                <span class="badge bg-info bg-opacity-10 text-info ms-2 rounded-full" style="padding: 6px 12px;">To Collect</span>
+                                                <span class="badge bg-danger bg-opacity-10 text-danger ms-2 rounded-full" style="padding: 6px 12px;">To Collect</span>
                                             </div>
                                         </div>
                                     </div>
@@ -43,8 +43,8 @@
                             <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
                                 <div class="card-body p-4">
                                     <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-success bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-currency-dollar text-success"></i>
+                                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
+                                            <i class="bi bi-currency-dollar text-danger"></i>
                                         </div>
                                         <div>
                                             <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Total Due Amount</p>
@@ -63,8 +63,8 @@
                             <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
                                 <div class="card-body p-4">
                                     <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-success bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-hourglass text-info"></i>
+                                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
+                                            <i class="bi bi-hourglass text-danger"></i>
                                         </div>
                                         <div>
                                             <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Today Due Payment</p>
@@ -83,8 +83,8 @@
                             <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
                                 <div class="card-body p-4">
                                     <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-success bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-currency-dollar text-success"></i>
+                                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
+                                            <i class="bi bi-currency-dollar text-danger"></i>
                                         </div>
                                         <div>
                                             <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Total Due Amount</p>
@@ -113,7 +113,7 @@
                         <div class="flex-grow-1 d-flex justify-content-lg">
                             <div class="input-group " style="max-width: 600px;">
                                 <span class="input-group-text bg-gray-100 border-0 px-3">
-                                    <i class="bi bi-search text-primary"></i>
+                                    <i class="bi bi-search text-danger"></i>
                                 </span>
                                 <input type="text"
                                     class="form-control "
@@ -124,29 +124,29 @@
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <div class="dropdown">
-                                <button class="btn btn-light rounded-pill shadow-sm px-4 py-2 transition-all hover:shadow" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #00C8FF; border-color: #00C8FF; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#00C8FF'; this.style.borderColor='#00C8FF';">
+                                <button class="btn btn-light rounded-pill shadow-sm px-4 py-2 transition-all hover:shadow" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
                                     <i class="bi bi-funnel me-1"></i> Filters
                                     @if ($filters['status'] || $filters['dateFrom'] || $filters['dateTo'])
-                                    <span class="badge bg-primary ms-1 rounded-pill" style="background-color: #233D7F; color: #ffffff;">!</span>
+                                    <span class="badge bg-primary ms-1 rounded-pill" style="background-color: #9d1c20; color: #ffffff;">!</span>
                                     @endif
                                 </button>
                                 <div class="dropdown-menu p-4 shadow-lg border-0 rounded-4" style="width: 300px;" aria-labelledby="filterDropdown">
-                                    <h6 class="dropdown-header bg-light rounded py-2 mb-3 text-center text-sm fw-semibold" style="color: #233D7F;">Filter Options</h6>
+                                    <h6 class="dropdown-header bg-light rounded py-2 mb-3 text-center text-sm fw-semibold" style="color: #9d1c20;">Filter Options</h6>
                                     <div class="mb-3">
-                                        <label class="form-label text-sm fw-semibold" style="color: #233D7F;">Payment Status</label>
-                                        <select class="form-select form-select-sm rounded-pill shadow-sm border-2" wire:model.live="filters.status" style="border-color: #233D7F; color: #233D7F;">
+                                        <label class="form-label text-sm fw-semibold" style="color: #9d1c20;">Payment Status</label>
+                                        <select class="form-select form-select-sm rounded-pill shadow-sm border-2" wire:model.live="filters.status" style="border-color: #9d1c20; color: #9d1c20;">
                                             <option value="">All Statuses</option>
                                             <option value="pending">Pending</option>
                                             <option value="paid">Paid</option>
                                         </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label text-sm fw-semibold" style="color: #233D7F;">Due Date From</label>
-                                        <input type="date" class="form-control form-control-sm rounded-pill shadow-sm border-2" wire:model.live="filters.dateFrom" style="border-color: #233D7F; color: #233D7F;">
+                                        <label class="form-label text-sm fw-semibold" style="color: #9d1c20;">Due Date From</label>
+                                        <input type="date" class="form-control form-control-sm rounded-pill shadow-sm border-2" wire:model.live="filters.dateFrom" style="border-color: #9d1c20; color: #9d1c20;">
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label text-sm fw-semibold" style="color: #233D7F;">Due Date To</label>
-                                        <input type="date" class="form-control form-control-sm rounded-pill shadow-sm border-2" wire:model.live="filters.dateTo" style="border-color: #233D7F; color: #233D7F;">
+                                        <label class="form-label text-sm fw-semibold" style="color: #9d1c20;">Due Date To</label>
+                                        <input type="date" class="form-control form-control-sm rounded-pill shadow-sm border-2" wire:model.live="filters.dateTo" style="border-color: #9d1c20; color: #9d1c20;">
                                     </div>
                                     <div class="d-grid">
                                         <button class="btn btn-secondary rounded-pill shadow-sm px-4 py-2 transition-all hover:shadow" wire:click="resetFilters" style="background-color: #6B7280; border-color: #6B7280; color: white;">
@@ -157,7 +157,7 @@
                             </div>
                             <button wire:click="printDuePayments"
                                 class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                                style="color: #fff; background-color: #233D7F; border: 1px solid #233D7F;"
+                                style="color: #fff; background-color: #9d1c20; border: 1px solid #9d1c20;"
                                 aria-label="Print due payments">
                                 <i class="bi bi-printer me-1" aria-hidden="true"></i> Print
                             </button>
@@ -171,11 +171,11 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead style="background-color: #eff6ff;">
                                 <tr>
-                                    <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Invoice</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3" style="color: #1e3a8a;">Customer</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Amount</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Status</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #1e3a8a;">Actions</th>
+                                    <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Invoice</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Customer</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Amount</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Status</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -263,7 +263,7 @@
         <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content rounded-4 shadow-lg">
                 <div class="modal-header text-white p-4"
-                    style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);">
+                    style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%);">
                     <h5 class="modal-title fw-bold tracking-tight" id="payment-detail-modal-label">
                         <i class="bi bi-credit-card me-2"></i> Receive Due Payment
                     </h5>
@@ -281,7 +281,7 @@
                                 <h6 class="mt-3 mb-0 fw-bold text-gray-800">{{ $paymentDetail->sale->customer->name }}</h6>
                                 <p class="text-sm text-gray-600 mb-0">{{ $paymentDetail->sale->customer->phone }}</p>
                             </div>
-                            <h6 class="text-uppercase text-sm fw-semibold mb-3 border-bottom pb-2" style="color: #1e3a8a;">Invoice Details</h6>
+                            <h6 class="text-uppercase text-sm fw-semibold mb-3 border-bottom pb-2" style="color: #9d1c20;">Invoice Details</h6>
                             <div class="mb-3">
                                 <p class="mb-2">
                                     <span class="text-gray-600">Invoice:</span>
@@ -295,7 +295,7 @@
                                 <div class="card border-0 shadow-sm rounded-4 p-3 mt-3 bg-light">
                                     <div>
                                         <span class="text-sm text-gray-600">Amount Due:</span>
-                                        <span class="fw-bold" style="font-size: 1.5rem; color: #1e3a8a;">Rs.{{ number_format($paymentDetail->amount, 2) }}</span>
+                                        <span class="fw-bold" style="font-size: 1.5rem; color: #9d1c20;">Rs.{{ number_format($paymentDetail->amount, 2) }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -310,7 +310,7 @@
                                             <i class="bi bi-wallet2 text-primary fs-4"></i>
                                         </div>
                                         <div>
-                                            <h5 class="mb-0 fw-bold text-gray-800" style="color: #1e3a8a;">Payment Collection</h5>
+                                            <h5 class="mb-0 fw-bold text-gray-800" style="color: #9d1c20;">Payment Collection</h5>
                                             <p class="text-sm text-gray-600 mb-0">Record customer payment details for admin approval</p>
                                         </div>
                                     </div>
@@ -319,7 +319,7 @@
                                 <div class="p-4">
                                     <div class="row">
                                         <div class="col-md-6 mb-4">
-                                            <label class="form-label text-sm fw-semibold mb-2" style="color: #1e3a8a;">Cash Amount</label>
+                                            <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">Cash Amount</label>
                                             <input type="text" class="form-control rounded-4 shadow-sm @error('receivedAmount') is-invalid @enderror" wire:model="receivedAmount" placeholder="Enter cash amount">
                                             @error('receivedAmount')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -328,7 +328,7 @@
                                     </div>
 
                                     <div class="border rounded-4 p-3 mb-4 shadow-sm bg-light">
-                                        <h6 class="text-sm fw-semibold mb-3" style="color: #1e3a8a;">Add Cheque Details</h6>
+                                        <h6 class="text-sm fw-semibold mb-3" style="color: #9d1c20;">Add Cheque Details</h6>
                                         <div class="row g-3 align-items-end">
                                             <div class="col-md-6">
                                                 <label class="form-label text-xs fw-semibold">Cheque No. <span class="text-danger">*</span></label>
@@ -407,7 +407,7 @@
 
                                     <div class="row">
                                         <div class="col-md-12 mb-4">
-                                            <label class="form-label text-sm fw-semibold mb-2" style="color: #1e3a8a;">Payment Notes</label>
+                                            <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">Payment Notes</label>
                                             <textarea class="form-control rounded-4 shadow-sm" rows="3" wire:model="paymentNote" placeholder="Add any notes about this payment (optional)"></textarea>
                                         </div>
                                     </div>
@@ -445,7 +445,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content border-0 shadow-lg rounded-4">
                 <div class="modal-header text-white p-4"
-                    style="background: linear-gradient(90deg, #1e40af 0%, #3b82f6 100%);">
+                    style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%);">
                     <h5 class="modal-title fw-bold tracking-tight" id="extend-due-modal-label">
                         <i class="bi bi-calendar-plus me-2"></i> Extend Due Date
                     </h5>
@@ -457,11 +457,11 @@
                             <div class="icon-shape icon-xl bg-warning bg-opacity-10 rounded-circle mx-auto mb-3">
                                 <i class="bi bi-calendar-week text-warning fs-2"></i>
                             </div>
-                            <h5 class="fw-bold text-gray-800" style="color: #1e3a8a;">Extend Payment Due Date</h5>
+                            <h5 class="fw-bold text-gray-800" style="color: #9d1c20;">Extend Payment Due Date</h5>
                             <p class="text-sm text-gray-600">Provide a new due date and reason for extension</p>
                         </div>
                         <div class="mb-4">
-                            <label class="form-label text-sm fw-semibold mb-2" style="color: #1e3a8a;">New Due Date <span class="text-danger">*</span></label>
+                            <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">New Due Date <span class="text-danger">*</span></label>
                             <div class="input-group shadow-sm rounded-4">
                                 <span class="input-group-text bg-white border-end-0">
                                     <i class="bi bi-calendar-date text-primary"></i>
@@ -476,7 +476,7 @@
                             </div>
                         </div>
                         <div class="mb-4">
-                            <label class="form-label text-sm fw-semibold mb-2" style="color: #1e3a8a;">Reason for Extension <span class="text-danger">*</span></label>
+                            <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">Reason for Extension <span class="text-danger">*</span></label>
                             <textarea class="form-control rounded-4 shadow-sm @error('extensionReason') is-invalid @enderror"
                                 wire:model="extensionReason"
                                 rows="3"
