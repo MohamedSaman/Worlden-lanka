@@ -30,6 +30,8 @@ use App\Livewire\Admin\Category;
 use App\Livewire\Admin\DueCheques;
 use App\Livewire\Admin\Products;
 use App\Livewire\Admin\DueChequesReturn;
+use App\Livewire\Admin\ProductReEntry;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -74,6 +76,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('/due-cheques-return', DueChequesReturn::class)->name('due-cheques-return');
         
         Route::get('/product-stocks', \App\Livewire\Admin\ProductStocks::class)->name('product-stocks');
+        Route::get('/product-re-entry',ProductReEntry::class )->name('product-reentry');
 
     });
 

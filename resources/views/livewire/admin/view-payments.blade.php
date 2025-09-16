@@ -220,7 +220,7 @@
                                 </td>
                                 <td>{{ $payment->sale->user->name ?? 'N/A' }}</td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-info rounded-pill px-3" wire:click="viewPaymentDetails({{ $payment->id }})">
+                                    <button class="btn btn-sm rounded-pill px-3" style="background-color:#9d1c20 ; color:white;" wire:click="viewPaymentDetails({{ $payment->id }})">
                                         <i class="bi bi-receipt-cutoff"></i> View
                                     </button>
                                 </td>

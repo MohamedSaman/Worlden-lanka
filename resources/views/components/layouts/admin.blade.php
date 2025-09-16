@@ -335,6 +335,12 @@
                                     <i class="bi bi-collection"></i> <span>Product Category</span>
                                 </a>
                             </li>
+                            <li class="nav-item">
+                                <a class="nav-link py-2 {{ request()->routeIs('admin.product-reentry') ? 'active' : '' }}"
+                                    href="{{ route('admin.product-reentry') }}">
+                                    <i class="bi bi-collection"></i> <span>Product Re-entry</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </li>
@@ -408,9 +414,11 @@
             </button>
 
             <!-- Center Title -->
-            <div class="flex-grow-1 text-center fw-bold my-2 title" style="color:#b5171a; font-size:18px;">
-                <h2 style="padding: 0;margin:0"><b>PLUS</b></h2>
-                <p style="padding: 0;margin:0; font-size:16px;">Importers Of Garment Accessories & Machinery</p>
+            <div class="flex-grow-1 text-center fw-bold my-2 title" style="color:#b5171a;">
+                <h2 class="m-0" style="font-size:28px;font-weight:700; letter-spacing:1px;"><b>PLUS</b></h2>
+                <p class="m-0" style="font-size:14px; font-weight:500; color:#444;">
+                    Importers of Garment Accessories & Machinery
+                </p>
             </div>
 
             <!-- Right Dropdown -->
