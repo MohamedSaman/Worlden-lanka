@@ -205,14 +205,21 @@ class ManageCustomer extends Component
         }
     }
 
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
     public function render()
     {
         $customers = Customer::query()
             ->when($this->search, function ($query) {
-                $query->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('phone', 'like', '%' . $this->search . '%')
-                    ->orWhere('email', 'like', '%' . $this->search . '%')
-                    ->orWhere('business_name', 'like', '%' . $this->search . '%');
+                $query->where(function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%')
+                        ->orWhere('phone', 'like', '%' . $this->search . '%')
+                        ->orWhere('email', 'like', '%' . $this->search . '%')
+                        ->orWhere('business_name', 'like', '%' . $this->search . '%');
+                });
             })
             ->orderBy('id')
             ->paginate(10);
