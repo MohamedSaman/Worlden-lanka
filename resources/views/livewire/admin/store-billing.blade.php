@@ -128,7 +128,7 @@
                                             <button class="btn btn-sm btn-primary"
                                                 wire:click="addToCart({{ $result->id }})" {{ $result->stock_quantity <=
                                                     0 ? 'disabled' : '' }}>
-                                                    <i class="fas fa-plus"></i> Add
+                                                <i class="fas fa-plus"></i> Add
                                             </button>
                                         </div>
 
@@ -289,7 +289,7 @@
 
                                                 </div>
                                                 <button class="btn  d-flex align-items-center"
-                                                style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';"
+                                                    style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';"
                                                     data-bs-toggle="modal" data-bs-target="#addCustomerModal">
                                                     <i class="bi bi-plus-circle me-1"></i>ADD
                                                 </button>
@@ -387,7 +387,7 @@
                                                     </div>
                                                     <div class="text-end mt-3">
                                                         <button type="submit" class="btn btn-sm "
-                                                        style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
+                                                            style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
                                                             <i class="fas fa-plus me-1"></i> Add Cheque
                                                         </button>
                                                     </div>
@@ -474,7 +474,7 @@
 
                                         <div class="d-flex mt-4">
                                             <button class="btn btn-danger me-2" wire:click="clearCart"
-                                            style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
+                                                style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
                                                 <i class="fas fa-times me-2"></i>Clear
                                             </button>
                                             <button class="btn btn-success flex-grow-1" wire:click="completeSale">
@@ -490,7 +490,7 @@
                 </div>
             </div>
 
-
+            <!-- View model -->
             <div wire:ignore.self class="modal fade" id="viewDetailModal" tabindex="-1"
                 aria-labelledby="viewDetailModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-xl modal-dialog-scrollable">
@@ -628,7 +628,7 @@
                 </div>
             </div>
 
-
+            <!-- Add customer -->
             <div wire:ignore.self class="modal fade" id="addCustomerModal" tabindex="-1"
                 aria-labelledby="addCustomerModalLabel" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
@@ -720,20 +720,20 @@
                     </div>
                 </div>
             </div>
-
+            <!-- reciepte model -->
             <div wire:ignore.self class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel"
                 aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content rounded-4 shadow-xl"
-                        style="border: 2px solid #233D7F; background: linear-gradient(145deg, #FFFFFF, #F8F9FA);">
+                        style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #FFFFFF, #F8F9FA);">
                         <div class="modal-header"
-                            style="background-color: #233D7F; color: #FFFFFF; border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem;">
+                            style="background-color: #9d1c20; color: #FFFFFF; border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem;">
                             <h5 class="modal-title fw-bold tracking-tight" id="receiptModalLabel">
                                 <i class="bi bi-receipt me-2"></i>Sales Receipt
                             </h5>
                             <div class="ms-auto d-flex gap-2">
                                 <button type="button" class="btn btn-sm rounded-full px-3 transition-all hover:shadow"
-                                    id="printButton" style="background-color: #233D7F;border-color:#fff; color: #fff;">
+                                    id="printButton" style="background-color: #9d1c20;border-color:#fff; color: #fff;">
                                     <i class="bi bi-printer me-1"></i>Print
                                 </button>
                                 <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100"
@@ -744,22 +744,22 @@
                             @if ($receipt)
                             <div class="receipt-container">
                                 <div class="text-center mb-4">
-                                    <h3 class="mb-1 fw-bold tracking-tight" style="color: #233D7F;">PLUS</h3>
+                                    <h3 class="mb-1 fw-bold tracking-tight" style="color: #9d1c20;">PLUS</h3>
                                     <p class="mb-0 text-muted small" style="color: #6B7280;">NO 20/2/1, 2nd FLOOR,HUNTER
                                         BUILDING,BANKSHALLL STREET,COLOMBO-11</p>
                                     <p class="mb-0 text-muted small" style="color: #6B7280;">Phone: 011 - 2332786 |
                                         Email: plusaccessories.lk@gmail.com</p>
                                     <h4 class="mt-3 border-bottom border-2 pb-2 fw-bold"
-                                        style="color: #233D7F; border-color: #233D7F;">SALES RECEIPT</h4>
+                                        style="color: #9d1c20; border-color: #9d1c20;">SALES RECEIPT</h4>
                                 </div>
 
                                 <div class="row mb-4">
                                     <div class="col-md-6">
                                         <h6 class="text-muted mb-2 fw-medium" style="color: #6B7280;">INVOICE DETAILS
                                         </h6>
-                                        <p class="mb-1" style="color: #233D7F;"><strong>Invoice Number:</strong> {{
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Invoice Number:</strong> {{
                                             $receipt->invoice_number }}</p>
-                                        <p class="mb-1" style="color: #233D7F;"><strong>Date:</strong> {{
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Date:</strong> {{
                                             $receipt->created_at->setTimezone('Asia/Colombo')->format('d/m/Y h:i A') }}
                                         </p>
                                         <p class="mb-1"><strong>Payment Status:</strong>
@@ -780,11 +780,11 @@
                                         <h6 class="text-muted mb-2 fw-medium" style="color: #6B7280;">CUSTOMER DETAILS
                                         </h6>
                                         @if ($receipt->customer)
-                                        <p class="mb-1" style="color: #233D7F;"><strong>Name:</strong> {{
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Name:</strong> {{
                                             $receipt->customer->name }}</p>
-                                        <p class="mb-1" style="color: #233D7F;"><strong>Phone:</strong> {{
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Phone:</strong> {{
                                             $receipt->customer->phone }}</p>
-                                        <p class="mb-1" style="color: #233D7F;"><strong>Type:</strong> {{
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Type:</strong> {{
                                             ucfirst($receipt->customer_type) }}</p>
                                         @else
                                         <p class="text-muted" style="color: #6B7280;">Walk-in Customer</p>
@@ -795,8 +795,8 @@
                                 <h6 class="text-muted mb-2 fw-medium" style="color: #6B7280;">PURCHASED ITEMS</h6>
                                 <div class="table-responsive mb-4">
                                     <table class="table table-bordered table-sm border-1"
-                                        style="border-color: #233D7F;">
-                                        <thead style="background-color: #233D7F; color: #FFFFFF;">
+                                        style="border-color: #9d1c20;">
+                                        <thead style="background-color: #9d1c20; color: #FFFFFF;">
                                             <tr>
                                                 <th scope="col" class="text-center py-2">No</th>
                                                 <th scope="col" class="text-center py-2">Item</th>
@@ -808,7 +808,7 @@
                                                 <th scope="col" class="text-center py-2">Total</th>
                                             </tr>
                                         </thead>
-                                        <tbody style="color: #233D7F;">
+                                        <tbody style="color: #9d1c20;">
                                             @foreach ($receipt->items as $index => $item)
                                             <tr class="transition-all hover:bg-gray-50">
                                                 <td class="text-center py-2">{{ $index + 1 }}</td>
@@ -838,28 +838,28 @@
                                         @foreach ($receipt->payments as $payment)
                                         <div class="mb-2 p-2 border-start border-3 rounded-2"
                                             style="border-color: {{ $payment->is_completed ? '#0F5132' : '#664D03' }}; background-color: #F8F9FA;">
-                                            <p class="mb-1" style="color: #233D7F;">
+                                            <p class="mb-1" style="color: #9d1c20;">
                                                 <strong>{{ $payment->is_completed ? 'Payment' : 'Scheduled Payment'
                                                     }}:</strong>
                                                 Rs.{{ number_format($payment->amount, 2) }}
                                             </p>
-                                            <p class="mb-1" style="color: #233D7F;">
+                                            <p class="mb-1" style="color: #9d1c20;">
                                                 <strong>Method:</strong> {{ ucfirst(str_replace('_', ' ',
                                                 $payment->payment_method)) }}
                                             </p>
                                             @if ($payment->payment_reference)
-                                            <p class="mb-1" style="color: #233D7F;">
+                                            <p class="mb-1" style="color: #9d1c20;">
                                                 <strong>Reference:</strong> {{ $payment->payment_reference }}
                                             </p>
                                             @endif
                                             @if ($payment->payment_date)
-                                            <p class="mb-0" style="color: #233D7F;">
+                                            <p class="mb-0" style="color: #9d1c20;">
                                                 <strong>Date:</strong> {{
                                                 \Carbon\Carbon::parse($payment->payment_date)->format('d/m/Y') }}
                                             </p>
                                             @endif
                                             @if ($payment->due_date)
-                                            <p class="mb-0" style="color: #233D7F;">
+                                            <p class="mb-0" style="color: #9d1c20;">
                                                 <strong>Due Date:</strong> {{
                                                 \Carbon\Carbon::parse($payment->due_date)->format('d/m/Y') }}
                                             </p>
@@ -877,22 +877,22 @@
                                         @endif
                                     </div>
                                     <div class="col-md-6">
-                                        <div class="card border-1 rounded-3 shadow-sm" style="border-color: #233D7F;">
+                                        <div class="card border-1 rounded-3 shadow-sm" style="border-color: #9d1c20;">
                                             <div class="card-body p-3">
-                                                <h6 class="card-title fw-bold tracking-tight" style="color: #233D7F;">
+                                                <h6 class="card-title fw-bold tracking-tight" style="color: #9d1c20;">
                                                     ORDER SUMMARY</h6>
                                                 <div class="d-flex justify-content-between mb-2"
-                                                    style="color: #233D7F;">
+                                                    style="color: #9d1c20;">
                                                     <span>Subtotal:</span>
                                                     <span>Rs.{{ number_format($receipt->subtotal, 2) }}</span>
                                                 </div>
                                                 <div class="d-flex justify-content-between mb-2"
-                                                    style="color: #233D7F;">
+                                                    style="color: #9d1c20;">
                                                     <span>Total Discount:</span>
                                                     <span>Rs.{{ number_format($receipt->discount_amount, 2) }}</span>
                                                 </div>
-                                                <hr style="border-color: #233D7F;">
-                                                <div class="d-flex justify-content-between" style="color: #233D7F;">
+                                                <hr style="border-color: #9d1c20;">
+                                                <div class="d-flex justify-content-between" style="color: #9d1c20;">
                                                     <span class="fw-bold">Grand Total:</span>
                                                     <span class="fw-bold">Rs.{{ number_format($receipt->total_amount, 2)
                                                         }}</span>
@@ -902,7 +902,7 @@
                                     </div>
                                 </div>
 
-                                <div class="text-center mt-4 pt-3 border-top" style="border-color: #233D7F;">
+                                <div class="text-center mt-4 pt-3 border-top" style="border-color: #9d1c20;">
                                     <p class="mb-0 text-muted small" style="color: #6B7280;">Thank you for your
                                         purchase!</p>
                                 </div>
@@ -913,12 +913,12 @@
                             </div>
                             @endif
                         </div>
-                        <div class="modal-footer border-top py-3" style="border-color: #233D7F; background: #F8F9FA;">
+                        <div class="modal-footer border-top py-3" style="border-color: #9d1c20; background: #F8F9FA;">
                             <button type="button"
                                 class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow"
                                 data-bs-dismiss="modal"
                                 style="background-color: #6B7280; border-color: #6B7280; color: #FFFFFF;"
-                                onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';"
+                                onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';"
                                 onmouseout="this.style.backgroundColor='#6B7280'; this.style.borderColor='#6B7280';">Close</button>
                         </div>
                     </div>
@@ -950,10 +950,22 @@
                     <title>Sales Receipt - Print</title>
                     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
                     <style>
-                        body { font-family: sans-serif; padding: 20px; font-size: 14px; }
-                        .table-bordered th, .table-bordered td { border: 1px solid #233D7F !important; }
-                        @media print { .no-print { display: none; } }
-                    </style>
+                    body { font-family: sans-serif; padding: 20px; font-size: 14px; }
+                    .table-bordered th, .table-bordered td { border: 1px solid #9d1c20 !important; padding: 2px 6px !important; font-size: 12px !important; }
+                    .receipt-container { max-width: 700px; margin: 0 auto; }
+                    .d-flex.flex-row { display: flex; flex-direction: row; gap: 2rem; }
+                    .d-flex.flex-row > .flex-fill { width: 50%; min-width: 0; }
+                    .row > .col-md-6 { width: 50%; float: left; min-width: 0; }
+                    @media print {
+                        .no-print, .btn, .modal-footer { display: none !important; }
+                        body { padding: 0; }
+                        .receipt-container { box-shadow: none; border: none; }
+                        .d-flex.flex-row { display: flex !important; flex-direction: row !important; gap: 2rem !important; }
+                        .d-flex.flex-row > .flex-fill { width: 50% !important; min-width: 0 !important; }
+                        .row { display: flex !important; flex-wrap: wrap !important; }
+                        .row > .col-md-6 { width: 50% !important; float: none !important; min-width: 0 !important; }
+                    }
+                </style>
                 </head>
                 <body>
                     ${receiptContent}

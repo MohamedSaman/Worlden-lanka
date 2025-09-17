@@ -28,15 +28,15 @@
 
         <!-- Right: Buttons -->
         <div class="d-flex gap-2 flex-shrink-0 justify-content-lg-end">
-            <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform btn-create"
+            <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105 btn-create"
                 wire:click="toggleAddModal"
-                style="color: #fff; background-color: #b5171a; border: 1px solid #b5171a;transition: all 0.3s ease; hover: transform: scale(1.05)">
+                style="color: #fff; background-color: #b5171a; border: 1px solid #b5171a;transition: all 0.3s ease; ">
                 <i class="bi bi-plus-circle me-2"></i> Add Product
             </button>
             <button wire:click="exportToCSV"
-                class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform "
+                class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform transition-transform hover:scale-105"
                 aria-label="Export stock details to CSV"
-                style="color: #fff; background-color:  #b5171a; border: 1px solid #b5171a; transition: all 0.3s ease; hover: transform: scale(1.05)">
+                style="color: #fff; background-color:  #b5171a; border: 1px solid #b5171a; transition: all 0.3s ease; ">
                 <i class="bi bi-download me-1" aria-hidden="true"></i> Export CSV
             </button>
 
@@ -710,7 +710,68 @@
     </div>
     @endif
 
+@push('styles')
+<style>
+    .input-group {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
 
+    .btn {
+        transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+        transform: scale(1.05);
+    }
+
+    .tracking-tight {
+        letter-spacing: -0.025em;
+    }
+
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+
+    .hover\:bg-gray-50:hover {
+        background-color: #f8f9fa;
+    }
+
+    .hover\:shadow:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 767.98px) {
+        .table {
+            font-size: 0.875rem;
+        }
+
+        .btn-group-sm>.btn,
+        .btn-sm {
+            padding: 0.25rem 0.4rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .table td:nth-child(5),
+        .table th:nth-child(5),
+        /* Email */
+        .table td:nth-child(7),
+        .table th:nth-child(7) {
+            /* Address */
+            display: none;
+        }
+    }
+
+    @media (max-width: 575.98px) {
+        .modal-footer {
+            justify-content: center;
+        }
+    }
+</style>
+@endpush
 
 
 

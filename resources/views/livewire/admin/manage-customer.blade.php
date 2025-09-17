@@ -144,7 +144,7 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="businessName" class="form-label fw-medium" style="color: #9d1c20;">Business Name</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="businessName" wire:model="bussinessName" placeholder="Enter business name" style=" color: #9d1c20;">
+                            <input type="text" class="form-control border-2 shadow-sm" id="businessName" wire:model="businessName" placeholder="Enter business name" style=" color: #9d1c20;">
                             @error('businessName')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
@@ -210,7 +210,7 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <label for="editBusinessName" class="form-label fw-medium" style="color: #9d1c20;">Business Name</label>
-                            <input type="text" class="form-control border-2 shadow-sm" id="editBusinessName" wire:model="editBussinessName" style=" color: #9d1c20;">
+                            <input type="text" class="form-control border-2 shadow-sm" id="editBusinessName" wire:model="editBusinessName" style=" color: #9d1c20;">
                             @error('editBusinessName')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror

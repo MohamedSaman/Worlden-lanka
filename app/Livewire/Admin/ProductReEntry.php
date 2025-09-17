@@ -19,7 +19,6 @@ class ProductReEntry extends Component
     public $selectedProduct = null;
     public $addStock = 0;
     public $addDamage = 0;
-    public $notes = '';
 
     public function selectProduct($productId)
     {
@@ -27,7 +26,6 @@ class ProductReEntry extends Component
         $this->selectedProduct = ProductDetail::with('category')->find($productId);
         $this->addStock = 0;
         $this->addDamage = 0;
-        $this->notes = '';
     }
 
     public function updateStock()
@@ -48,7 +46,7 @@ class ProductReEntry extends Component
             // Reset form
             $this->addStock = 0;
             $this->addDamage = 0;
-            $this->notes = '';
+
             
             // Show success message
             session()->flash('message', 'Stock updated successfully.');

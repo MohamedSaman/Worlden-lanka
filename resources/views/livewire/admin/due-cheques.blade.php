@@ -181,6 +181,7 @@
                                     <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Cheque Date</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Status</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Actions</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">View</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -210,6 +211,11 @@
                                         @else
                                         <span class="text-success">completed</span>
                                         @endif
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm rounded-pill view-cheque-btn" data-cheque-id="{{ $cheque->id }}">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
                                     </td>
                                 </tr>
                                 @empty
@@ -537,6 +543,50 @@
             </div>
         </div>
     </div>
+    <!-- Cheque view model -->
+    <div class="modal fade" id="chequeDetailsModal" tabindex="-1" aria-labelledby="chequeDetailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header" style="background-color: #eff6ff;">
+                    <h5 class="modal-title fw-semibold" id="chequeDetailsModalLabel" style="color: #9d1c20;">Cheque Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="fw-semibold text-muted">Invoice Number</label>
+                            <p class="fw-bold">{{ $cheque->payment->sale->invoice_number ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="fw-semibold text-muted">Customer Name</label>
+                            <p class="fw-bold">{{ $cheque->customer->name ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="fw-semibold text-muted">Cheque Number</label>
+                            <p class="fw-bold">{{ $cheque->cheque_number ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="fw-semibold text-muted">Cheque Amount</label>
+                            <p class="fw-bold">Rs. {{ number_format($cheque->cheque_amount ?? 0, 2) }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="fw-semibold text-muted">Cheque Date</label>
+                            <p class="fw-bold">{{ $cheque->cheque_date?->format('d/m/Y') ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="fw-semibold text-muted">Status</label>
+                            <p class="fw-bold {{ $cheque->status === 'pending' ? 'text-warning' : ($cheque->status === 'complete' ? 'text-success' : 'text-danger') }}">
+                                {{ ucfirst($cheque->status ?? 'Pending') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @push('styles')
@@ -804,5 +854,18 @@
             };
         });
     });
+
+     // JavaScript to handle modal data population
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.view-cheque-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    // Assuming you pass cheque data via data attributes or fetch via Livewire
+                    const chequeId = this.getAttribute('data-cheque-id');
+                    // Trigger Livewire or fetch cheque details and populate modal
+                    // Example: Livewire.emit('loadChequeDetails', chequeId);
+                    new bootstrap.Modal(document.getElementById('chequeDetailsModal')).show();
+                });
+            });
+        });
 </script>
 @endpush

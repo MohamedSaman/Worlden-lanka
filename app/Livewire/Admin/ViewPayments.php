@@ -50,8 +50,6 @@ class ViewPayments extends Component
 
     public function render()
     {
-
-
         $query = Payment::query()
             ->with(['sale', 'sale.customer', 'sale.user'])
             ->where('status', 'Paid') // Force only Paid status
