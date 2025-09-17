@@ -43,6 +43,11 @@ class ViewPayments extends Component
         }
     }
 
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
     public function resetFilters()
     {
         $this->reset('filters');
@@ -52,13 +57,16 @@ class ViewPayments extends Component
     {
         $query = Payment::query()
             ->with(['sale', 'sale.customer', 'sale.user'])
-            ->where('status', 'Paid') // Force only Paid status
+            ->where('status', 'Paid') // Only Paid status
             ->when($this->search, function ($q) {
-                return $q->whereHas('sale', function ($sq) {
-                    $sq->where('invoice_number', 'like', "%{$this->search}%")
-                        ->orWhereHas('customer', function ($cq) {
-                            $cq->where('name', 'like', "%{$this->search}%")
-                                ->orWhere('phone', 'like', "%{$this->search}%");
+                $search = $this->search;
+                $q->where(function ($mainQuery) use ($search) {
+                    $mainQuery->whereHas('sale', function ($sq) use ($search) {
+                        $sq->where('invoice_number', 'like', "%{$search}%");
+                    })
+                        ->orWhereHas('sale.customer', function ($cq) use ($search) {
+                            $cq->where('name', 'like', "%{$search}%")
+                                ->orWhere('phone', 'like', "%{$search}%");
                         });
                 });
             })
@@ -67,6 +75,7 @@ class ViewPayments extends Component
             });
 
         $payments = $query->orderBy('created_at', 'desc')->paginate(15);
+
 
         // Get summary stats
         $totalPayments = Payment::where('is_completed', 1)->sum('amount');
@@ -83,4 +92,3 @@ class ViewPayments extends Component
         ]);
     }
 }
-    
