@@ -411,13 +411,23 @@ class Products extends Component
 
         return response()->stream($callback, 200, $headers);
     }
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
     public function render()
     {
         $products = ProductDetail::with('category')
-            ->where('product_code', 'like', '%' . $this->search . '%')
-            ->orWhere('product_name', 'like', '%' . $this->search . '%')
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('product_code', 'like', '%' . $this->search . '%')
+                        ->orWhere('product_name', 'like', '%' . $this->search . '%');
+                });
+            })
             ->orderBy('id', 'asc')
-            ->paginate(10);;
+            ->paginate(10);
 
         return view('livewire.admin.products', [
             'products' => $products
