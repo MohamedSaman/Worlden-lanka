@@ -171,53 +171,45 @@
                         <table class="table table-hover align-middle mb-0">
                             <thead style="background-color: #eff6ff;">
                                 <tr>
-                                    <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Invoice</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Customer</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Amount</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Status</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Current Due</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Back-Forward Due</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Total Due</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($duePayments as $payment)
-                                <tr class="border-bottom transition-all hover:bg-[#f1f5f9] {{ $loop->iteration % 2 == 0 ? 'bg-[#f9fafb]' : '' }} {{ now()->gt($payment->due_date) && $payment->status === null ? 'bg-danger bg-opacity-10' : '' }}">
-                                    <td class="ps-4" data-label="Invoice">
-                                        <div class="d-flex flex-column">
-                                            <h6 class="mb-0 text-sm fw-semibold text-gray-800">{{ $payment->sale->invoice_number }}</h6>
-                                            <p class="text-xs text-gray-600 mb-0">{{ $payment->sale->created_at->format('d M Y') }}</p>
-                                        </div>
-                                    </td>
+                                @forelse($duePayments as $customer)
+                                <tr class="border-bottom transition-all hover:bg-[#f1f5f9] {{ $loop->iteration % 2 == 0 ? 'bg-[#f9fafb]' : '' }} {{ now()->gt($customer->customerAccounts->last()->created_at->addDays(30) ?? now()) && $customer->customer_accounts_sum_current_due_amount > 0 ? 'bg-danger bg-opacity-10' : '' }}">
                                     <td data-label="Customer">
                                         <div class="d-flex align-items-center">
                                             <div class="icon-shape icon-md rounded-circle bg-primary bg-opacity-10 me-2 d-flex align-items-center justify-content-center">
-                                                <span class="text-primary fw-bold">{{ substr($payment->sale->customer->name, 0, 1) }}</span>
+                                                <span class="text-primary fw-bold">{{ substr($customer->name, 0, 1) }}</span>
                                             </div>
                                             <div>
-                                                <p class="text-sm fw-semibold text-gray-800 mb-0">{{ $payment->sale->customer->name }}</p>
-                                                <p class="text-xs text-gray-600 mb-0">{{ $payment->sale->customer->phone }}</p>
+                                                <p class="text-sm fw-semibold text-gray-800 mb-0">{{ $customer->name }}</p>
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="text-center" data-label="Amount">
+                                    <td class="text-center" data-label="Current Due">
                                         <div class="d-flex align-items-center justify-content-center">
-                                            <span class="text-sm fw-semibold text-gray-800">Rs.{{ number_format($payment->amount, 2) }}</span>
+                                            <span class="text-sm fw-semibold text-gray-800">Rs.{{ number_format($customer->customer_accounts_sum_current_due_amount, 2) }}</span>
                                         </div>
                                     </td>
-                                    <td class="text-center" data-label="Status">
-                                        @if ($payment->status === null)
-                                        <span class="badge bg-danger bg-opacity-10 text-danger rounded-full px-3 py-1" style="font-size: 0.75rem;">Pending</span>
-
-                                        @elseif($payment->status === 'Paid')
-                                        <span class="badge bg-success bg-opacity-10 text-success rounded-full px-3 py-1" style="font-size: 0.75rem;">Paid</span>
-
-                                        @else
-                                        <span class="badge bg-secondary bg-opacity-10 text-secondary rounded-full px-3 py-1" style="font-size: 0.75rem;">No show</span>
-                                        @endif
+                                    <td class="text-center" data-label="Back-Forward Due">
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <span class="text-sm fw-semibold text-gray-800">Rs.{{ number_format($customer->customer_accounts_sum_back_forward_amount, 2) }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-center" data-label="Total Due">
+                                        <div class="d-flex align-items-center justify-content-center">
+                                            <span class="text-sm fw-semibold text-gray-800">Rs.{{ number_format($customer->customer_accounts_sum_total_due, 2) }}</span>
+                                        </div>
                                     </td>
                                     <td class="text-center" data-label="Actions">
-                                        @if ($payment->status === null)
+                                        @if ($customer->customer_accounts_sum_current_due_amount > 0)
                                         <button class="btn btn-primary text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                                            wire:click="getPaymentDetails({{ $payment->id }})">
+                                            wire:click="getPaymentDetails({{ $customer->id }})">
                                             <i class="bi bi-currency-dollar me-1"></i> Receive
                                         </button>
                                         @else
@@ -276,27 +268,32 @@
                         <div class="col-md-3 bg-light p-4 border-end rounded-start-4">
                             <div class="text-center mb-4">
                                 <div class="icon-shape icon-xl rounded-circle bg-primary bg-opacity-10 mx-auto d-flex align-items-center justify-content-center">
-                                    <span class="text-primary fw-bold" style="font-size: 2rem;">{{ substr($paymentDetail->sale->customer->name, 0, 1) }}</span>
+                                    <span class="text-primary fw-bold" style="font-size: 2rem;">{{ substr($paymentDetail->sale->customer->name ?? $paymentDetail->name, 0, 1) }}</span>
                                 </div>
-                                <h6 class="mt-3 mb-0 fw-bold text-gray-800">{{ $paymentDetail->sale->customer->name }}</h6>
-                                <p class="text-sm text-gray-600 mb-0">{{ $paymentDetail->sale->customer->phone }}</p>
+                                <h6 class="mt-3 mb-0 fw-bold text-gray-800">{{ $paymentDetail->sale->customer->name ?? $paymentDetail->name }}</h6>
+                                <p class="text-sm text-gray-600 mb-0">{{ $paymentDetail->sale->customer->phone ?? $paymentDetail->phone }}</p>
                             </div>
                             <h6 class="text-uppercase text-sm fw-semibold mb-3 border-bottom pb-2" style="color: #9d1c20;">Invoice Details</h6>
+                            @if ($paymentDetail->sales && $paymentDetail->sales->count() > 0)
                             <div class="mb-3">
                                 <p class="mb-2">
                                     <span class="text-gray-600">Invoice:</span>
-                                    <span class="fw-bold text-gray-800 fs-6">{{ $paymentDetail->sale->invoice_number }}</span>
+                                    <span class="fw-bold text-gray-800 fs-6">{{ $paymentDetail->sales->first()->invoice_number }}</span>
                                 </p>
                                 <p class="mb-2 d-flex justify-content-between text-sm">
                                     <span class="text-gray-600">Sale Date:</span>
-                                    <span class="text-gray-800">{{ $paymentDetail->sale->created_at->format('d/m/Y') }}</span>
+                                    <span class="text-gray-800">{{ $paymentDetail->sales->first()->created_at->format('d/m/Y') }}</span>
                                 </p>
-
-                                <div class="card border-0 shadow-sm rounded-4 p-3 mt-3 bg-light">
-                                    <div>
-                                        <span class="text-sm text-gray-600">Amount Due:</span>
-                                        <span class="fw-bold" style="font-size: 1.5rem; color: #9d1c20;">Rs.{{ number_format($paymentDetail->amount, 2) }}</span>
-                                    </div>
+                            </div>
+                            @endif
+                            <div class="card border-0 shadow-sm rounded-4 p-3 mt-3 bg-light">
+                                <div>
+                                    <span class="text-sm text-gray-600">Current Due:</span>
+                                    <span class="fw-bold" style="font-size: 1.5rem; color: #9d1c20;">Rs.{{ number_format($currentDueAmount, 2) }}</span>
+                                </div>
+                                <div class="mt-2">
+                                    <span class="text-sm text-gray-600">Back-Forward:</span>
+                                    <span class="fw-bold" style="font-size: 1.5rem; color: #9d1c20;">Rs.{{ number_format($backForwardAmount, 2) }}</span>
                                 </div>
                             </div>
                         </div>
@@ -319,6 +316,17 @@
                                 <div class="p-4">
                                     <div class="row">
                                         <div class="col-md-6 mb-4">
+                                            <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">Apply To:</label>
+                                            <div class="form-check">
+                                                <input type="radio" class="form-check-input" name="applyTarget" id="applyToCurrent" value="current" wire:model="applyTarget">
+                                                <label class="form-check-label" for="applyToCurrent">Current Due (Rs.{{ number_format($currentDueAmount, 2) }})</label>
+                                            </div>
+                                            <div class="form-check">
+                                                <input type="radio" class="form-check-input" name="applyTarget" id="applyToBackForward" value="back_forward" wire:model="applyTarget">
+                                                <label class="form-check-label" for="applyToBackForward">Back-Forward (Rs.{{ number_format($backForwardAmount, 2) }})</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-4">
                                             <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">Cash Amount</label>
                                             <input type="text" class="form-control rounded-4 shadow-sm @error('receivedAmount') is-invalid @enderror" wire:model="receivedAmount" placeholder="Enter cash amount">
                                             @error('receivedAmount')
@@ -338,11 +346,11 @@
                                             <div class="col-md-6">
                                                 <label class="form-label text-xs fw-semibold">Bank Name <span class="text-danger">*</span></label>
                                                 <select class="form-control form-control-sm rounded-3 shadow-sm" wire:model="bankName">
-                                                        <option value="">-- Select a bank --</option>
-                                                        @foreach($banks as $bank)
-                                                        <option value="{{ $bank }}">{{ $bank }}</option>
-                                                        @endforeach
-                                                    </select>
+                                                    <option value="">-- Select a bank --</option>
+                                                    @foreach($banks as $bank)
+                                                    <option value="{{ $bank }}">{{ $bank }}</option>
+                                                    @endforeach
+                                                </select>
                                                 @error('bankName') <span class="text-danger text-xs">{{ $message }}</span> @enderror
                                             </div>
                                             <div class="col-md-6">

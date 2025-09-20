@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithFileUploads;
 use App\Models\AdminSale;
+use App\Models\CustomerAccount;
 use App\Models\ProductDetail;
 use App\Models\SalesItem;
 
@@ -560,6 +561,31 @@ class StoreBilling extends Component
                     'status'          => null,
                     'due_date'        => $this->balanceDueDate ?? now()->addDays(7),
                 ]);
+                
+                // Maintain a single CustomerAccount row per customer.
+                // If an account exists, update it; otherwise, create a new one.
+                // Business rule: carry forward old current due + add new due.
+                $account = CustomerAccount::where('customer_id', $this->customerId)->first();
+
+                if ($account) {
+                    $oldCurrentDue = floatval($account->current_due_amount ?? 0);
+                    $newCurrentDue = floatval($this->balanceAmount);
+                    // Keep back_forward_amount as-is; only add to current due
+                    $account->current_due_amount  = $oldCurrentDue + $newCurrentDue; // accumulate due
+                    // Do not modify paid_due here
+                    $account->total_due           = floatval($account->back_forward_amount ?? 0) + floatval($account->current_due_amount ?? 0);
+                    $account->sale_id             = $sale->id; // reference latest sale causing the due
+                    $account->save();
+                } else {
+                    CustomerAccount::create([
+                        'customer_id'         => $this->customerId,
+                        'sale_id'             => $sale->id,
+                        'back_forward_amount' => 0,
+                        'current_due_amount'  => $this->balanceAmount,
+                        'paid_due'            => 0,
+                        'total_due'           => $this->balanceAmount,
+                    ]);
+                }
             }
 
             DB::commit();

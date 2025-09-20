@@ -102,7 +102,7 @@
                             </span>
                             <input type="text"
                                 class="form-control "
-                                placeholder="Search invoices or customers..."
+                                placeholder="Search customers..."
                                 wire:model.live.debounce.300ms="search"
                                 autocomplete="off">
                         </div>
@@ -114,11 +114,11 @@
                                 aria-expanded="false"
                                 style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
                                 <i class="bi bi-funnel me-1"></i> Filters
-                                @if ($filters['status'] || $filters['paymentMethod'] || $filters['dateRange'])
+                                @if ($filters['status'] || $filters['paymentMethod'] || $filters['dateFrom'] || $filters['dateTo'] || $filters['dateRange'])
                                 <span class="badge bg-primary ms-1 rounded-full" style="background-color: #9d1c20; color: #ffffff;">!</span>
                                 @endif
                             </button>
-                            <div class="dropdown-menu p-4 shadow-lg border-0 rounded-4" style="width: 300px;"
+                            <div class="dropdown-menu p-4 shadow-lg border-0 rounded-4" style="width: 320px;"
                                 aria-labelledby="filterDropdown">
                                 <h6 class="dropdown-header bg-light rounded py-2 mb-3 text-center text-sm fw-semibold" style="color: #9d1c20;">Filter Options</h6>
                                 <div class="mb-3">
@@ -126,10 +126,9 @@
                                     <select class="form-select form-select-sm rounded-full shadow-sm"
                                         wire:model.live="filters.status">
                                         <option value="">All Statuses</option>
-                                        <option value="pending">Pending Approval</option>
-                                        <option value="approved">Approved</option>
-                                        <option value="rejected">Rejected</option>
                                         <option value="paid">Paid</option>
+                                        <option value="current">Current</option>
+                                        <option value="forward">Forward</option>
                                     </select>
                                 </div>
                                 <div class="mb-3">
@@ -142,14 +141,29 @@
                                         <option value="bank_transfer">Bank Transfer</option>
                                         <option value="cheque">Cheque</option>
                                         <option value="credit">Credit</option>
+                                        <option value="cash+cheque">Cash + Cheque</option>
                                     </select>
                                 </div>
+                                <div class="mb-2">
+                                    <label class="form-label text-sm fw-semibold d-block mb-2" style="color: #9d1c20;">Quick Dates</label>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-full" wire:click="setDatePreset('today')">Today</button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-full" wire:click="setDatePreset('this_week')">This Week</button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger rounded-full" wire:click="setDatePreset('this_month')">This Month</button>
+                                        <button type="button" class="btn btn-sm btn-outline-secondary rounded-full" wire:click="setDatePreset('clear')">Clear</button>
+                                    </div>
+                                </div>
                                 <div class="mb-3">
-                                    <label class="form-label text-sm fw-semibold" style="color: #9d1c20;">Date Range</label>
-                                    <input type="text"
+                                    <label class="form-label text-sm fw-semibold" style="color: #9d1c20;">Date From</label>
+                                    <input type="date"
                                         class="form-control form-control-sm rounded-full shadow-sm"
-                                        placeholder="Select date range"
-                                        wire:model.live="filters.dateRange">
+                                        wire:model.live="filters.dateFrom">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-sm fw-semibold" style="color: #9d1c20;">Date To</label>
+                                    <input type="date"
+                                        class="form-control form-control-sm rounded-full shadow-sm"
+                                        wire:model.live="filters.dateTo">
                                 </div>
                                 <div class="d-grid">
                                     <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
@@ -168,57 +182,41 @@
                     <table class="table table-hover align-middle mb-0">
                         <thead style="background-color: #eff6ff;">
                             <tr>
-                                <th class="ps-4 text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Invoice</th>
-                                <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Customer</th>
+                                <th class="ps-4 text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Name</th>
                                 <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Amount</th>
                                 <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Method</th>
                                 <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Status</th>
-                                <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Date</th>
-                                <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Staff</th>
-                                <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Actions</th>
+                                <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse ($payments as $payment)
                             <tr>
-                                <td class="fw-bold ps-4">{{ $payment->sale->invoice_number }}</td>
-                                <td>
-                                    <div>
-                                        <div class="fw-bold">{{ $payment->sale->customer->name ?? 'Walk-in Customer' }}</div>
-                                        <div class="text-xs text-gray-600">{{ $payment->sale->customer->phone ?? 'N/A' }}</div>
-                                    </div>
-                                </td>
+                                <td class="fw-bold ps-4">{{ $payment->sale->customer->name ?? 'Walk-in Customer' }}</td>
                                 <td class="text-center fw-bold">Rs.{{ number_format($payment->amount, 2) }}</td>
                                 <td class="text-center">
+                                    @php $method =$payment->due_payment_method ?? $payment->payment_method; @endphp
                                     <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary px-3 py-2">
-                                        {{ ucfirst(str_replace('_', ' ', $payment->payment_method)) }}
+                                        {{ ucfirst(str_replace('_', ' ', $method)) }}
                                     </span>
                                 </td>
                                 <td class="text-center">
                                     @php
-                                    $status = $payment->status ? $payment->status : ($payment->is_completed ? 'paid' : 'scheduled');
-                                    $statusClass = [
-                                    'pending' => 'warning',
-                                    'paid' => 'success',
-                                    'approved' => 'success',
-                                    'rejected' => 'danger',
-                                    'scheduled' => 'info'
-                                    ][$status] ?? 'secondary';
+                                        if ($payment->status =='Paid') {
+                                            $displayStatus = 'Paid';
+                                            $statusClass = 'success';
+                                        } elseif ($payment->status == 'forward') {
+                                            $displayStatus = 'Forward';
+                                            $statusClass = 'warning';
+                                        } else {
+                                            $displayStatus = 'current';
+                                            $statusClass = 'info';
+                                        }
                                     @endphp
                                     <span class="badge rounded-pill bg-{{$statusClass}} bg-opacity-10 text-{{$statusClass}} px-3 py-2">
-                                        {{ ucfirst($status) }}
+                                        {{ $displayStatus }}
                                     </span>
                                 </td>
-                                <td>
-                                    <div class="fw-bold">
-                                        {{ $payment->payment_date ? $payment->payment_date->format('d M, Y') : 
-                                                ($payment->due_date ? 'Due: '.$payment->due_date->format('d M, Y') : 'N/A') }}
-                                    </div>
-                                    <div class="text-xs text-gray-600">
-                                        {{ $payment->payment_date ? $payment->payment_date->format('h:i A') : '' }}
-                                    </div>
-                                </td>
-                                <td>{{ $payment->sale->user->name ?? 'N/A' }}</td>
                                 <td class="text-center">
                                     <button class="btn btn-sm rounded-pill px-3" style="background-color:#9d1c20 ; color:white;" wire:click="viewPaymentDetails({{ $payment->id }})">
                                         <i class="bi bi-receipt-cutoff"></i> View
@@ -227,7 +225,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="8" class="text-center py-4 text-gray-600">No payment records found.</td>
+                                <td colspan="5" class="text-center py-4 text-gray-600">No payment records found.</td>
                             </tr>
                             @endforelse
                         </tbody>

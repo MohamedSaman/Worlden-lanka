@@ -364,6 +364,12 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a class="nav-link py-2 {{ request()->routeIs('admin.back-forward') ? 'active' : '' }}"
+                                    href="{{ route('admin.back-forward') }}">
+                                    <i class="bi bi-cash-coin"></i> <span>Back Forward</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a class="nav-link py-2 {{ request()->routeIs('admin.due-payments') ? 'active' : '' }}"
                                     href="{{ route('admin.due-payments') }}">
                                     <i class="bi bi-cash-coin"></i> <span>Due Payments</span>

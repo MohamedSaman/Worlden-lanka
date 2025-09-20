@@ -552,6 +552,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    @forelse($duePayments as $cheque)
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="fw-semibold text-muted">Invoice Number</label>
@@ -580,6 +581,9 @@
                             </p>
                         </div>
                     </div>
+                    @empty
+                    <p class="text-muted">No due cheques found.</p>
+                    @endforelse
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Close</button>

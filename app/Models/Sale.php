@@ -44,6 +44,10 @@ class Sale extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function customerAccount()
+    {
+        return $this->hasOne(CustomerAccount::class);
+    }
     // Generate unique invoice numbers
     public static function generateInvoiceNumber()
     {

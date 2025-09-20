@@ -38,6 +38,7 @@
         .content-tab.active {
             color: #b5171a;
         }
+
         .content-tab.active::after {
             content: '';
             display: block;
@@ -84,8 +85,9 @@
             margin: 0.4rem 0;
             color: #233d7f;
         }
+
         /* progress */
-        .progress{
+        .progress {
             height: 8px;
             margin-bottom: 15px;
         }
@@ -201,7 +203,7 @@
 
         .btn-outline-primary:hover {
             background: #b5171a;
-             border: 1px solid #b5171a;
+            border: 1px solid #b5171a;
             color: #fff;
         }
 
@@ -327,7 +329,7 @@
             <div class="col-sm-6 col-lg-3 mb-3">
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="stat-label">Total Revenue</div>
+                        <div class="stat-label">Total Revenue</div>
                     </div>
                     <div class="stat-value">Rs.{{ number_format($totalRevenue, 2) }}</div>
                     <div class="stat-info mt-1">
@@ -335,7 +337,7 @@
                             <small>Revenue</small>
                             <small>{{ $revenuePercentage }}% of total sales</small>
                         </div>
-                        <div class="progress " >
+                        <div class="progress ">
                             <div class="progress-bar bg-success" role="progressbar" style=" width: {{ $revenuePercentage }}%;" aria-valuenow="{{ $revenuePercentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <div class="d-flex justify-content-between">
@@ -346,7 +348,7 @@
                         <div class="d-flex justify-content-between align-items-center">
                             <small class="text-muted"><i class="bi bi-check-circle-fill text-success me-1"></i> Today Revenue</small>
                             <span class="badge bg-success">{{$todayRevenueCount}}</span>
-                            
+
                         </div>
                         <small class="d-block text-end text-success">Rs.{{ number_format($todayRevenue, 2) }}</small>
                     </div>
@@ -355,7 +357,7 @@
             <div class="col-sm-6 col-lg-3 mb-3">
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="stat-label">Total Due Amount</div>
+                        <div class="stat-label">Total Due Amount</div>
                     </div>
                     <div class="stat-value">Rs.{{ number_format($totalDueAmount, 2) }}</div>
                     <div class="stat-change-alert">
@@ -381,7 +383,7 @@
             <div class="col-sm-6 col-lg-3 mb-3">
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                    <div class="stat-label">Inventory Status</div>
+                        <div class="stat-label">Inventory Status</div>
                     </div>
                     <div class="stat-value">{{ number_format($totalStock) }} <span class="fs-6 text-muted">units</span></div>
                     <div class="stat-info">
@@ -517,21 +519,21 @@
                         @php
                         $stockPercentage = ($product->stock_quantity + $product->damage_quantity) > 0 ? round(($product->stock_quantity / ($product->stock_quantity + $product->damage_quantity)) * 100, 2) : 0;
                         $statusClass = $product->stock_quantity == 0 ? 'out-of-stock' : ($stockPercentage <= 25 ? 'low-stock' : 'in-stock' );
-                        $statusText=$product->stock_quantity == 0 ? 'Out of Stock' : ($stockPercentage <= 25 ? 'Low Stock' : 'In Stock' );
-                        $progressClass=$product->stock_quantity == 0 ? 'bg-danger' : ($stockPercentage <= 25 ? 'bg-warning' : 'bg-success' );
-                        @endphp
+                            $statusText=$product->stock_quantity == 0 ? 'Out of Stock' : ($stockPercentage <= 25 ? 'Low Stock' : 'In Stock' );
+                                $progressClass=$product->stock_quantity == 0 ? 'bg-danger' : ($stockPercentage <= 25 ? 'bg-warning' : 'bg-success' );
+                                    @endphp
 
-                    <div class="mb-2">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h6 class="mb-0" style="color:#233d7f;">{{ $product->name }}</h6>
-                            <div class="d-flex align-items-end flex-wrap mt-1 mt-md-0">
-                                <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
-                                <div class="ms-2 text-muted small">{{ $product->stock_quantity }}/{{ $product->stock_quantity + $product->damage_quantity }}</div>
-                            </div>
-                        </div>
-                        <div class="progress mt-1">
-                            <div class="progress-bar {{ $progressClass }}" style="width: {{ $stockPercentage }}%"></div>
-                        </div>
+                                    <div class="mb-2">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h6 class="mb-0" style="color:#233d7f;">{{ $product->name }}</h6>
+                                        <div class="d-flex align-items-end flex-wrap mt-1 mt-md-0">
+                                            <span class="status-badge {{ $statusClass }}">{{ $statusText }}</span>
+                                            <div class="ms-2 text-muted small">{{ $product->stock_quantity }}/{{ $product->stock_quantity + $product->damage_quantity }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="progress mt-1">
+                                        <div class="progress-bar {{ $progressClass }}" style="width: {{ $stockPercentage }}%"></div>
+                                    </div>
                     </div>
                     @empty
                     <div class="alert alert-danger border-0">No product inventory data available.</div>

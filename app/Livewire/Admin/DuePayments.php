@@ -1,4 +1,5 @@
 <?php
+// File: app/Livewire/Admin/DuePayments.php
 
 namespace App\Livewire\Admin;
 
@@ -8,9 +9,13 @@ use Livewire\Attributes\Layout;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
+use App\Models\Customer;
+use App\Models\CustomerAccount;
+use App\Models\Sale;
 use App\Models\Payment;
 use App\Models\Cheque;
 use Exception;
+use Illuminate\Support\Collection;
 
 #[Title("Due Payments")]
 #[Layout('components.layouts.admin')]
@@ -27,6 +32,12 @@ class DuePayments extends Component
     public $paymentNote = '';
     public $duePaymentAttachmentPreview;
     public $receivedAmount = '';
+    public $totalDueAmount = 0;
+    public $currentDueAmount = 0;
+    public $backForwardAmount = 0;
+    public $applyToCurrent = true;
+    public $applyToBackForward = false;
+    public $applyTarget = 'current'; // 'current' or 'back_forward'
     public $filters = [
         'status' => '',
         'dateFrom' => '',
@@ -44,34 +55,35 @@ class DuePayments extends Component
     public $duePayment;
     protected $listeners = ['refreshPayments' => '$refresh'];
 
-    public function mount() {
+    public function mount()
+    {
         $this->loadBanks();
     }
 
     public function loadBanks()
     {
         $this->banks = [
-            'Bank of Ceylon (BOC)'=>'Bank of Ceylon (BOC)',
-            'Commercial Bank of Ceylon (ComBank)'=>'Commercial Bank of Ceylon (ComBank)',
-            'Hatton National Bank (HNB)'=>'Hatton National Bank (HNB)',
-            'People\'s Bank'=>'People\'s Bank',
-            'Sampath Bank'=>'Sampath Bank',
-            'National Development Bank (NDB)'=>'National Development Bank (NDB)',
-            'DFCC Bank'=>'DFCC Bank',
-            'Nations Trust Bank (NTB)'=>'Nations Trust Bank (NTB)',
-            'Seylan Bank'=>'Seylan Bank',
-            'Amana Bank'=>'Amana Bank',
-            'Cargills Bank'=>'Cargills Bank',
-            'Pan Asia Banking Corporation'=>'Pan Asia Banking Corporation',
-            'Union Bank of Colombo'=>'Union Bank of Colombo',
-            'Bank of China Ltd'=>'Bank of China Ltd',
-            'Citibank, N.A.'=>'Citibank, N.A.',
-            'Habib Bank Ltd'=>'Habib Bank Ltd',
-            'Indian Bank'=>'Indian Bank',
-            'Indian Overseas Bank'=>'Indian Overseas Bank',
-            'MCB Bank Ltd'=>'MCB Bank Ltd',
-            'Public Bank Berhad'=>'Public Bank Berhad',
-            'Standard Chartered Bank'=>'Standard Chartered Bank',
+            'Bank of Ceylon (BOC)' => 'Bank of Ceylon (BOC)',
+            'Commercial Bank of Ceylon (ComBank)' => 'Commercial Bank of Ceylon (ComBank)',
+            'Hatton National Bank (HNB)' => 'Hatton National Bank (HNB)',
+            'People\'s Bank' => 'People\'s Bank',
+            'Sampath Bank' => 'Sampath Bank',
+            'National Development Bank (NDB)' => 'National Development Bank (NDB)',
+            'DFCC Bank' => 'DFCC Bank',
+            'Nations Trust Bank (NTB)' => 'Nations Trust Bank (NTB)',
+            'Seylan Bank' => 'Seylan Bank',
+            'Amana Bank' => 'Amana Bank',
+            'Cargills Bank' => 'Cargills Bank',
+            'Pan Asia Banking Corporation' => 'Pan Asia Banking Corporation',
+            'Union Bank of Colombo' => 'Union Bank of Colombo',
+            'Bank of China Ltd' => 'Bank of China Ltd',
+            'Citibank, N.A.' => 'Citibank, N.A.',
+            'Habib Bank Ltd' => 'Habib Bank Ltd',
+            'Indian Bank' => 'Indian Bank',
+            'Indian Overseas Bank' => 'Indian Overseas Bank',
+            'MCB Bank Ltd' => 'MCB Bank Ltd',
+            'Public Bank Berhad' => 'Public Bank Berhad',
+            'Standard Chartered Bank' => 'Standard Chartered Bank',
         ];
     }
 
@@ -86,11 +98,26 @@ class DuePayments extends Component
         }
     }
 
-    public function getPaymentDetails($paymentId)
+    public function getPaymentDetails($customerId)
     {
-        $this->paymentId = $paymentId;
-        $this->paymentDetail = Payment::with(['sale.customer', 'sale.items'])->find($paymentId);
-        $this->duePaymentMethod = $this->paymentDetail->due_payment_method ?? '';
+        $this->paymentId = $customerId;
+        $customer = Customer::withSum(['customerAccounts' => function($query) {
+            $query->where('total_due', '>', 0);
+        }], 'total_due')
+        ->withSum('customerAccounts', 'current_due_amount')
+        ->withSum('customerAccounts', 'back_forward_amount')
+        ->with(['customerAccounts' => function($query) {
+            $query->where('total_due', '>', 0)->latest()->limit(1);
+        }, 'sales' => function($query) {
+            $query->latest()->limit(1);
+        }])
+        ->find($customerId);
+
+        $this->paymentDetail = $customer;
+        $this->totalDueAmount = $customer->customer_accounts_sum_total_due ?? 0;
+        $this->currentDueAmount = $customer->customer_accounts_sum_current_due_amount ?? 0;
+        $this->backForwardAmount = $customer->customer_accounts_sum_back_forward_amount ?? 0;
+        $this->duePaymentMethod = '';
         $this->paymentNote = '';
         $this->duePaymentAttachment = null;
         $this->duePaymentAttachmentPreview = null;
@@ -100,8 +127,48 @@ class DuePayments extends Component
         $this->chequeAmount = '';
         $this->chequeDate = '';
         $this->cheques = [];
+        $this->applyToCurrent = true;
+        $this->applyToBackForward = false;
+        $this->applyTarget = 'current';
 
         $this->dispatch('openModal', 'payment-detail-modal');
+    }
+
+    public function updatedApplyToCurrent()
+    {
+        if ($this->applyToCurrent) {
+            $this->applyToBackForward = false;
+            $this->applyTarget = 'current';
+        }
+    }
+
+    public function updatedApplyToBackForward()
+    {
+        if ($this->applyToBackForward) {
+            $this->applyToCurrent = false;
+            $this->applyTarget = 'back_forward';
+        }
+    }
+
+    // Helper to explicitly set apply target from the UI (radio-like behavior)
+    public function setApplyTarget(string $target): void
+    {
+        if ($target === 'current') {
+            $this->applyToCurrent = true;
+            $this->applyToBackForward = false;
+            $this->applyTarget = 'current';
+        } elseif ($target === 'back_forward') {
+            $this->applyToCurrent = false;
+            $this->applyToBackForward = true;
+            $this->applyTarget = 'back_forward';
+        }
+    }
+
+    // Keep booleans in sync if applyTarget is changed via radio binding
+    public function updatedApplyTarget($value)
+    {
+        $this->applyToCurrent = ($value === 'current');
+        $this->applyToBackForward = ($value === 'back_forward');
     }
 
     public function addCheque()
@@ -140,15 +207,22 @@ class DuePayments extends Component
             'duePaymentAttachment' => 'nullable|file|mimes:jpg,jpeg,png,gif,pdf|max:2048',
         ]);
 
+        // Ensure exactly one target is selected (using applyTarget)
+        if (!in_array($this->applyTarget, ['current', 'back_forward'], true)) {
+            $this->dispatch('showToast', [
+                'type' => 'error',
+                'message' => 'Please select exactly one target: Current Due or Back-Forward.'
+            ]);
+            return;
+        }
+
         try {
             DB::beginTransaction();
 
-            $payment = Payment::findOrFail($this->paymentId);
-
             // Store attachment if provided
-            $attachmentPath = $payment->due_payment_attachment;
+            $attachmentPath = null;
             if ($this->duePaymentAttachment) {
-                $receiptName = time() . '-payment-' . $payment->id . '.' . $this->duePaymentAttachment->getClientOriginalExtension();
+                $receiptName = time() . '-payment-' . $this->paymentId . '.' . $this->duePaymentAttachment->getClientOriginalExtension();
                 $this->duePaymentAttachment->storeAs('public/due-receipts', $receiptName);
                 $attachmentPath = "due-receipts/{$receiptName}";
             }
@@ -166,26 +240,118 @@ class DuePayments extends Component
                 return;
             }
 
-            if ($totalPaid > $payment->amount) {
+            $paymentMethod = $cashAmount > 0 && $chequeTotal > 0 ? 'cash+cheque' : ($chequeTotal > 0 ? 'cheque' : 'cash');
+
+            // Determine target amount based on selected target
+            $isCurrent = ($this->applyTarget === 'current');
+            $targetAmount = $isCurrent ? $this->currentDueAmount : max(0, $this->backForwardAmount);
+
+            if ($totalPaid > $targetAmount) {
                 DB::rollBack();
                 $this->dispatch('showToast', [
                     'type' => 'error',
-                    'message' => 'Total payment exceeds due amount.'
+                    'message' => 'Total payment exceeds selected amount.'
                 ]);
                 return;
             }
 
-            // Update payment record
-            $payment->update([
+            // Create Payment record
+            $saleId = $this->paymentDetail->sales->first()->id ?? null;
+            $paymentStatus = $isCurrent ? 'current' : 'forward';
+            $payment = Payment::create([
+                'sale_id' => $saleId,
                 'amount' => $totalPaid,
-                'due_payment_method' => $cashAmount > 0 && $chequeTotal > 0 ? 'cash+cheque' : ($chequeTotal > 0 ? 'cheque' : 'cash'),
-                'due_payment_attachment' => $attachmentPath,
-                'status' => 'Paid', 
+                'due_date' => now(), // or appropriate due date
+                'status' => $paymentStatus,
                 'is_completed' => true,
                 'payment_date' => now(),
+                'due_payment_method' => $paymentMethod,
+                'due_payment_attachment' => $attachmentPath,
+                // Persist which bucket was selected
+                'applied_to' => $isCurrent ? 'current' : 'back_forward',
             ]);
 
-            // Save cheques if any
+            // Get all due accounts for the customer, ordered by creation date (oldest first)
+            $customerAccounts = CustomerAccount::where('customer_id', $this->paymentId)
+                ->where('total_due', '>', 0)
+                ->orderBy('created_at')
+                ->get();
+
+            $remainingPayment = $totalPaid;
+
+            foreach ($customerAccounts as $acc) {
+                if ($remainingPayment <= 0) {
+                    break;
+                }
+
+                if ($isCurrent) {
+                    $dueForThis = $acc->current_due_amount;
+                    $payForThis = min($dueForThis, $remainingPayment);
+                    $newCurrentDue = $dueForThis - $payForThis;
+                    $newTotalDue = max(0, $newCurrentDue + $acc->back_forward_amount);
+                    $status = $newTotalDue == 0 ? 'Paid' : 'Partial';
+
+                    $acc->update([
+                        'paid_due' => DB::raw("paid_due + {$payForThis}"),
+                        'current_due_amount' => $newCurrentDue,
+                        'total_due' => $newTotalDue,
+                        'due_payment_method' => $paymentMethod,
+                        'status' => $status,
+                        'payment_date' => now(),
+                    ]);
+                } else {
+                    // Paying against back-forward due: reduce back_forward_amount by the payment
+                    $dueForThis = max(0, floatval($acc->back_forward_amount));
+                    $payForThis = min($dueForThis, $remainingPayment);
+                    $newBackForward = max(0, $dueForThis - $payForThis);
+                    $newTotalDue = max(0, floatval($acc->current_due_amount) + $newBackForward);
+                    $status = $newTotalDue == 0 ? 'Paid' : 'Partial';
+
+                    $acc->update([
+                        'paid_due' => DB::raw("paid_due + {$payForThis}"),
+                        'back_forward_amount' => $newBackForward,
+                        'total_due' => $newTotalDue,
+                        'due_payment_method' => $paymentMethod,
+                        'status' => $status,
+                        'payment_date' => now(),
+                    ]);
+                }
+
+                // Update associated sale if exists
+                if ($acc->sale_id) {
+                    $sale = Sale::find($acc->sale_id);
+                    if ($sale) {
+                        $sale->update(['due_amount' => $acc->total_due]);
+                    }
+                }
+
+                $remainingPayment -= $payForThis;
+            }
+
+            // Handle overpayment as advance (positive back_forward)
+            if ($remainingPayment > 0) {
+                $lastAccount = CustomerAccount::where('customer_id', $this->paymentId)->latest()->first();
+                if ($lastAccount) {
+                    $newBackForward = $lastAccount->back_forward_amount - $remainingPayment; // Decrease back-forward
+                    $newTotalDue = max(0, $lastAccount->current_due_amount + $newBackForward);
+                    $lastAccount->update([
+                        'back_forward_amount' => $newBackForward,
+                        'total_due' => $newTotalDue,
+                    ]);
+                } else {
+                    CustomerAccount::create([
+                        'customer_id' => $this->paymentId,
+                        'sale_id' => null,
+                        'back_forward_amount' => -$remainingPayment, // Negative to indicate advance
+                        'current_due_amount' => 0,
+                        'paid_due' => 0,
+                        'total_due' => 0,
+                        'notes' => 'Excess payment from due collection on ' . now()->format('Y-m-d H:i:s'),
+                    ]);
+                }
+            }
+
+            // Save cheques with payment_id
             foreach ($this->cheques as $cheque) {
                 Cheque::create([
                     'cheque_number' => $cheque['number'],
@@ -193,34 +359,31 @@ class DuePayments extends Component
                     'bank_name' => $cheque['bank'],
                     'cheque_amount' => $cheque['amount'],
                     'status' => 'pending',
-                    'customer_id' => $payment->sale->customer_id,
+                    'customer_id' => $this->paymentId,
                     'payment_id' => $payment->id,
                 ]);
             }
 
-            // Add a note to track this payment submission
+            // Add notes to the last updated account
             if ($this->paymentNote) {
-                $payment->sale->update([
-                    'notes' => ($payment->sale->notes ? $payment->sale->notes . "\n" : '') .
-                        "Payment received on " . now()->format('Y-m-d H:i') . ": " . $this->paymentNote
-                ]);
+                $lastUpdatedAccount = CustomerAccount::where('customer_id', $this->paymentId)
+                    ->orderBy('updated_at', 'desc')
+                    ->first();
+                if ($lastUpdatedAccount) {
+                    $notes = ($lastUpdatedAccount->notes ? $lastUpdatedAccount->notes . "\n" : '') .
+                        "Payment received on " . now()->format('Y-m-d H:i') . ": " . $this->paymentNote;
+                    $lastUpdatedAccount->update(['notes' => $notes]);
+                }
             }
 
-            $sale = $payment->sale;
-            $remainingAmount = $sale->due_amount - $totalPaid;
-
-            $sale->update([
-                'due_amount' => $remainingAmount
-            ]);
-
-            if ($remainingAmount > 0) {
-                Payment::create([
-                    'sale_id' => $payment->sale_id,
-                    'amount' => $remainingAmount,
-                    'due_date' => $payment->due_date,
-                    'status' => null,
-                    'is_completed' => false,
-                ]);
+            // Set attachment to the last updated account if not set in Payment
+            if ($attachmentPath) {
+                $lastUpdatedAccount = CustomerAccount::where('customer_id', $this->paymentId)
+                    ->orderBy('updated_at', 'desc')
+                    ->first();
+                if ($lastUpdatedAccount) {
+                    $lastUpdatedAccount->update(['due_payment_attachment' => $attachmentPath]);
+                }
             }
 
             DB::commit();
@@ -237,11 +400,16 @@ class DuePayments extends Component
                 'duePaymentAttachment',
                 'paymentNote',
                 'receivedAmount',
+                'totalDueAmount',
+                'currentDueAmount',
+                'backForwardAmount',
                 'chequeNumber',
                 'bankName',
                 'chequeAmount',
                 'chequeDate',
-                'cheques'
+                'cheques',
+                'applyToCurrent',
+                'applyToBackForward'
             ]);
         } catch (Exception $e) {
             DB::rollBack();
@@ -268,54 +436,56 @@ class DuePayments extends Component
 
     public function render()
     {
-        $query = Payment::where(function ($query) {
-            if ($this->search) {
-                $query->whereHas('sale', function ($q) {
-                    $q->where('invoice_number', 'like', '%' . $this->search . '%')
-                        ->orWhereHas('customer', function ($c) {
-                            $c->where('name', 'like', '%' . $this->search . '%')
-                                ->orWhere('phone', 'like', '%' . $this->search . '%');
-                        });
+        $query = Customer::withSum(['customerAccounts' => function($subQuery) {
+            $subQuery->where('total_due', '>', 0);
+        }], 'total_due')
+        ->withSum('customerAccounts', 'current_due_amount')
+        ->withSum('customerAccounts', 'back_forward_amount')
+        ->withMin('customerAccounts', 'created_at')
+        ->when($this->search, function ($query) {
+            $query->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                    ->orWhere('phone', 'like', '%' . $this->search . '%');
+            })->orWhereHas('sales', function ($s) {
+                $s->where('invoice_number', 'like', '%' . $this->search . '%');
+            });
+        })
+        ->when($this->filters['status'] !== '', function ($query) {
+            if ($this->filters['status'] === 'pending') {
+                $query->whereRelation('customerAccounts', 'total_due', '>', 0);
+            } elseif ($this->filters['status'] === 'paid') {
+                $query->whereDoesntHave('customerAccounts', function ($q) {
+                    $q->where('total_due', '>', 0);
                 });
             }
-
-            if ($this->filters['status'] !== '') {
-                if ($this->filters['status'] === 'pending') {
-                    $query->whereNull('status');
-                } elseif ($this->filters['status'] === 'paid') {
-                    $query->where('status', 'Paid');
-                }
-            }
-
-            if ($this->filters['dateFrom']) {
-                $query->whereDate('due_date', '>=', $this->filters['dateFrom']);
-            }
-
-            if ($this->filters['dateTo']) {
-                $query->whereDate('due_date', '<=', $this->filters['dateTo']);
-            }
+        })
+        ->when($this->filters['dateFrom'], function ($query) {
+            $query->whereHas('customerAccounts', function ($q) {
+                $q->whereDate('created_at', '>=', $this->filters['dateFrom']);
+            });
+        })
+        ->when($this->filters['dateTo'], function ($query) {
+            $query->whereHas('customerAccounts', function ($q) {
+                $q->whereDate('created_at', '<=', $this->filters['dateTo']);
+            });
+        })
+        ->whereHas('customerAccounts', function ($q) {
+            $q->where('total_due', '>', 0);
         });
 
-        $allPayments = $query->get();
+        $duePayments = $query->orderBy('id')->paginate(10);
 
-        $duePayments = $query->orderBy('created_at', 'desc')->paginate(10);
+        $duePaymentsCount = Customer::whereHas('customerAccounts', function ($q) {
+            $q->where('total_due', '>', 0);
+        })->count();
 
-        $duePaymentsCount = Payment::whereNull('status')->count();
-        $totalDue = Payment::whereNull('status')->sum('amount');
-        $todayDuePayments = Payment::whereNull('status')->whereDate('created_at', today())->sum('amount');
-        $todayDuePaymentsCount = Payment::whereNull('status')->whereDate('created_at', today())->count();
+        $totalDue = CustomerAccount::where('total_due', '>', 0)->sum('total_due');
 
-        foreach ($duePayments as $payment) {
-            if ($payment->status === null || $payment->status === 'pending') {
-                $payment->status_badge = '<span class="badge bg-info">Pending</span>';
-            } elseif ($payment->status === 'approved') {
-                $payment->status_badge = '<span class="badge bg-success">Paid</span>';
-            } elseif ($payment->status === 'rejected') {
-                $payment->status_badge = '<span class="badge bg-danger">Rejected</span>';
-            } else {
-                $payment->status_badge = '<span class="badge bg-secondary">Unknown</span>';
-            }
-        }
+        $todayDuePayments = CustomerAccount::where('total_due', '>', 0)->whereDate('created_at', today())->sum('total_due');
+
+        $todayDuePaymentsCount = Customer::whereHas('customerAccounts', function ($q) {
+            $q->where('total_due', '>', 0)->whereDate('created_at', today());
+        })->count();
 
         return view('livewire.admin.due-payments', [
             'duePayments' => $duePayments,

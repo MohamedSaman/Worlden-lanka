@@ -1,7 +1,6 @@
 <div class="container-fluid py-6 bg-gray-50 min-vh-100 transition-colors duration-300">
     <div class="card border-0 ">
         <!-- Card Header -->
-
         <div class="card-header text-white p-2  d-flex align-items-center"
             style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%); border-radius: 20px 20px 0 0;">
             <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
@@ -46,7 +45,6 @@
 
         <!-- Card Body -->
         <div class="card-body p-1  pt-5 bg-transparent">
-
             <!-- Sales Table or Empty State -->
             @if($customerSales->count())
             <div class="table-responsive  shadow-sm rounded-2 overflow-auto">
@@ -55,40 +53,48 @@
                         <tr>
                             <th class="text-center ps-4 py-3">ID</th>
                             <th class="text-center py-3">Customer Name</th>
-                            <th class="text-center py-3">Email</th>
-                            <th class="text-center py-3">Type</th>
-                            <th class="text-center py-3">Invoices</th>
                             <th class="text-center py-3">Total Sales</th>
-                            <th class="text-center py-3">Total Paid</th>
-                            <th class="text-center py-3">Total Due</th>
+                            <th class="text-center py-3">Current Due Paid</th>
+                            <th class="text-center py-3">Current Due</th>
+                            <th class="text-center py-3">Back-Forward Due</th>
+                            <th class="text-center py-3">Total Due Amount</th>
                             <th class="text-center py-3">Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($customerSales as $index => $customer)
                         <tr class="transition-all hover:bg-gray-50">
-                            <td class="text-sm text-center  ps-4 py-3" >
+                            <td class="text-sm text-center  ps-4 py-3">
                                 {{ $customerSales->firstItem() + $index }}
                             </td>
                             <td class="text-sm text-center py-3" data-label="Customer Name">{{ $customer->name }}</td>
-                            <td class="text-sm text-center py-3">{{ $customer->email }}</td>
-                            <td class="text-sm text-center py-3">
-                                {{ ucfirst($customer->type) }}
-                            </td>
-                            <td class="text-sm text-center py-3" >{{ $customer->invoice_count }}</td>
-                            <td class="text-sm text-center py-3 text-gray-800" data-label="Total Sales">Rs.{{ number_format($customer->total_sales, 2) }}</td>
+                            <td class="text-sm text-center py-3 text-gray-800" data-label="Total Sales">Rs.{{ number_format($customer->total_sales ?? 0, 2) }}</td>
                             <td class="text-sm text-center py-3">
                                 <span class="badge"
-                                    style="background-color: {{ $customer->total_sales - $customer->total_due > 0 ? '#22c55e' : '#ef4444' }};
+                                    style="background-color:#22c55e;
                                              color: #ffffff; padding: 6px 12px; border-radius: 9999px; font-weight: 600;">
-                                    Rs.{{ number_format($customer->total_sales - $customer->total_due, 2) }}
+                                    Rs.{{ number_format($customer->total_paid ?? 0, 2) }}
                                 </span>
                             </td>
                             <td class="text-sm text-center py-3">
                                 <span class="badge"
                                     style="background-color: {{ $customer->total_due > 0 ? '#ef4444' : '#22c55e' }};
                                              color: #ffffff; padding: 6px 12px; border-radius: 9999px; font-weight: 600;">
-                                    Rs.{{ number_format($customer->total_due, 2) }}
+                                    Rs.{{ number_format($customer->total_due ?? 0, 2) }}
+                                </span>
+                            </td>
+                            <td class="text-sm text-center py-3">
+                                <span class="badge"
+                                    style="background-color: {{ $customer->total_back_forward_amount > 0 ? '#ef4444' : '#22c55e' }};
+                                             color: #ffffff; padding: 6px 12px; border-radius: 9999px; font-weight: 600;">
+                                    Rs.{{ number_format($customer->total_back_forward_amount ?? 0, 2) }}
+                                </span>
+                            </td>
+                            <td class="text-sm text-center py-3">
+                                <span class="badge"
+                                    style="background-color:#ef4444;
+                                             color: #ffffff; padding: 6px 12px; border-radius: 9999px; font-weight: 600;">
+                                    Rs.{{ number_format(($customer->total_back_forward_amount ?? 0) + ($customer->total_due ?? 0), 2) }}
                                 </span>
                             </td>
                             <td class="text-sm text-center py-3">
@@ -140,10 +146,16 @@
                     </h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body p-5">
+                <div class="modal-body p-4">
+                    <!-- Print-only company header for modal prints -->
+                    <div class="print-only text-center mb-4" style="text-align:center; margin-bottom:16px;">
+                        <h3 class="mb-1 fw-bold tracking-tight" style="color: #9d1c20; margin:0;">PLUS</h3>
+                        <p class="mb-0 text-muted small" style="color: #6B7280; margin:0;">NO 20/2/1, 2nd FLOOR,HUNTER BUILDING,BANKSHALLL STREET,COLOMBO-11</p>
+                        <p class="mb-0 text-muted small" style="color: #6B7280; margin:0;">Phone: 011 - 2332786 | Email: plusaccessories.lk@gmail.com</p>
+                    </div>
                     @if($modalData)
                     <!-- Customer Information Section -->
-                    <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 no-print">
                         <div class="card-body p-4">
                             <div class="row">
                                 <div class="col-md-6">
@@ -167,8 +179,8 @@
                     </div>
 
                     <!-- Sales Summary Cards -->
-                    <div class="row mb-4">
-                        <div class="col-md-4">
+                    <div class="row mb-4 no-print g-3">
+                        <div class="col-md-3 col-sm-6">
                             <div class="card border-0 shadow-sm rounded-4 h-100">
                                 <div class="card-body text-center p-4">
                                     <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #9d1c20;">Total Sales Amount</h6>
@@ -177,7 +189,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3 col-sm-6">
                             <div class="card border-0 shadow-sm rounded-4 h-100">
                                 <div class="card-body text-center p-4">
                                     <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #22c55e;">Amount Paid</h6>
@@ -188,7 +200,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3 col-sm-6">
                             <div class="card border-0 shadow-sm rounded-4 h-100">
                                 <div class="card-body text-center p-4">
                                     <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #ef4444;">Amount Due</h6>
@@ -196,6 +208,15 @@
                                     <p class="text-sm text-gray-500 mb-0">
                                         {{ round(($modalData['salesSummary']->total_due / $modalData['salesSummary']->total_amount) * 100) }}% outstanding
                                     </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card border-0 shadow-sm rounded-4 h-100">
+                                <div class="card-body text-center p-4">
+                                    <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #0ea5e9;">Back-Forward Due</h6>
+                                    <h3 class="fw-bold" style="color: #0ea5e9;">Rs.{{ number_format($modalData['backForwardDue'] ?? 0, 2) }}</h3>
+                                    <p class="text-sm text-gray-500 mb-0">From customer accounts</p>
                                 </div>
                             </div>
                         </div>
@@ -207,7 +228,7 @@
                     ? round(($modalData['salesSummary']->total_paid / $modalData['salesSummary']->total_amount) * 100)
                     : 0;
                     @endphp
-                    <div class="card border-0 shadow-sm rounded-4 mb-4">
+                    <div class="card border-0 shadow-sm rounded-4 mb-4 no-print">
                         <div class="card-body p-4">
                             <p class="fw-bold mb-2 text-sm text-gray-800" style="color: #9d1c20;">Payment Progress</p>
                             <div class="d-flex align-items-center">
@@ -225,66 +246,62 @@
                         </div>
                     </div>
 
-                    <!-- Product-wise Sales Table -->
+                    <!-- Invoice Summary (Back-Forward, Invoices, and Paid) -->
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-header p-4" style="background-color: #eff6ff;">
-                            <h5 class="card-title mb-0 fw-bold text-sm" style="color: #9d1c20;">Product-wise Sales</h5>
+                            <h5 class="card-title mb-0 fw-bold text-sm" style="color: #9d1c20;">Sales Summary</h5>
                         </div>
                         <div class="card-body p-0">
                             <div class="table-responsive" style="max-height: 350px; overflow-y: auto;">
                                 <table class="table table-hover align-middle mb-0">
                                     <thead class="position-sticky top-0" style="background-color: #eff6ff;">
                                         <tr>
-                                            <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">ID</th>
-                                            <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Product</th>
-                                            <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Invoice</th>
+                                            <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">No</th>
+                                            <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Description</th>
                                             <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Date</th>
-                                            <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Quantity</th>
-                                            <th class="text-uppercase text-xs fw-semibold py-3 text-end" style="color: #9d1c20;">Unit Price</th>
-                                            <th class="text-uppercase text-xs fw-semibold py-3 text-end" style="color: #9d1c20;">Discount</th>
-                                            <th class="text-uppercase text-xs fw-semibold py-3 text-end" style="color: #9d1c20;">Total</th>
+                                            <th class="text-uppercase text-xs fw-semibold py-3 text-end" style="color: #9d1c20;">Amount</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @forelse($modalData['productSales'] as $item)
+                                        @php $grandTotal = 0; @endphp
+                                        @forelse($modalData['invoiceSummaryRows'] ?? [] as $row)
+                                        @php
+                                            $amt = floatval($row['amount'] ?? 0);
+                                            if (($row['type'] ?? '') === 'paid') {
+                                                $grandTotal -= $amt; // subtract paid amounts
+                                            } else {
+                                                $grandTotal += $amt; // add back-forward and invoice amounts
+                                            }
+                                        @endphp
                                         <tr class="border-bottom transition-all hover:bg-[#f1f5f9] {{ $loop->iteration % 2 == 0 ? 'bg-[#f9fafb]' : '' }}">
-                                            <td class="ps-4 text-center text-sm text-gray-800" data-label="#">{{ $loop->iteration }}</td>
-                                            <td class="text-sm" data-label="Product">
-                                                <div class="d-flex align-items-center">
-                                                    <div>
-                                                        <h6 class="fw-bold mb-1 text-gray-800">{{ $item->product_name }}</h6>
-                                                        <small class="text-muted d-block">
-                                                            {{ $item->product_brand ?? '' }} {{ $item->product_model ?? '' }}
-                                                        </small>
-                                                        <span class="badge" style="background-color: #f3f4f6; color: #9d1c20; padding: 6px 12px; border-radius: 9999px;">
-                                                            {{ $item->product_code }}
-                                                        </span>
-                                                    </div>
-                                                </div>
+                                            <td class="ps-4 text-center text-sm text-gray-800">{{ $loop->iteration }}</td>
+                                            <td class="text-sm text-gray-600">{{ $row['description'] }}</td>
+                                            <td class="text-sm text-gray-600">
+                                                @if(!empty($row['date']))
+                                                    {{ \Carbon\Carbon::parse($row['date'])->format('d M Y') }}
+                                                @else
+                                                    —
+                                                @endif
                                             </td>
-                                            <td class="text-sm text-gray-600" data-label="Invoice #">{{ $item->invoice_number }}</td>
-                                            <td class="text-sm text-gray-600" data-label="Date">{{ \Carbon\Carbon::parse($item->sale_date)->format('d M Y') }}</td>
-                                            <td class="text-center text-sm text-gray-800" data-label="Quantity">{{ $item->total_quantity }}</td>
-                                            <td class="text-end text-sm text-gray-800" data-label="Unit Price">Rs.{{ number_format($item->price, 2) }}</td>
-                                            <td class="text-end text-sm text-gray-800" data-label="Discount">Rs.{{ number_format($item->discount, 2) ?: 0 }}</td>
-                                            <td class="text-end fw-bold text-sm text-gray-800" data-label="Total">Rs.{{ number_format($item->total_sales, 2) }}</td>
+                                            <td class="text-end fw-bold text-sm text-gray-800">Rs.{{ number_format($row['amount'] ?? 0, 2) }}</td>
                                         </tr>
                                         @empty
                                         <tr>
-                                            <td colspan="8" class="text-center py-6">
-                                                <div style="width:72px;height:72px;background-color:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;margin-bottom:12px;">
-                                                    <i class="bi bi-box-seam text-gray-600 fs-3"></i>
-                                                </div>
-                                                <h5 class="text-gray-600 fw-normal">No Product Sales Found</h5>
-                                                <p class="text-sm text-gray-500 mb-0">No product sales data available.</p>
-                                            </td>
+                                            <td colspan="4" class="text-center py-6"> ... no invoices UI ... </td>
                                         </tr>
                                         @endforelse
+                                        @if(($grandTotal ?? 0) > 0)
+                                        <tr class="bg-[#f1f5f9] fw-bold">
+                                            <td colspan="3" class="text-end text-gray-800">Balance Total Due Amount</td>
+                                            <td class="text-end text-gray-800">Rs.{{ number_format($grandTotal ?? 0, 2) }}</td>
+                                        </tr>
+                                        @endif
                                     </tbody>
                                 </table>
                             </div>
                         </div>
                     </div>
+
                     @else
                     <div class="text-center py-5">
                         <div style="width:72px;height:72px;background-color:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;margin-bottom:12px;">
@@ -312,10 +329,78 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+    /* Hidden by default, visible only in print */
+    .print-only { display: none; }
+    /* Print only the modal content */
+    @media print {
+        body * {
+            visibility: hidden !important;
+        }
+        #customerSalesModal, #customerSalesModal *,
+        #mainCustomerSalesPrint, #mainCustomerSalesPrint * {
+            visibility: visible !important;
+        }
+        .print-only { display: block !important; }
+        #customerSalesModal, #mainCustomerSalesPrint {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 100% !important;
+        }
+        .modal-backdrop {
+            display: none !important;
+        }
+        .modal-dialog {
+            max-width: 100% !important;
+            margin: 0 !important;
+        }
+        .modal-content {
+            border: none !important;
+            box-shadow: none !important;
+        }
+        /* Optional: hide modal close button on print */
+        .modal-header .btn-close, .no-print {
+            display: none !important;
+        }
+
+        /* Hide modal footer (buttons) and any buttons inside modal content when printing */
+        #customerSalesModal .modal-footer,
+        #customerSalesModal button,
+        #customerSalesModal .btn {
+            display: none !important;
+        }
+
+        /* Print entire modal content without internal scrollbars */
+        @page {
+            size: auto;
+            margin: 10mm;
+        }
+        html, body {
+            height: auto !important;
+            overflow: visible !important;
+        }
+        #customerSalesModal .modal-body,
+        #customerSalesModal .card-body,
+        #customerSalesModal .table-responsive,
+        #mainCustomerSalesPrint .table-responsive {
+            max-height: none !important;
+            overflow: visible !important;
+        }
+        #customerSalesModal thead,
+        #mainCustomerSalesPrint thead {
+            position: static !important; /* disable sticky header for print */
+        }
+        /* Avoid breaking rows across pages */
+        #customerSalesModal table, #mainCustomerSalesPrint table { page-break-inside: auto; }
+        #customerSalesModal tr, #mainCustomerSalesPrint tr { page-break-inside: avoid; page-break-after: auto; }
+    }
+</style>
 @endpush
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
     // Toast notifications for Livewire events
     document.addEventListener('livewire:initialized', () => {
         @this.on('showToast', ({
@@ -351,12 +436,14 @@
     // Main table print function
     document.addEventListener('livewire:initialized', function() {
         Livewire.on('print-customer-table', function() {
-            const printWindow = window.open('', '_blank', 'width=1000,height=700');
+            // Clone the current table and remove the Action column
             const tableElement = document.querySelector('.table.table-hover').cloneNode(true);
-            const actionColumnIndex = 8;
+            const actionColumnIndex = 7; // 0-based index; Action is the 8th column
             const headerRow = tableElement.querySelector('thead tr');
-            const headerCells = headerRow.querySelectorAll('th');
-            headerCells[actionColumnIndex].remove();
+            const headerCells = headerRow ? headerRow.querySelectorAll('th') : [];
+            if (headerCells.length > actionColumnIndex) {
+                headerCells[actionColumnIndex].remove();
+            }
             const rows = tableElement.querySelectorAll('tbody tr');
             rows.forEach(row => {
                 const cells = row.querySelectorAll('td');
@@ -365,205 +452,40 @@
                 }
             });
 
-            const htmlContent = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>Customer Sales Details - Print Report</title>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-                    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-                    <style>
-                        @page { size: landscape; margin: 1cm; }
-                        body { font-family: 'Inter', sans-serif; padding: 20px; font-size: 14px; color: #1f2937; }
-                        .print-container { max-width: 900px; margin: 0 auto; }
-                        .print-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #1e40af; display: flex; justify-content: space-between; align-items: center; }
-                        .print-header h2 { color: #9d1c20; font-weight: 700; letter-spacing: -0.025em; }
-                        .print-footer { margin-top: 20px; padding-top: 15px; border-top: 2px solid #e5e7eb; text-align: center; font-size: 12px; color: #6b7280; }
-                        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                        th, td { border: 1px solid #e5e7eb; padding: 12px; text-align: center; vertical-align: middle; }
-                        th { background-color: #eff6ff; font-weight: 600; text-transform: uppercase; color: #1e3a8a; }
-                        tr:nth-child(even) { background-color: #f9fafb; }
-                        tr:hover { background-color: #f1f5f9; }
-                        .badge { padding: 6px 12px; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; color: #ffffff; }
-                        .bg-primary { background-color: #9d1c20; }
-                        .bg-info { background-color: #0ea5e9; }
-                        .bg-success { background-color: #22c55e; }
-                        .bg-danger { background-color: #ef4444; }
-                        .no-print { display: none; }
-                        @media print {
-                            .no-print { display: none; }
-                            thead { display: table-header-group; }
-                            tr { page-break-inside: avoid; }
-                            body { padding: 10px; }
-                            .print-container { max-width: 100%; }
-                            table { -webkit-print-color-adjust: exact; color-adjust: exact; }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="print-container">
-                        <div class="print-header">
-                            <h2 class="fw-bold tracking-tight">Customer Sales Details</h2>
-                            <div class="no-print">
-                                <button class="btn btn-light rounded-full px-4" style="background-color:#ffffff;border-color:#ffffff;color:#1e3a8a;" onclick="window.print();">Print</button>
-                                <button class="btn btn-light rounded-full px-4 ms-2" style="background-color:#ffffff;border-color:#ffffff;color:#1e3a8a;" onclick="window.close();">Close</button>
-                            </div>
-                        </div>
-                        <div class="table-responsive">
-                            ${tableElement.outerHTML}
-                        </div>
-                        <div class="print-footer">
-                            <small>Generated on ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Colombo' })}</small><br>
-                            <p>PLUS <br> NO 20/2/1, 2nd FLOOR,HUNTER BUILDING,BANKSHALLL STREET,COLOMBO-11 | Phone: 011 - 2332786 <br> Email: plusaccessories.lk@gmail.com</p>
-                        </div>
-                    </div>
-                </body>
-                </html>
+            // Create a temporary print container in the current page
+            const containerId = 'mainCustomerSalesPrint';
+            let container = document.getElementById(containerId);
+            if (container) container.remove();
+            container = document.createElement('div');
+            container.id = containerId;
+            container.style.padding = '20px';
+            container.innerHTML = `
+                <div class="text-center mb-4" style="text-align:center; margin-bottom:16px;">
+                    <h3 class="mb-1 fw-bold tracking-tight" style="color: #9d1c20; margin:0;">PLUS</h3>
+                    <p class="mb-0 text-muted small" style="color: #6B7280; margin:0;">NO 20/2/1, 2nd FLOOR,HUNTER BUILDING,BANKSHALLL STREET,COLOMBO-11</p>
+                    <p class="mb-0 text-muted small" style="color: #6B7280; margin:0;">Phone: 011 - 2332786 | Email: plusaccessories.lk@gmail.com</p>
+                </div>
+                <div style="margin-bottom: 12px; padding-bottom: 8px; display:flex; justify-content:space-between; align-items:center;">
+                    <h2 style="color:#9d1c20; margin:0;">Customer Sales Details</h2>
+                    <small>Generated on ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Colombo' })}</small>
+                </div>
             `;
+            const wrapper = document.createElement('div');
+            wrapper.appendChild(tableElement);
+            container.appendChild(wrapper);
+            document.body.appendChild(container);
 
-            printWindow.document.open();
-            printWindow.document.write(htmlContent);
-            printWindow.document.close();
-            printWindow.onload = function() {
-                printWindow.focus();
-            };
+            window.print();
+            setTimeout(() => {
+                container.remove();
+            }, 500);
         });
     });
 
     // Modal print function
     function printModalContent() {
-        const customerName = document.querySelector('#customerSalesModalLabel').innerText.trim();
-        const modalBody = document.querySelector('.modal-body');
-        const customerInfoSection = modalBody.querySelector('.card.mb-4');
-        const customerDetails = {};
-        customerInfoSection.querySelectorAll('p').forEach(p => {
-            const text = p.innerText;
-            if (text.includes(':')) {
-                const [key, value] = text.split(':');
-                customerDetails[key.trim()] = value.trim();
-            }
-        });
-
-        const summaryCards = modalBody.querySelectorAll('.row.mb-4 .card-body');
-        const summaryData = {
-            totalSales: summaryCards[0]?.querySelector('h3')?.innerText || '0',
-            totalPaid: summaryCards[1]?.querySelector('h3')?.innerText || '0',
-            totalDue: summaryCards[2]?.querySelector('h3')?.innerText || '0',
-        };
-
-        const progressBar = modalBody.querySelector('.progress-bar');
-        const paymentPercentage = progressBar?.getAttribute('aria-valuenow') || '0';
-        const productTable = modalBody.querySelector('.table');
-
-        const htmlContent = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>${customerName}</title>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-                <style>
-                    @page { size: landscape; margin: 1cm; }
-                    body { font-family: 'Inter', sans-serif; padding: 20px; font-size: 14px; color: #1f2937; }
-                    .print-container { max-width: 900px; margin: 0 auto; }
-                    .print-header { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 2px solid #1e40af; text-align: center; }
-                    .print-header h2 { color: #1e40af; font-weight: 700; letter-spacing: -0.025em; }
-                    .print-footer { margin-top: 20px; padding-top: 15px; border-top: 2px solid #e5e7eb; text-align: center; font-size: 12px; color: #6b7280; }
-                    .customer-info { border: 1px solid #e5e7eb; border-radius: 1rem; padding: 15px; margin-bottom: 20px; background: #f9fafb; }
-                    .summary-row { display: flex; justify-content: space-between; margin-bottom: 20px; }
-                    .summary-card { width: 31%; border: 1px solid #e5e7eb; border-radius: 1rem; padding: 15px; text-align: center; background: #ffffff; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1); }
-                    .progress-container { border: 1px solid #e5e7eb; border-radius: 1rem; padding: 15px; margin-bottom: 20px; background: #ffffff; }
-                    .progress-bar-container { height: 10px; background-color: #e5e7eb; border-radius: 5px; margin: 10px 0; }
-                    .progress-bar-fill { height: 100%; background-color: #1e40af; border-radius: 5px; }
-                    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-                    th, td { border: 1px solid #e5e7eb; padding: 12px; text-align: left; vertical-align: middle; }
-                    th { background-color: #eff6ff; font-weight: 600; text-transform: uppercase; color: #1e3a8a; }
-                    tr:nth-child(even) { background-color: #f9fafb; }
-                    tr:hover { background-color: #f1f5f9; }
-                    .text-right { text-align: right; }
-                    .text-center { text-align: center; }
-                    .font-bold { font-weight: 600; }
-                    .badge { padding: 6px 12px; border-radius: 9999px; font-size: 0.875rem; font-weight: 600; color: #ffffff; }
-                    .bg-primary { background-color: #1e40af; }
-                    .bg-info { background-color: #0ea5e9; }
-                    .bg-light { background-color: #f3f4f6; color: #1f2937; }
-                    .print-btn { display: block; margin: 20px auto; padding: 10px 20px; background: #1e40af; color: #ffffff; border: none; border-radius: 9999px; cursor: pointer; }
-                    @media print {
-                        .print-btn { display: none; }
-                        body { -webkit-print-color-adjust: exact; color-adjust: exact; }
-                        table { -webkit-print-color-adjust: exact; color-adjust: exact; }
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="print-container">
-                    <div class="print-header">
-                        <h2 class="fw-bold tracking-tight">${customerName}</h2>
-                        <p>Generated on: ${new Date().toLocaleString('en-US', { timeZone: 'Asia/Colombo' })}</p>
-                    </div>
-                    <div class="customer-info">
-                        <div style="display: flex; flex-wrap: wrap;">
-                            <div style="width: 50%;">
-                                <p><strong>Name:</strong> ${customerDetails['Name'] || 'N/A'}</p>
-                                <p><strong>Email:</strong> ${customerDetails['Email'] || 'N/A'}</p>
-                                <p><strong>Phone:</strong> ${customerDetails['Phone'] || 'N/A'}</p>
-                                <p><strong>Type:</strong> <span class="badge bg-primary">${customerDetails['Type'] || 'N/A'}</span></p>
-                            </div>
-                            <div style="width: 50%;">
-                                <p><strong>Business Name:</strong> ${customerDetails['Business Name'] || 'N/A'}</p>
-                                <p><strong>Address:</strong> ${customerDetails['Address'] || 'N/A'}</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="summary-row">
-                        <div class="summary-card">
-                            <h5 style="color: #1e3a8a;">Total Sales Amount</h5>
-                            <h3>${summaryData.totalSales}</h3>
-                        </div>
-                        <div class="summary-card">
-                            <h5 style="color: #22c55e;">Amount Paid</h5>
-                            <h3>${summaryData.totalPaid}</h3>
-                        </div>
-                        <div class="summary-card">
-                            <h5 style="color: #ef4444;">Amount Due</h5>
-                            <h3>${summaryData.totalDue}</h3>
-                        </div>
-                    </div>
-                    <div class="progress-container">
-                        <p class="font-bold" style="color: #1e3a8a;">Payment Progress</p>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar-fill" style="width: ${paymentPercentage}%;"></div>
-                        </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span>0%</span>
-                            <span>${paymentPercentage}%</span>
-                            <span>100%</span>
-                        </div>
-                    </div>
-                    <h5 style="color: #1e3a8a;">Product-wise Sales</h5>
-                    ${productTable ? productTable.outerHTML : '<p>No product sales data available</p>'}
-                    <div class="print-footer">
-                        <p>PLUS <br> NO 20/2/1, 2nd FLOOR,HUNTER BUILDING,BANKSHALLL STREET,COLOMBO-11 | Phone: 011 - 2332786 <br> Email: plusaccessories.lk@gmail.com</p>
-                    </div>
-                    <button class="print-btn" onclick="window.print(); setTimeout(() => window.close(), 500);">
-                        Print Report
-                    </button>
-                </div>
-            </body>
-            </html>
-        `;
-
-        const printWindow = window.open('', '_blank', 'width=1000,height=800');
-        printWindow.document.open();
-        printWindow.document.write(htmlContent);
-        printWindow.document.close();
-        printWindow.onload = function() {
-            printWindow.focus();
-        };
+        // Directly trigger the browser print dialog without opening a new window
+        window.print();
     }
 </script>
 @endpush
