@@ -137,16 +137,10 @@ class Products extends Component
 
             DB::commit();
 
-            $this->dispatch('notify', [
-                'type' => 'success',
-                'message' => $message,
-            ]);
+            $this->js("Swal.fire('Success!', '" . addslashes($message) . "', 'success')");
         } catch (\Exception $e) {
             DB::rollBack();
-            $this->dispatch('notify', [
-                'type' => 'error',
-                'message' => 'Error: ' . $e->getMessage(),
-            ]);
+            $this->js("Swal.fire('Error!', '" . addslashes('Error: ' . $e->getMessage()) . "', 'error')");
         }
     }
 
@@ -297,7 +291,7 @@ class Products extends Component
 
         $this->resetFields();
         $this->showEditModal = false;
-        session()->flash('message', 'Product updated successfully!');
+        $this->js("Swal.fire('Success!', 'Product updated successfully!', 'success')");
     }
 
 
@@ -318,7 +312,7 @@ class Products extends Component
         $this->deletingProductId = null;
         $this->deletingProductName = '';
 
-        session()->flash('message', 'Product deleted successfully!');
+        $this->js("Swal.fire('Success!', 'Product deleted successfully!', 'success')");
     }
 
     public function viewProduct($productId)

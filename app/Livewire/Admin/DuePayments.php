@@ -209,10 +209,7 @@ class DuePayments extends Component
 
         // Ensure exactly one target is selected (using applyTarget)
         if (!in_array($this->applyTarget, ['current', 'back_forward'], true)) {
-            $this->dispatch('showToast', [
-                'type' => 'error',
-                'message' => 'Please select exactly one target: Current Due or Back-Forward.'
-            ]);
+            $this->js("Swal.fire('Error', 'Please select exactly one target: Current Due or Back-Forward.', 'error')");
             return;
         }
 
@@ -233,10 +230,7 @@ class DuePayments extends Component
 
             if ($totalPaid <= 0) {
                 DB::rollBack();
-                $this->dispatch('showToast', [
-                    'type' => 'error',
-                    'message' => 'Please enter a cash amount, add cheque(s), or both.'
-                ]);
+                $this->js("Swal.fire('Error', 'Please enter a cash amount, add cheque(s), or both.', 'error')");
                 return;
             }
 
@@ -248,10 +242,7 @@ class DuePayments extends Component
 
             if ($totalPaid > $targetAmount) {
                 DB::rollBack();
-                $this->dispatch('showToast', [
-                    'type' => 'error',
-                    'message' => 'Total payment exceeds selected amount.'
-                ]);
+                $this->js("Swal.fire('Error', 'Total payment exceeds selected amount.', 'error')");
                 return;
             }
 
@@ -389,10 +380,7 @@ class DuePayments extends Component
             DB::commit();
 
             $this->dispatch('closeModal', 'payment-detail-modal');
-            $this->dispatch('showToast', [
-                'type' => 'success',
-                'message' => 'Payment submitted successfully.'
-            ]);
+            $this->js("Swal.fire('Success', 'Payment submitted successfully.', 'success')");
 
             $this->reset([
                 'paymentDetail',
@@ -413,10 +401,7 @@ class DuePayments extends Component
             ]);
         } catch (Exception $e) {
             DB::rollBack();
-            $this->dispatch('showToast', [
-                'type' => 'error',
-                'message' => 'Failed to submit payment: ' . $e->getMessage()
-            ]);
+            $this->js("Swal.fire('Error', 'Failed to submit payment: " . addslashes($e->getMessage()) . "', 'error')");
         }
     }
 
