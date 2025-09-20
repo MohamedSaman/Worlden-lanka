@@ -9,6 +9,7 @@ use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\DB;
 use App\Models\Sale;
 use App\Models\Customer;
+use App\Models\Payment;
 
 #[Layout('components.layouts.admin')]
 #[Title('Customer Sales Details')]
@@ -29,21 +30,54 @@ class CustomerSaleDetails extends Component
         $salesSummary = DB::table('sales')
             ->where('customer_id', $customerId)
             ->select(
+                DB::raw('COUNT(DISTINCT invoice_number) as invoice_count'),
                 DB::raw('SUM(total_amount) as total_amount'),
-                DB::raw('SUM(due_amount) as total_due'),
-                DB::raw('SUM(total_amount) - SUM(due_amount) as total_paid')
+                DB::raw('SUM(due_amount) as total_due')
             )
             ->first();
+
+        // Payment sums by logical status for this customer's sales
+        $paymentsBase = Payment::whereHas('sale', function($q) use ($customerId) {
+            $q->where('customer_id', $customerId);
+        });
+
+        $paidSum = (clone $paymentsBase)
+            ->where(function($q){
+                $q->where('is_completed', true)
+                  ->orWhereIn('status', ['Paid','paid']);
+            })
+            ->sum('amount');
+
+        $currentSum = (clone $paymentsBase)
+            ->where(function($q){
+                $q->where('applied_to', 'current')
+                  ->orWhere('status', 'current');
+            })
+            ->sum('amount');
+
+        $forwardSum = (clone $paymentsBase)
+            ->where(function($q){
+                $q->where('applied_to', 'back_forward')
+                  ->orWhere('status', 'forward');
+            })
+            ->sum('amount');
+
+        // Attach computed paid sum to sales summary
+        $salesSummary->total_paid = $paidSum;
 
         // Get individual invoices
         $invoices = Sale::where('customer_id', $customerId)
             ->orderBy('created_at', 'desc')
             ->get();
 
-        // Get back-forward due summary from customer_accounts
-        $backForwardSummary = DB::table('customer_accounts')
+        // Get due totals from customer_accounts (authoritative due balances)
+        $accountTotals = DB::table('customer_accounts')
             ->where('customer_id', $customerId)
-            ->select(DB::raw('SUM(back_forward_amount) as back_forward_due'))
+            ->select(
+                DB::raw('SUM(total_due) as total_due'),
+                DB::raw('SUM(current_due_amount) as current_due'),
+                DB::raw('SUM(back_forward_amount) as back_forward_due')
+            )
             ->first();
 
         // Get product-wise sales with product details
@@ -106,7 +140,8 @@ class CustomerSaleDetails extends Component
                 'payments.payment_date',
                 'payments.created_at',
                 'payments.is_completed',
-                'payments.status'
+                'payments.status',
+                'payments.applied_to'
             )
             ->orderBy('payments.created_at', 'desc')
             ->get();
@@ -114,7 +149,7 @@ class CustomerSaleDetails extends Component
         // Build unified invoice summary rows timeline: Back-Forward first, then Invoices and Paid ordered by date
         $invoiceSummaryRows = [];
 
-        $bfAmount = $backForwardSummary->back_forward_due ?? 0;
+        $bfAmount = $accountTotals->back_forward_due ?? 0;
 
         // Collect invoice and payment events with comparable dates
         $events = [];
@@ -129,7 +164,12 @@ class CustomerSaleDetails extends Component
         foreach ($payments as $p) {
             $isPaid = ($p->is_completed === 1) || (strtolower((string)$p->status) === 'paid');
             if (!$isPaid) continue;
-            $label = 'Paid' . (!empty($p->payment_method) ? (' - ' . ucfirst($p->payment_method)) : '');
+            // Build label: Paid (Current/Forward) - Method
+            $target = ($p->applied_to === 'back_forward' || strtolower((string)$p->status) === 'forward') ? 'Forward' : 'Current';
+            $label = 'Paid (' . $target . ')';
+            if (!empty($p->due_payment_method)) {
+                $label .= ' - ' . ucfirst(str_replace('_',' ', $p->due_payment_method));
+            }
             if (!empty($p->payment_reference)) {
                 $label .= ' (' . $p->payment_reference . ')';
             }
@@ -167,10 +207,19 @@ class CustomerSaleDetails extends Component
         $this->modalData = [
             'customer' => $customer,
             'salesSummary' => $salesSummary,
+            'paymentSums' => [
+                'paid' => $paidSum,
+                'current' => $currentSum,
+                'forward' => $forwardSum,
+            ],
             'invoices' => $invoices,
             'productSales' => $productSales,
             'invoiceSales' => $invoiceSales,
-            'backForwardDue' => $backForwardSummary->back_forward_due ?? 0,
+            'accountTotals' => [
+                'total_due' => $accountTotals->total_due ?? 0,
+                'current_due' => $accountTotals->current_due ?? 0,
+                'back_forward_due' => $accountTotals->back_forward_due ?? 0,
+            ],
             'invoiceSummaryRows' => $invoiceSummaryRows,
         ];
 
@@ -187,8 +236,7 @@ class CustomerSaleDetails extends Component
     // For CSV export
     public function exportToCSV()
     {
-        // Build a summary aligned with the main table: total_sales from sales,
-        // and total_due/total_paid from customer_accounts (back_forward + current_due)
+        // Build a comprehensive summary per customer including payment status splits and due breakdown
         $customerSales = DB::table('customers')
             ->leftJoin(DB::raw('(
                 SELECT customer_id,
@@ -199,26 +247,32 @@ class CustomerSaleDetails extends Component
             ) AS sales_summary'), 'customers.id', '=', 'sales_summary.customer_id')
             ->leftJoin(DB::raw('(
                 SELECT customer_id,
-                       SUM(current_due_amount) AS current_due
+                       SUM(current_due_amount) AS current_due,
+                       SUM(back_forward_amount) AS back_forward_due,
+                       SUM(total_due) AS total_due
                 FROM customer_accounts
                 GROUP BY customer_id
-            ) AS account_summary'), 'customers.id', '=', 'account_summary.customer_id')
+            ) AS account_totals'), 'customers.id', '=', 'account_totals.customer_id')
             ->leftJoin(DB::raw('(
-                SELECT customer_id,
-                       SUM(back_forward_amount) AS total_back_forward_amount
-                FROM customer_accounts
-                GROUP BY customer_id
-            ) AS back_forward_summary'), 'customers.id', '=', 'back_forward_summary.customer_id')
+                SELECT s.customer_id,
+                       SUM(CASE WHEN p.is_completed = 1 OR LOWER(p.status) IN ("paid") THEN p.amount ELSE 0 END) AS paid_all,
+                       SUM(CASE WHEN p.applied_to = "current" OR LOWER(p.status) = "current" THEN p.amount ELSE 0 END) AS paid_current,
+                       SUM(CASE WHEN p.applied_to = "back_forward" OR LOWER(p.status) = "forward" THEN p.amount ELSE 0 END) AS paid_forward
+                FROM payments p
+                INNER JOIN sales s ON p.sale_id = s.id
+                GROUP BY s.customer_id
+            ) AS pay_summaries'), 'customers.id', '=', 'pay_summaries.customer_id')
             ->select(
                 'customers.id as customer_id',
                 'customers.name',
-                'customers.email',
-                'customers.business_name',
-                'customers.type',
                 DB::raw('COALESCE(sales_summary.invoice_count, 0) as invoice_count'),
                 DB::raw('COALESCE(sales_summary.total_sales, 0) as total_sales'),
-                DB::raw('COALESCE(account_summary.current_due, 0) + COALESCE(back_forward_summary.total_back_forward_amount, 0) as total_due'),
-                DB::raw('COALESCE(sales_summary.total_sales, 0) - (COALESCE(account_summary.current_due, 0) + COALESCE(back_forward_summary.total_back_forward_amount, 0)) as total_paid')
+                DB::raw('COALESCE(pay_summaries.paid_all, 0) as paid_all'),
+                DB::raw('COALESCE(pay_summaries.paid_current, 0) as paid_current'),
+                DB::raw('COALESCE(pay_summaries.paid_forward, 0) as paid_forward'),
+                DB::raw('COALESCE(account_totals.current_due, 0) as current_due'),
+                DB::raw('COALESCE(account_totals.back_forward_due, 0) as back_forward_due'),
+                DB::raw('COALESCE(account_totals.total_due, 0) as total_due')
             )
             ->orderByDesc('total_sales')
             ->get();
@@ -232,21 +286,22 @@ class CustomerSaleDetails extends Component
             $file = fopen('php://output', 'w');
 
             // Add headers
-            fputcsv($file, ['#', 'Customer Name', 'Email', 'Business Name', 'Type', 'Invoices', 'Total Sales', 'Total Paid', 'Total Due', 'Collection %']);
+            fputcsv($file, ['#', 'Customer Name', 'Invoices', 'Total Sales', 'Paid (All)', 'Paid - Current', 'Paid - Forward', 'Current Due', 'Back-Forward Due', 'Total Due', 'Collection %']);
 
             // Add data rows
             foreach ($customerSales as $index => $customer) {
-                $percentage = $customer->total_sales > 0 ? round(($customer->total_paid / $customer->total_sales) * 100) : 100;
+                $percentage = $customer->total_sales > 0 ? round(((float)$customer->paid_all / (float)$customer->total_sales) * 100) : 100;
 
                 fputcsv($file, [
                     $index + 1,
                     $customer->name,
-                    $customer->email,
-                    $customer->business_name ?? 'N/A',
-                    ucfirst($customer->type),
                     $customer->invoice_count,
                     'Rs.' . number_format($customer->total_sales, 2),
-                    'Rs.' . number_format($customer->total_paid, 2),
+                    'Rs.' . number_format($customer->paid_all, 2),
+                    'Rs.' . number_format($customer->paid_current, 2),
+                    'Rs.' . number_format($customer->paid_forward, 2),
+                    'Rs.' . number_format($customer->current_due, 2),
+                    'Rs.' . number_format($customer->back_forward_due, 2),
                     'Rs.' . number_format($customer->total_due, 2),
                     $percentage . '%'
                 ]);

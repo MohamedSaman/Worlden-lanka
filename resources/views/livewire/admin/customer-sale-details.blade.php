@@ -193,9 +193,9 @@
                             <div class="card border-0 shadow-sm rounded-4 h-100">
                                 <div class="card-body text-center p-4">
                                     <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #22c55e;">Amount Paid</h6>
-                                    <h3 class="fw-bold" style="color: #22c55e;">Rs.{{ number_format($modalData['salesSummary']->total_paid, 2) }}</h3>
-                                    <p class="text-sm text-gray-500 mb-0">
-                                        {{ round(($modalData['salesSummary']->total_paid / $modalData['salesSummary']->total_amount) * 100) }}% of total
+                                    <h3 class="fw-bold" style="color: #22c55e;">Rs.{{ number_format($modalData['paymentSums']['paid'] ?? 0, 2) }}</h3>
+                                    <p class="text-xs text-gray-500 mb-0">
+                                        Current: Rs.{{ number_format($modalData['paymentSums']['current'] ?? 0, 2) }} | Forward: Rs.{{ number_format($modalData['paymentSums']['forward'] ?? 0, 2) }}
                                     </p>
                                 </div>
                             </div>
@@ -203,7 +203,7 @@
                         <div class="col-md-3 col-sm-6">
                             <div class="card border-0 shadow-sm rounded-4 h-100">
                                 <div class="card-body text-center p-4">
-                                    <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #ef4444;">Amount Due</h6>
+                                    <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #ef4444;">Total Due Amount</h6>
                                     <h3 class="fw-bold" style="color: #ef4444;">Rs.{{ number_format($modalData['salesSummary']->total_due, 2) }}</h3>
                                     <p class="text-sm text-gray-500 mb-0">
                                         {{ round(($modalData['salesSummary']->total_due / $modalData['salesSummary']->total_amount) * 100) }}% outstanding
@@ -290,12 +290,11 @@
                                             <td colspan="4" class="text-center py-6"> ... no invoices UI ... </td>
                                         </tr>
                                         @endforelse
-                                        @if(($grandTotal ?? 0) > 0)
+                                        @php $accountTotalDue = $modalData['accountTotals']['total_due'] ?? 0; @endphp
                                         <tr class="bg-[#f1f5f9] fw-bold">
                                             <td colspan="3" class="text-end text-gray-800">Balance Total Due Amount</td>
-                                            <td class="text-end text-gray-800">Rs.{{ number_format($grandTotal ?? 0, 2) }}</td>
+                                            <td class="text-end text-gray-800">Rs.{{ number_format($accountTotalDue, 2) }}</td>
                                         </tr>
-                                        @endif
                                     </tbody>
                                 </table>
                             </div>
