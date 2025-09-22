@@ -99,7 +99,7 @@
                 </tbody>
             </table>
             <div class="mt-3 mx-2">
-                {{ $categories->links('pagination::bootstrap-5') }}
+                {{ $categories->links('livewire::bootstrap') }}
             </div>
         </div>
     </div>

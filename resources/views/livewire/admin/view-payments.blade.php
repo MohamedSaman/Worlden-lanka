@@ -232,7 +232,7 @@
                     </table>
                 </div>
                 <div class="px-4 py-3 border-top">
-                    {{ $payments->links('pagination::bootstrap-5') }}
+                    {{ $payments->links('livewire::bootstrap') }}
                 </div>
             </div>
         </div>

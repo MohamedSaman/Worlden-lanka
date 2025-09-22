@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 class DuePayments extends Component
 {
     use WithPagination, WithFileUploads;
+    protected $paginationTheme = 'bootstrap';
     
     public $search = '';
     public $selectedPayment = null;
@@ -42,6 +43,13 @@ class DuePayments extends Component
     public function mount()
     {
         // Initialize component
+    }
+
+    public function updated($propertyName)
+    {
+        if ($propertyName === 'search' || strpos($propertyName, 'filters.') === 0) {
+            $this->resetPage();
+        }
     }
 
     public function updatedDuePaymentAttachment()

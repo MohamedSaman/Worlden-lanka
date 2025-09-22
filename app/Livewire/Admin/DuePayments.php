@@ -22,6 +22,7 @@ use Illuminate\Support\Collection;
 class DuePayments extends Component
 {
     use WithPagination, WithFileUploads;
+    protected $paginationTheme = 'bootstrap';
 
     public $search = '';
     public $selectedPayment = null;

@@ -227,7 +227,7 @@
                         </table>
                     </div>
                     <div class="px-4 py-3 border-top">
-                        {{ $duePayments->links('pagination::bootstrap-5') }}
+                        {{ $duePayments->links('livewire::bootstrap') }}
                     </div>
                 </div>
             </div>

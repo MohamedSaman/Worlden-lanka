@@ -240,7 +240,7 @@
                                 Showing <span class="fw-semibold text-gray-800">{{ $duePayments->firstItem() }}</span> to <span class="fw-semibold text-gray-800">{{ $duePayments->lastItem() }}</span> of <span class="fw-semibold text-gray-800">{{ $duePayments->total() }}</span> results
                             </div>
                             <div class="pagination-container">
-                                {{ $duePayments->links('pagination::bootstrap-5') }}
+                                {{ $duePayments->links('livewire::bootstrap') }}
                             </div>
                         </div>
                     </div>

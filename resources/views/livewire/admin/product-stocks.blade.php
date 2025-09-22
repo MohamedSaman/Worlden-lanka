@@ -129,7 +129,7 @@
             <!-- Pagination -->
             @if($products instanceof \Illuminate\Pagination\AbstractPaginator)
                 <div class="d-flex justify-content-end mt-4">
-                    {{ $products->links('pagination::bootstrap-5') }}
+                    {{ $products->links('livewire::bootstrap') }}
                 </div>
             @endif
 

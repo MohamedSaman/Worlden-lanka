@@ -15,6 +15,7 @@ use Carbon\Carbon;
 class ViewPayments extends Component
 {
     use WithPagination;
+    protected $paginationTheme = 'bootstrap';
 
     public $search = '';
     public $selectedPayment = null;

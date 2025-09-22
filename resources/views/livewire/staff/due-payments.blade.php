@@ -333,7 +333,7 @@
                         </div>
 
                         <div class="px-4 py-3 border-top">
-                            {{ $duePayments->links() }}
+                            {{ $duePayments->links('livewire::bootstrap') }}
                         </div>
                     </div>
                 </div>

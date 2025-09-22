@@ -136,7 +136,7 @@
     </div>
 
     <div class="mt-4">
-        {{ $products->links('pagination::bootstrap-5') }}
+        {{ $products->links('livewire::bootstrap') }}
     </div>
 
     <!-- Add Product Modal -->

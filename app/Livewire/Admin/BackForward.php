@@ -18,6 +18,7 @@ use Livewire\Attributes\On;
 class BackForward extends Component
 {
     use WithPagination;
+    protected $paginationTheme = 'bootstrap';
 
     public $search = '';
     public $editCustomerId;

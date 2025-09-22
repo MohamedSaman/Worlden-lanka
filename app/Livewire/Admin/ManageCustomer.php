@@ -19,6 +19,8 @@ class ManageCustomer extends Component
 {
     use WithFileUploads, WithPagination;
 
+    protected $paginationTheme = 'bootstrap';
+
     public $importFile;
     public $name;
     public $contactNumber;

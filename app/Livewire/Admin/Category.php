@@ -15,6 +15,7 @@ class Category extends Component
     use WithPagination;
 
     public $name, $description, $search = '';
+    protected $paginationTheme = 'bootstrap';
     public $showAddModal = false;
     public $showEditModal = false;
     public $showDeleteModal = false;

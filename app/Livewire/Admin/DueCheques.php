@@ -19,6 +19,7 @@ use Livewire\WithPagination;
 class DueCheques extends Component
 {
     use WithPagination, WithFileUploads;
+    protected $paginationTheme = 'bootstrap';
 
     public $search = '';
     public $selectedPayment = null;

@@ -17,6 +17,13 @@ class ProductStocks extends Component
 
     public $search = '';
     public bool $showAll = false;
+    protected $paginationTheme = 'bootstrap';
+
+    // When the search term changes, reset to the first page to avoid invalid page issues
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
 
     public function toggleShowAll(): void
     {

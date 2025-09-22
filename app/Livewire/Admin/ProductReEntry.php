@@ -13,12 +13,18 @@ use Livewire\WithPagination;
 class ProductReEntry extends Component
 {
     use WithPagination;
+    protected $paginationTheme = 'bootstrap';
     
     public $search = '';
     public $selectedProductId = null;
     public $selectedProduct = null;
     public $addStock = 0;
     public $addDamage = 0;
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
 
     public function selectProduct($productId)
     {

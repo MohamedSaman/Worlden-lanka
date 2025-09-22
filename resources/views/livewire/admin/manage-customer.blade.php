@@ -106,7 +106,7 @@
                 </table>
             </div>
             <div class="d-flex justify-content-end mt-4">
-                {{ $customers->links('pagination::bootstrap-5') }}
+                {{ $customers->links('livewire::bootstrap') }}
             </div>
         </div>
     </div>
