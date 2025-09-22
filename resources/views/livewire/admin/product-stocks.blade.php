@@ -40,6 +40,15 @@
                     style="background-color: #9d1c20; border-color: #9d1c20; color: white;transition: all 0.3s ease;  transform: scale-(1.05)">
                     <i class="bi bi-printer me-1" aria-hidden="true"></i> Print
                 </button>
+                <button wire:click="toggleShowAll"
+                    class="btn btn-outline-secondary rounded-full shadow-sm px-4 py-2"
+                    aria-label="Toggle show all or paginated">
+                    @if($showAll)
+                        <i class="bi bi-list-nested me-1" aria-hidden="true"></i> Show Paginated
+                    @else
+                        <i class="bi bi-list-task me-1" aria-hidden="true"></i> Show All
+                    @endif
+                </button>
             </div>
         </div>
 
@@ -64,10 +73,13 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            $isPaginated = $products instanceof \Illuminate\Pagination\AbstractPaginator;
+                        @endphp
                         @forelse($products as $index => $product)
                         <tr class="transition-all hover:bg-gray-50">
                             <td class="text-sm text-center ps-4 py-3">
-                                {{ $products->firstItem() + $index }}
+                                {{ $isPaginated ? ($products->firstItem() + $index) : ($loop->iteration) }}
                             </td>
                             <td class="text-sm text-center py-3">
                                 @if($product->image)
@@ -115,9 +127,11 @@
                 </table>
             </div>
             <!-- Pagination -->
-            <div class="d-flex justify-content-end mt-4">
-                {{ $products->links('pagination::bootstrap-5') }}
-            </div>
+            @if($products instanceof \Illuminate\Pagination\AbstractPaginator)
+                <div class="d-flex justify-content-end mt-4">
+                    {{ $products->links('pagination::bootstrap-5') }}
+                </div>
+            @endif
 
         </div>
     </div>
