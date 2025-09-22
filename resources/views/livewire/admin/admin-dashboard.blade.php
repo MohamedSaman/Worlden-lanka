@@ -329,24 +329,24 @@
             <div class="col-sm-6 col-lg-3 mb-3">
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div class="stat-label">Total Revenue</div>
+                        <div class="stat-label">Total Sales</div>
                     </div>
-                    <div class="stat-value">Rs.{{ number_format($totalRevenue, 2) }}</div>
+                    <div class="stat-value">Rs.{{ number_format($totalSales, 2) }}</div>
                     <div class="stat-info mt-1">
                         <div class="d-flex justify-content-between mb-1">
-                            <small>Revenue</small>
+                            <small>Total Paid Amount</small>
                             <small>{{ $revenuePercentage }}% of total sales</small>
                         </div>
-                        <div class="progress ">
-                            <div class="progress-bar bg-success" role="progressbar" style=" width: {{ $revenuePercentage }}%;" aria-valuenow="{{ $revenuePercentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress">
+                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ $revenuePercentage }}%;" aria-valuenow="{{ $revenuePercentage }}" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
                         <div class="d-flex justify-content-between">
-                            <small class="text-muted text-truncate-mobile">Rs.{{ number_format($totalRevenue) }} of Rs.{{ number_format($totalRevenue + $totalDueAmount) }}</small>
+                            <small class="text-muted text-truncate-mobile">Rs.{{ number_format($totalRevenue, 2) }} paid of Rs.{{ number_format($totalSales, 2) }}</small>
                         </div>
                     </div>
                     <div class="stat-info mt-3 pt-2 border-top border-1 border-gray-200">
                         <div class="d-flex justify-content-between align-items-center">
-                            <small class="text-muted"><i class="bi bi-check-circle-fill text-success me-1"></i> Today Revenue</small>
+                            <small class="text-muted"><i class="bi bi-check-circle-fill text-success me-1"></i> Today Sales</small>
                             <span class="badge bg-success">{{$todayRevenueCount}}</span>
 
                         </div>
@@ -363,7 +363,7 @@
                     <div class="stat-change-alert">
                         <div class="d-flex justify-content-between mb-1">
                             <small>Due Amount</small>
-                            <small>{{ $duePercentage }}% of total sales</small>
+                            <small>{{ $duePercentage }}% Total Sales</small>
                         </div>
                         <div class="progress">
                             <div class="progress-bar bg-danger" role="progressbar" style="width: {{ $duePercentage }}%;" aria-valuenow="{{ $duePercentage }}" aria-valuemin="0" aria-valuemax="100"></div>
