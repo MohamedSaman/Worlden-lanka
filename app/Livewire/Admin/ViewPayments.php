@@ -7,7 +7,6 @@ use App\Models\Payment;
 use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 #[Layout('components.layouts.admin')]
@@ -38,15 +37,37 @@ class ViewPayments extends Component
                 'sale.items.product'
             ])->findOrFail($paymentId);
 
+            // Log for debugging
+            \Log::info('Selected Payment:', [
+                'payment_id' => $paymentId,
+                'sale_id' => $this->selectedPayment->sale_id,
+                'sale_exists' => !is_null($this->selectedPayment->sale),
+                'items_count' => $this->selectedPayment->sale ? $this->selectedPayment->sale->items->count() : 0,
+                'invoice_number' => $this->selectedPayment->sale ? $this->selectedPayment->sale->invoice_number : 'N/A',
+            ]);
+
+            if (!$this->selectedPayment->sale) {
+                $this->dispatch('showToast', [
+                    'type' => 'warning',
+                    'message' => 'No sale associated with this payment.'
+                ]);
+                return;
+            }
+
+            if ($this->selectedPayment->sale->items->isEmpty()) {
+                \Log::warning('No items found for sale ID: ' . $this->selectedPayment->sale_id);
+            }
+
             $this->dispatch('openModal', 'payment-receipt-modal');
         } catch (\Exception $e) {
+            \Log::error('Error loading payment: ' . $e->getMessage());
             $this->dispatch('showToast', [
                 'type' => 'error',
                 'message' => 'Error loading payment: ' . $e->getMessage()
             ]);
         }
     }
-    // Quick date preset setter for better UX
+
     public function setDatePreset(string $preset): void
     {
         $today = Carbon::today();
@@ -64,11 +85,9 @@ class ViewPayments extends Component
                 $this->filters['dateTo'] = $today->copy()->endOfMonth()->toDateString();
                 break;
             default:
-                // clear
                 $this->filters['dateFrom'] = '';
                 $this->filters['dateTo'] = '';
         }
-        // Clear legacy dateRange when using presets
         $this->filters['dateRange'] = '';
         $this->resetPage();
     }
@@ -103,7 +122,6 @@ class ViewPayments extends Component
                         });
                 });
             })
-            // Filter by logical status (Paid/Current/Forward) on top of inclusion filter
             ->when($this->filters['status'], function ($q) {
                 $status = strtolower($this->filters['status']);
                 if ($status === 'paid') {
@@ -130,7 +148,6 @@ class ViewPayments extends Component
                        ->orWhere('due_payment_method', $method);
                 });
             })
-            // New: dateFrom/dateTo take precedence if provided
             ->when($this->filters['dateFrom'] || $this->filters['dateTo'], function ($q) {
                 try {
                     $from = $this->filters['dateFrom'] ? Carbon::parse($this->filters['dateFrom'])->startOfDay() : null;
@@ -161,12 +178,11 @@ class ViewPayments extends Component
                         });
                     }
                 } catch (\Throwable $e) {
-                    // ignore parse errors
+                    \Log::warning('Date filter parse error: ' . $e->getMessage());
                 }
             })
             ->when($this->filters['dateRange'], function ($q) {
                 $range = trim($this->filters['dateRange']);
-                // Expected formats: 'YYYY-MM-DD - YYYY-MM-DD' or single 'YYYY-MM-DD'
                 $dates = preg_split('/\s*-\s*/', $range);
                 try {
                     if (count($dates) === 2) {
@@ -190,25 +206,27 @@ class ViewPayments extends Component
                         });
                     }
                 } catch (\Throwable $e) {
-                    // Ignore parse errors; no date filter applied
+                    \Log::warning('Date range parse error: ' . $e->getMessage());
                 }
             });
 
         $payments = $query->orderBy('created_at', 'desc')->paginate(15);
 
-
-        // Get summary stats
         $totalPayments = Payment::where('is_completed', 1)->sum('amount');
         $pendingPayments = Payment::where('is_completed', 0)->sum('amount');
         $todayTotalPayments = Payment::whereDate('created_at', now()->toDateString())->where('is_completed', 1)->sum('amount');
         $todayPendingPayments = Payment::whereDate('created_at', now()->toDateString())->where('is_completed', 0)->sum('amount');
+        $totalPayCount = Payment::where('is_completed', 1)->count();
+        $todayPayCount = Payment::whereDate('created_at', now()->toDateString())->where('is_completed', 1)->count();
 
         return view('livewire.admin.view-payments', [
             'payments' => $payments,
             'totalPayments' => $totalPayments,
             'pendingPayments' => $pendingPayments,
             'todayTotalPayments' => $todayTotalPayments,
-            'todayPendingPayments' => $todayPendingPayments
+            'todayPendingPayments' => $todayPendingPayments,
+            'totalPayCount' => $totalPayCount,
+            'todayPayCount' => $todayPayCount
         ]);
     }
 }

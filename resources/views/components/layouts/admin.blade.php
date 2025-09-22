@@ -613,6 +613,27 @@
 
             adjustSidebarHeight();
         });
+
+        // SweetAlert listener for Livewire events
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('swal', (...args) => {
+                // Livewire v3 passes dispatched payload as first arg; sometimes as array
+                const payload = args && args.length ? args[0] : {};
+                const data = Array.isArray(payload) ? payload[0] : payload;
+                const { icon, title, text } = data || {};
+                if (typeof Swal !== 'undefined' && icon && title) {
+                    Swal.fire({
+                        icon: icon,
+                        title: title,
+                        text: text || '',
+                        confirmButtonColor: '#d34d51ff'
+                    });
+                } else if (title) {
+                    alert((icon ? '[' + icon + '] ' : '') + title + (text ? ': ' + text : ''));
+                }
+            });
+        });
+        
     </script>
 
 

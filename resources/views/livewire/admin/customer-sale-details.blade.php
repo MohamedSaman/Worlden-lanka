@@ -54,7 +54,7 @@
                             <th class="text-center ps-4 py-3">ID</th>
                             <th class="text-center py-3">Customer Name</th>
                             <th class="text-center py-3">Total Sales</th>
-                            <th class="text-center py-3">Current Due Paid</th>
+                            <th class="text-center py-3">Current Paid Amount</th>
                             <th class="text-center py-3">Current Due</th>
                             <th class="text-center py-3">Back-Forward Due</th>
                             <th class="text-center py-3">Total Due Amount</th>

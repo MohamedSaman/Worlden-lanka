@@ -23,7 +23,7 @@
                                                 <i class="bi bi-wallet2 text-danger"></i>
                                             </div>
                                             <div>
-                                                <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Total Payments</p>
+                                                <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Total Pay Amount</p>
                                                 <div class="d-flex align-items-baseline mt-1">
                                                     <h4 class="mb-0 fw-bold text-gray-800">Rs.{{ number_format($totalPayments, 2) }}</h4>
                                                 </div>
@@ -37,19 +37,18 @@
                                     <div class="card-body p-4">
                                         <div class="d-flex align-items-center">
                                             <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
-                                                <i class="bi bi-hourglass-split text-danger"></i>
+                                                <i class="bi bi-receipt-cutoff text-danger"></i>
                                             </div>
                                             <div>
-                                                <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Pending Payments</p>
+                                                <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Total Pay Count</p>
                                                 <div class="d-flex align-items-baseline mt-1">
-                                                    <h4 class="mb-0 fw-bold text-gray-800">Rs.{{ number_format($pendingPayments, 2) }}</h4>
+                                                    <h4 class="mb-0 fw-bold text-gray-800">{{ number_format($totalPayCount) }}</h4>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                             <div class="col-xl-3 col-md-6">
                                 <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
                                     <div class="card-body p-4">
@@ -58,16 +57,15 @@
                                                 <i class="bi bi-hourglass-split text-danger"></i>
                                             </div>
                                             <div>
-                                                <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Today Total Payments</p>
+                                                <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Today Pay Amount</p>
                                                 <div class="d-flex align-items-baseline mt-1">
-                                                    <h4 class="mb-0 fw-bold text-gray-800">Rs.{{number_format($todayTotalPayments, 2)}}</h4>
+                                                    <h4 class="mb-0 fw-bold text-gray-800">Rs.{{ number_format($todayTotalPayments, 2) }}</h4>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                             <div class="col-xl-3 col-md-6">
                                 <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
                                     <div class="card-body p-4">
@@ -76,16 +74,15 @@
                                                 <i class="bi bi-hourglass-split text-danger"></i>
                                             </div>
                                             <div>
-                                                <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Today Pending Payments</p>
+                                                <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Today Pay Count</p>
                                                 <div class="d-flex align-items-baseline mt-1">
-                                                    <h4 class="mb-0 fw-bold text-gray-800">Rs.{{number_format($todayPendingPayments, 2)}}</h4>
+                                                    <h4 class="mb-0 fw-bold text-gray-800">{{ number_format($todayPayCount) }}</h4>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -96,12 +93,12 @@
             <div class="card-header p-4" style="background-color: #eff6ff;">
                 <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                     <div class="flex-grow-1 d-flex justify-content-lg">
-                        <div class="input-group " style="max-width: 600px;">
+                        <div class="input-group" style="max-width: 600px;">
                             <span class="input-group-text bg-gray-100 border-0 px-3">
                                 <i class="bi bi-search text-danger"></i>
                             </span>
                             <input type="text"
-                                class="form-control "
+                                class="form-control"
                                 placeholder="Search customers..."
                                 wire:model.live.debounce.300ms="search"
                                 autocomplete="off">
@@ -109,10 +106,12 @@
                     </div>
                     <div class="d-flex align-items-center gap-2">
                         <div class="dropdown">
-                            <button class="btn btn-danger rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105 "
+                            <button class="btn btn-danger rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
                                 type="button" id="filterDropdown" data-bs-toggle="dropdown"
                                 aria-expanded="false"
-                                style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
+                                style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;"
+                                onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';"
+                                onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
                                 <i class="bi bi-funnel me-1"></i> Filters
                                 @if ($filters['status'] || $filters['paymentMethod'] || $filters['dateFrom'] || $filters['dateTo'] || $filters['dateRange'])
                                 <span class="badge bg-primary ms-1 rounded-full" style="background-color: #9d1c20; color: #ffffff;">!</span>
@@ -191,34 +190,34 @@
                         </thead>
                         <tbody>
                             @forelse ($payments as $payment)
-                            <tr>
+                            <tr wire:key="payment-{{ $payment->id }}">
                                 <td class="fw-bold ps-4">{{ $payment->sale->customer->name ?? 'Walk-in Customer' }}</td>
                                 <td class="text-center fw-bold">Rs.{{ number_format($payment->amount, 2) }}</td>
                                 <td class="text-center">
-                                    @php $method =$payment->due_payment_method ?? $payment->payment_method; @endphp
+                                    @php $method = $payment->due_payment_method ?? $payment->payment_method; @endphp
                                     <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary px-3 py-2">
                                         {{ ucfirst(str_replace('_', ' ', $method)) }}
                                     </span>
                                 </td>
                                 <td class="text-center">
                                     @php
-                                        if ($payment->status =='Paid') {
+                                        if ($payment->status == 'Paid' || $payment->status == 'paid') {
                                             $displayStatus = 'Paid';
                                             $statusClass = 'success';
                                         } elseif ($payment->status == 'forward') {
                                             $displayStatus = 'Forward';
                                             $statusClass = 'warning';
                                         } else {
-                                            $displayStatus = 'current';
+                                            $displayStatus = 'Current';
                                             $statusClass = 'info';
                                         }
                                     @endphp
-                                    <span class="badge rounded-pill bg-{{$statusClass}} bg-opacity-10 text-{{$statusClass}} px-3 py-2">
+                                    <span class="badge rounded-pill bg-{{ $statusClass }} bg-opacity-10 text-{{ $statusClass }} px-3 py-2">
                                         {{ $displayStatus }}
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm rounded-pill px-3" style="background-color:#9d1c20 ; color:white;" wire:click="viewPaymentDetails({{ $payment->id }})">
+                                    <button class="btn btn-sm rounded-pill px-3" style="background-color:#9d1c20; color:white;" wire:click="viewPaymentDetails({{ $payment->id }})" wire:loading.attr="disabled">
                                         <i class="bi bi-receipt-cutoff"></i> View
                                     </button>
                                 </td>
@@ -238,7 +237,7 @@
         </div>
     </div>
 
-    <div wire:ignore.self class="modal fade" id="payment-receipt-modal" tabindex="-1" aria-labelledby="payment-receipt-modal-label" aria-hidden="true">
+    <div wire:ignore.self class="modal fade" id="payment-receipt-modal" tabindex="-1" aria-labelledby="payment-receipt-modal-label" aria-hidden="true" wire:key="payment-receipt-{{ $selectedPayment ? $selectedPayment->id : 'none' }}">
         <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
             <div class="modal-content border-0 shadow-lg rounded-4">
                 <div class="modal-header text-white p-4" style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%);">
@@ -249,7 +248,7 @@
                         <button type="button" class="btn btn-sm btn-light me-2 rounded-full" onclick="printReceiptContent()">
                             <i class="bi bi-printer me-1"></i>Print
                         </button>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" wire:click="$set('selectedPayment', null)"></button>
                     </div>
                 </div>
                 <div class="modal-body p-4" id="receiptContent">
@@ -267,12 +266,14 @@
                                 <h6 class="text-muted mb-2" style="font-size: 1rem;">CUSTOMER INFORMATION</h6>
                                 <div class="card border-0 shadow-sm">
                                     <div class="card-body p-3">
+                                        @if($selectedPayment->sale && $selectedPayment->sale->customer)
                                         <h6 class="mb-1" style="font-size: 1rem;">{{ $selectedPayment->sale->customer->name ?? 'Guest Customer' }}</h6>
-                                        @if($selectedPayment->sale->customer)
-                                        <p class="mb-1 small" style="font-size: 0.9rem;"><i class="bi bi-telephone me-2"></i>{{ $selectedPayment->sale->customer->phone }}</p>
+                                        <p class="mb-1 small" style="font-size: 0.9rem;"><i class="bi bi-telephone me-2"></i>{{ $selectedPayment->sale->customer->phone ?? 'N/A' }}</p>
                                         @if($selectedPayment->sale->customer->address)
                                         <p class="mb-0 small" style="font-size: 0.9rem;"><i class="bi bi-geo-alt me-2"></i>{{ $selectedPayment->sale->customer->address }}</p>
                                         @endif
+                                        @else
+                                        <p class="mb-0 text-muted" style="font-size: 0.9rem;">No customer information available.</p>
                                         @endif
                                     </div>
                                 </div>
@@ -282,9 +283,11 @@
                                 <h6 class="text-muted mb-2" style="font-size: 1rem;">STAFF INFORMATION</h6>
                                 <div class="card border-0 shadow-sm">
                                     <div class="card-body p-3">
+                                        @if($selectedPayment->sale && $selectedPayment->sale->user)
                                         <h6 class="mb-0" style="font-size: 1rem;">{{ $selectedPayment->sale->user->name ?? 'Unknown' }}</h6>
-                                        @if($selectedPayment->sale->user)
-                                        <p class="mb-1 small" style="font-size: 0.9rem;"><i class="bi bi-envelope me-2"></i>{{ $selectedPayment->sale->user->email }}</p>
+                                        <p class="mb-1 small" style="font-size: 0.9rem;"><i class="bi bi-envelope me-2"></i>{{ $selectedPayment->sale->user->email ?? 'N/A' }}</p>
+                                        @else
+                                        <p class="mb-0 text-muted" style="font-size: 0.9rem;">No staff information available.</p>
                                         @endif
                                     </div>
                                 </div>
@@ -293,6 +296,7 @@
 
                         <h6 class="text-muted mb-2" style="font-size: 1rem;">PURCHASED ITEMS</h6>
                         <div class="table-responsive mb-4">
+                            @if($selectedPayment && $selectedPayment->sale && $selectedPayment->sale->items && $selectedPayment->sale->items->count() > 0)
                             <table class="table table-bordered table-sm">
                                 <thead class="table-light">
                                     <tr>
@@ -309,16 +313,31 @@
                                     @foreach ($selectedPayment->sale->items as $index => $item)
                                     <tr>
                                         <td style="font-size: 0.85rem;">{{ $index + 1 }}</td>
-                                        <td style="font-size: 0.85rem;">{{ $item->product->product_name }}</td>
-                                        <td style="font-size: 0.85rem;">{{ $item->product->product_code }}</td>
-                                        <td style="font-size: 0.85rem;">Rs.{{ number_format($item->price, 2) }}</td>
-                                        <td style="font-size: 0.85rem;">{{ $item->quantity }}</td>
-                                        <td style="font-size: 0.85rem;">{{ ucfirst($item->quantity_type) }}</td>
-                                        <td style="font-size: 0.85rem;">Rs.{{ number_format($item->price * $item->quantity, 2) }}</td>
+                                        <td style="font-size: 0.85rem;">{{ $item->product->product_name ?? 'N/A' }}</td>
+                                        <td style="font-size: 0.85rem;">{{ $item->product->product_code ?? 'N/A' }}</td>
+                                        <td style="font-size: 0.85rem;">Rs.{{ number_format($item->price ?? 0, 2) }}</td>
+                                        <td style="font-size: 0.85rem;">{{ $item->quantity ?? 0 }}</td>
+                                        <td style="font-size: 0.85rem;">{{ ucfirst($item->quantity_type ?? 'N/A') }}</td>
+                                        <td style="font-size: 0.85rem;">Rs.{{ number_format($item->total ?? 0, 2) }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
                             </table>
+                            @else
+                            <div class="text-center py-3 text-muted">
+                                <p>
+                                    @if(!$selectedPayment)
+                                        No payment selected.
+                                    @elseif(!$selectedPayment->sale)
+                                        No sale associated with this payment.
+                                    @elseif(!$selectedPayment->sale->items || $selectedPayment->sale->items->count() == 0)
+                                        No items found for this sale.
+                                    @else
+                                        No items found for this payment.
+                                    @endif
+                                </p>
+                            </div>
+                            @endif
                         </div>
 
                         <div class="row">
@@ -328,16 +347,16 @@
                                     <div class="card-body p-3">
                                         <p class="mb-1" style="font-size: 0.9rem;"><strong>Payment ID:</strong> #{{ $selectedPayment->id }}</p>
                                         <p class="mb-1" style="font-size: 0.9rem;"><strong>Amount:</strong> Rs.{{ number_format($selectedPayment->amount, 2) }}</p>
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Method:</strong> {{ ucfirst($selectedPayment->payment_method) }}</p>
+                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Method:</strong> {{ ucfirst(str_replace('_', ' ', $selectedPayment->payment_method ?? 'N/A')) }}</p>
                                         <p class="mb-1" style="font-size: 0.9rem;"><strong>Date:</strong>
                                             {{ $selectedPayment->payment_date ? $selectedPayment->payment_date->format('d/m/Y h:i A') : 'N/A' }}
                                         </p>
                                         <p class="mb-1" style="font-size: 0.9rem;"><strong>Status:</strong>
                                             <span class="badge bg-{{ 
-                                        $selectedPayment->status === 'pending' ? 'warning' : 
-                                        ($selectedPayment->status === 'approved' ? 'success' : 
-                                        ($selectedPayment->status === 'rejected' ? 'danger' : 
-                                        ($selectedPayment->is_completed ? 'success' : 'secondary'))) }}">
+                                                $selectedPayment->status === 'pending' ? 'warning' : 
+                                                ($selectedPayment->status === 'approved' ? 'success' : 
+                                                ($selectedPayment->status === 'rejected' ? 'danger' : 
+                                                ($selectedPayment->is_completed ? 'success' : 'secondary'))) }}">
                                                 {{ $selectedPayment->status ? ucfirst($selectedPayment->status) : ($selectedPayment->is_completed ? 'Paid' : 'Scheduled') }}
                                             </span>
                                         </p>
@@ -349,14 +368,18 @@
                                 <h6 class="text-muted mb-2" style="font-size: 1rem;">INVOICE INFORMATION</h6>
                                 <div class="card border-0 shadow-sm mb-3">
                                     <div class="card-body p-3">
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Invoice:</strong> {{ $selectedPayment->sale->invoice_number }}</p>
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Sale Date:</strong> {{ $selectedPayment->sale->created_at->format('d/m/Y h:i A') }}</p>
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Total:</strong> Rs.{{ number_format($selectedPayment->sale->total_amount, 2) }}</p>
+                                        @if($selectedPayment->sale)
+                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Invoice:</strong> {{ $selectedPayment->sale->invoice_number ?? 'N/A' }}</p>
+                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Sale Date:</strong> {{ $selectedPayment->sale->created_at ? $selectedPayment->sale->created_at->format('d/m/Y h:i A') : 'N/A' }}</p>
+                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Total:</strong> Rs.{{ number_format($selectedPayment->sale->total_amount ?? 0, 2) }}</p>
                                         <p class="mb-0" style="font-size: 0.9rem;"><strong>Payment Status:</strong>
                                             <span class="badge bg-{{ $selectedPayment->sale->payment_status == 'paid' ? 'success' : ($selectedPayment->sale->payment_status == 'partial' ? 'warning' : 'danger') }}">
-                                                {{ ucfirst($selectedPayment->sale->payment_status) }}
+                                                {{ $selectedPayment->sale->payment_status ? ucfirst($selectedPayment->sale->payment_status) : 'Unknown' }}
                                             </span>
                                         </p>
+                                        @else
+                                        <p class="mb-1 text-muted" style="font-size: 0.9rem;">No invoice details available for this payment.</p>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -380,7 +403,8 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+
+    <div wire:ignore.self class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-xl">
             <div class="modal-content rounded-4 shadow-lg">
                 <div class="modal-header text-white p-4" style="background: linear-gradient(90deg, #9d1c20 0%, #9d1c20 100%);">
@@ -405,7 +429,6 @@
         </div>
     </div>
 
-
     @push('styles')
     <style>
         body {
@@ -413,23 +436,18 @@
             font-size: 15px;
             color: #1f2937;
         }
-
         .tracking-tight {
             letter-spacing: -0.025em;
         }
-
         .transition-all {
             transition: all 0.3s ease;
         }
-
         .transition-transform {
             transition: transform 0.2s ease;
         }
-
         .hover\:scale-105:hover {
             transform: scale(1.05);
         }
-
         .icon-shape {
             width: 2rem;
             height: 2rem;
@@ -437,64 +455,51 @@
             align-items: center;
             justify-content: center;
         }
-
         .icon-shape.icon-lg {
             width: 3rem;
             height: 3rem;
         }
-
         .icon-shape.icon-md {
             width: 2.5rem;
             height: 2.5rem;
         }
-
         .table {
             border-collapse: separate;
             border-spacing: 0;
         }
-
         .table th,
         .table td {
             border: 1px solid #e5e7eb;
             vertical-align: middle;
         }
-
         .table tbody tr:nth-child(even) {
             background-color: #f9fafb;
         }
-
         .table tbody tr:hover {
             background-color: #f1f5f9;
         }
-
         .rounded-full {
             border-radius: 9999px;
         }
-
         .rounded-4 {
             border-radius: 1rem;
         }
-
         .shadow-lg {
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
-
         .shadow-sm {
             box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
         }
-
         .btn-light {
             background-color: #ffffff;
             border-color: #ffffff;
             color: #1e3a8a;
         }
-
         .btn-light:hover {
             background-color: #f1f5f9;
             border-color: #f1f5f9;
             color: #9d1c20;
         }
-
         .form-control:focus,
         .form-select:focus {
             border-color: #1e40af;
@@ -516,30 +521,34 @@
 
             iframeDoc.open();
             iframeDoc.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>Print Payment Receipt</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; font-size: 14px; }
-                    .receipt-container { max-width: 800px; margin: auto; }
-                    .row { display: flex; flex-wrap: wrap; margin: 0 -15px; }
-                    .col-md-6 { flex: 0 0 45%; max-width: 45%; padding: 0 15px; }
-                    .card { border: 1px solid #eee; border-radius: 8px; margin-bottom: 15px; }
-                    .card-body { padding: 15px; }
-                    .table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
-                    .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    .table thead th { background-color: #f5f5f5; }
-                    .text-center { text-align: center; } .border-top { border-top: 1px solid #dee2e6 !important; }
-                    .pt-3 { padding-top: 1rem !important; } .mt-4 { margin-top: 1.5rem !important; }
-                    .mb-4 { margin-bottom: 1.5rem !important; } .mb-0 { margin-bottom: 0 !important; }
-                    .mb-1 { margin-bottom: 0.25rem !important; } .mb-2 { margin-bottom: 0.5rem !important; }
-                    h3,h4,h6,p,strong { margin:0; padding:0; }
-                </style>
-            </head>
-            <body>${printContent.innerHTML}</body>
-            </html>
-        `);
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Print Payment Receipt</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 20px; font-size: 14px; }
+                        .receipt-container { max-width: 800px; margin: auto; }
+                        .row { display: flex; flex-wrap: wrap; margin: 0 -15px; }
+                        .col-md-6 { flex: 0 0 45%; max-width: 45%; padding: 0 15px; }
+                        .card { border: 1px solid #eee; border-radius: 8px; margin-bottom: 15px; }
+                        .card-body { padding: 15px; }
+                        .table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+                        .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                        .table thead th { background-color: #f5f5f5; }
+                        .text-center { text-align: center; }
+                        .border-top { border-top: 1px solid #dee2e6 !important; }
+                        .pt-3 { padding-top: 1rem !important; }
+                        .mt-4 { margin-top: 1.5rem !important; }
+                        .mb-4 { margin-bottom: 1.5rem !important; }
+                        .mb-0 { margin-bottom: 0 !important; }
+                        .mb-1 { margin-bottom: 0.25rem !important; }
+                        .mb-2 { margin-bottom: 0.5rem !important; }
+                        h3,h4,h6,p,strong { margin:0; padding:0; }
+                    </style>
+                </head>
+                <body>${printContent.innerHTML}</body>
+                </html>
+            `);
             iframeDoc.close();
 
             iframe.onload = function() {
@@ -568,9 +577,17 @@
             Livewire.on('openModal', (modalId) => {
                 const modalElement = document.getElementById(modalId);
                 if (modalElement) {
+                    // Clear modal content before showing
+                    modalElement.querySelector('.modal-body').innerHTML = '';
                     const modal = new bootstrap.Modal(modalElement);
                     modal.show();
                 }
+            });
+
+            Livewire.on('showToast', (event) => {
+                // Implement toast notification (e.g., using Toastr)
+                console.log('Toast:', event.type, event.message);
+                // Example: alert(event.message); // Replace with actual toast implementation
             });
         });
     </script>
