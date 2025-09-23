@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('applied_to')->nullable()->index()->after('status');
         });
     }
+    
 
     /**
      * Reverse the migrations.
