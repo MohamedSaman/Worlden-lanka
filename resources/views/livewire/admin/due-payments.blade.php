@@ -173,7 +173,7 @@
                                 <tr>
                                     <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Customer</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Current Due</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Brought-Forward Due</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Back-Forward Due</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Total Due</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Actions</th>
                                 </tr>
@@ -292,7 +292,7 @@
                                     <span class="fw-bold" style="font-size: 1.5rem; color: #9d1c20;">Rs.{{ number_format($currentDueAmount, 2) }}</span>
                                 </div>
                                 <div class="mt-2">
-                                    <span class="text-sm text-gray-600">Brought-Forward:</span>
+                                    <span class="text-sm text-gray-600">Back-Forward:</span>
                                     <span class="fw-bold" style="font-size: 1.5rem; color: #9d1c20;">Rs.{{ number_format($backForwardAmount, 2) }}</span>
                                 </div>
                             </div>
@@ -326,7 +326,7 @@
                                             @if($backForwardAmount > 0)
                                             <div class="form-check">
                                                 <input type="radio" class="form-check-input" name="applyTarget" id="applyToBackForward" value="back_forward" wire:model="applyTarget">
-                                                <label class="form-check-label" for="applyToBackForward">Brought-Forward (Rs.{{ number_format($backForwardAmount, 2) }})</label>
+                                                <label class="form-check-label" for="applyToBackForward">Back-Forward (Rs.{{ number_format($backForwardAmount, 2) }})</label>
                                             </div>
                                             @endif
                                             @if($currentDueAmount <= 0 && $backForwardAmount <= 0)

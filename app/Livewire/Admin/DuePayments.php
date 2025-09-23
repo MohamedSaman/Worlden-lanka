@@ -216,7 +216,7 @@ class DuePayments extends Component
 
         // Ensure exactly one target is selected (using applyTarget)
         if (!in_array($this->applyTarget, ['current', 'back_forward'], true)) {
-            $this->js("Swal.fire('Error', 'Please select exactly one target: Current Due or Back-Forward.', 'error')");
+            $this->js("Swal.fire('Error', 'Please select exactly one target: Current Due or Brought-Forward.', 'error')");
             return;
         }
 
@@ -266,14 +266,14 @@ class DuePayments extends Component
 
             // Get a valid sale_id - prioritize customer accounts with sales
             $saleId = null;
-            
+
             // First try to get sale_id from customer accounts with dues
             $customerAccountWithSale = CustomerAccount::where('customer_id', $this->paymentId)
                 ->where('total_due', '>', 0)
                 ->whereNotNull('sale_id')
                 ->latest()
                 ->first();
-                
+
             if ($customerAccountWithSale && $customerAccountWithSale->sale_id) {
                 $saleId = $customerAccountWithSale->sale_id;
             } else {
@@ -281,20 +281,14 @@ class DuePayments extends Component
                 $recentSale = Sale::where('customer_id', $this->paymentId)
                     ->latest()
                     ->first();
-                    
+
                 if ($recentSale) {
                     $saleId = $recentSale->id;
                 }
+                // If no sale found, saleId remains null - this is allowed
             }
 
-            // Only create payment record if we have a valid sale_id
-            if (!$saleId) {
-                DB::rollBack();
-                $this->js("Swal.fire('Error', 'No valid sale found for this customer. Cannot process payment.', 'error')");
-                return;
-            }
-
-            // Create Payment record
+            // Create Payment record (sale_id can be null)
             $paymentStatus = $isCurrent ? 'current' : 'forward';
             $payment = Payment::create([
                 'sale_id' => $saleId,
@@ -313,6 +307,32 @@ class DuePayments extends Component
                 ->where('total_due', '>', 0)
                 ->orderBy('created_at')
                 ->get();
+
+            // If no due accounts exist but there's a back forward amount, create one
+            if ($customerAccounts->isEmpty() && $this->backForwardAmount > 0) {
+                $customerAccount = CustomerAccount::create([
+                    'customer_id' => $this->paymentId,
+                    'sale_id' => $saleId, // Can be null
+                    'current_due_amount' => 0,
+                    'back_forward_amount' => $this->backForwardAmount,
+                    'total_due' => $this->backForwardAmount,
+                    'paid_due' => 0,
+                ]);
+                $customerAccounts = collect([$customerAccount]);
+            }
+
+            // If still no accounts and no back forward amount, create a general account
+            if ($customerAccounts->isEmpty()) {
+                $customerAccount = CustomerAccount::create([
+                    'customer_id' => $this->paymentId,
+                    'sale_id' => $saleId, // Can be null
+                    'current_due_amount' => $this->currentDueAmount,
+                    'back_forward_amount' => $this->backForwardAmount,
+                    'total_due' => $this->currentDueAmount + $this->backForwardAmount,
+                    'paid_due' => 0,
+                ]);
+                $customerAccounts = collect([$customerAccount]);
+            }
 
             $remainingPayment = $totalPaid;
 
