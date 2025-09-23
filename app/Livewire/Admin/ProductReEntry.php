@@ -19,7 +19,7 @@ class ProductReEntry extends Component
 {
     use WithPagination;
     protected $paginationTheme = 'bootstrap';
-    
+
     // Left panel searches
     public $searchCustomer = '';
     public $searchInvoice = '';
@@ -54,7 +54,7 @@ class ProductReEntry extends Component
         $this->productResults = ProductDetail::with('category')
             ->where(function ($q) use ($term) {
                 $q->where('product_name', 'like', "%{$term}%")
-                  ->orWhere('product_code', 'like', "%{$term}%");
+                    ->orWhere('product_code', 'like', "%{$term}%");
             })
             ->orderBy('product_name')
             ->limit(20)
@@ -72,9 +72,9 @@ class ProductReEntry extends Component
         $this->customerResults = Customer::query()
             ->where(function ($q) use ($term) {
                 $q->where('name', 'like', "%{$term}%")
-                  ->orWhere('phone', 'like', "%{$term}%")
-                  ->orWhere('email', 'like', "%{$term}%")
-                  ->orWhere('business_name', 'like', "%{$term}%");
+                    ->orWhere('phone', 'like', "%{$term}%")
+                    ->orWhere('email', 'like', "%{$term}%")
+                    ->orWhere('business_name', 'like', "%{$term}%");
             })
             ->orderBy('name')
             ->limit(20)
@@ -235,26 +235,9 @@ class ProductReEntry extends Component
                     if ($this->selectedInvoiceId) {
                         $sale = Sale::find($this->selectedInvoiceId);
                         if ($sale) {
-                            // Adjust SalesItem quantities for this sale and product
-                            $remainingUnitsToRevert = $totalReturnUnits;
-                            $items = SalesItem::where('sale_id', $sale->id)
-                                ->where('product_id', $this->selectedProduct->id)
-                                ->orderBy('id', 'asc')
-                                ->get();
-                            foreach ($items as $item) {
-                                if ($remainingUnitsToRevert <= 0) break;
-                                $reduce = min($remainingUnitsToRevert, (int)$item->quantity);
-                                $item->quantity = max(0, (int)$item->quantity - $reduce);
-                                // Recalculate total based on new quantity
-                                $newTotal = ($item->price ?? 0) * $item->quantity;
-                                $item->total = max(0, $newTotal);
-                                $item->save();
-                                if ((int)$item->quantity === 0) {
-                                    // optionally delete empty rows
-                                    // $item->delete();
-                                }
-                                $remainingUnitsToRevert -= $reduce;
-                            }
+                            // Helper function to recalculate sale total
+                            $this->recalculateSaleTotal($sale->id);
+
                             // Reduce sale total by the full return value (re-entry + damage)
                             $sale->total_amount = max(0, floatval($sale->total_amount) - $returnValue);
                             $sale->save();
@@ -320,29 +303,32 @@ class ProductReEntry extends Component
                             if ($acc->sale_id) {
                                 $sale = Sale::find($acc->sale_id);
                                 if ($sale) {
-                                    // Adjust SalesItem quantities for this sale and product
+                                    // FIXED: Update quantities for this product in the sale
                                     $remainingUnitsToRevert = $totalReturnUnits;
                                     $items = SalesItem::where('sale_id', $sale->id)
                                         ->where('product_id', $this->selectedProduct->id)
                                         ->orderBy('id', 'asc')
+                                        ->lockForUpdate()
                                         ->get();
+
                                     foreach ($items as $item) {
                                         if ($remainingUnitsToRevert <= 0) break;
                                         $reduce = min($remainingUnitsToRevert, (int)$item->quantity);
                                         $item->quantity = max(0, (int)$item->quantity - $reduce);
-                                        // Recalculate total based on new quantity
-                                        $newTotal = ($item->price ?? 0) * $item->quantity;
-                                        $item->total = max(0, $newTotal);
+                                        // FIXED: Don't update 'total' column - just save quantity
                                         $item->save();
+
                                         if ((int)$item->quantity === 0) {
-                                            // optionally delete empty rows
+                                            // Optionally delete empty rows
                                             // $item->delete();
                                         }
                                         $remainingUnitsToRevert -= $reduce;
                                     }
+
+                                    // Recalculate the sale total from all items
+                                    $this->recalculateSaleTotal($sale->id);
+
                                     $sale->due_amount = $acc->total_due;
-                                    // Reduce sale total by full return value (re-entry + damage)
-                                    $sale->total_amount = max(0, floatval($sale->total_amount) - $returnValue);
                                     $sale->save();
 
                                     // Reduce payments by full return value
@@ -433,8 +419,8 @@ class ProductReEntry extends Component
                                 }
                             }
                         }
+                        // Note: No creation of advance/negative back_forward; leftover credit is ignored per requirement
                     }
-                    // Note: No creation of advance/negative back_forward; leftover credit is ignored per requirement
                 }
             }
 
@@ -460,6 +446,20 @@ class ProductReEntry extends Component
                 'text' => 'Failed to process re-entry: ' . $e->getMessage()
             ]);
         }
+    }
+
+    // Add this helper method to the class
+    private function recalculateSaleTotal($saleId)
+    {
+        $sale = Sale::find($saleId);
+        if (!$sale) return;
+
+        // Calculate total from all sales items
+        $itemsTotal = SalesItem::where('sale_id', $saleId)->sum(DB::raw('price * quantity'));
+
+        // Update sale total
+        $sale->total_amount = max(0, floatval($itemsTotal));
+        $sale->save();
     }
 
     public function render()
