@@ -3,51 +3,50 @@
 
         <!-- header  -->
 
-        <div class="card-header text-white p-2  d-flex align-items-center"
+        <div class="card-header text-white p-3 d-flex flex-column flex-md-row align-items-start align-items-md-center"
             style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%); border-radius: 20px 20px 0 0;">
-            <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
-                <i class="bi bi-people fs-4 text-white" aria-hidden="true"></i>
+            <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-2 d-flex align-items-center justify-content-center me-md-3 mb-2 mb-md-0">
+                <i class="bi bi-people fs-5 fs-md-4 text-white" aria-hidden="true"></i>
             </div>
-            <div>
-                <h3 class="mb-1 fw-bold tracking-tight text-white">Customer Management</h3>
+            <div class="text-center text-md-start">
+                <h3 class="mb-1 fw-bold tracking-tight text-white fs-5 fs-md-4">Customer Management</h3>
                 <p class="text-white opacity-80 mb-0 text-sm">Monitor and manage your Customer Details</p>
             </div>
         </div>
-        <div class="card-header bg-transparent pb-4 mt-2 d-flex flex-column flex-lg-row justify-space-between align-items-lg-center gap-3">
-
-
-            <!-- Middle: Search Bar -->
-            <div class="flex-grow-1 d-flex justify-content-lg">
-                <div class="input-group " style="max-width: 600px;">
+        <div class="card-header bg-transparent pb-4 mt-2 d-flex flex-column gap-3">
+            <!-- Search Bar -->
+            <div class="w-100 d-flex justify-content-center justify-content-lg-start">
+                <div class="input-group" style="max-width: 600px;">
                     <span class="input-group-text bg-gray-100 border-0 px-3">
                         <i class="bi bi-search text-danger"></i>
                     </span>
                     <input type="text"
-                        class="form-control "
+                        class="form-control"
                         placeholder="Search customers..."
                         wire:model.live.debounce.300ms="search"
                         autocomplete="off">
                 </div>
             </div>
 
-            <!-- Right: Buttons -->
-            <div class="d-flex gap-2 flex-shrink-0 justify-content-lg-end">
-
-                <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105 btn-create"
+            <!-- Buttons -->
+            <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center justify-content-lg-end">
+                <button class="btn btn-light rounded-pill shadow-sm px-3 py-2 transition-transform hover:scale-105 btn-create"
                     wire:click="createCustomer"
-                    style="color: #fff; background-color: #9d1c20; border: 1px solid #9d1c20;">
-                    <i class="bi bi-plus-circle me-2"></i> Create Customer
+                    style="color: #fff; background-color: #9d1c20; border: 1px solid #9d1c20; font-size: 0.875rem;">
+                    <i class="bi bi-plus-circle me-1"></i> 
+                    <span class="d-none d-sm-inline">Create </span>Customer
                 </button>
                 <button wire:click="exportCustomers"
-                    class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                    aria-label="Export stock details to CSV"
-                    style="color: #fff; background-color: #9d1c20; border: 1px solid #9d1c20;">
-                    <i class="bi bi-download me-1" aria-hidden="true"></i> Export CSV
+                    class="btn btn-light rounded-pill shadow-sm px-3 py-2 transition-transform hover:scale-105"
+                    aria-label="Export customers to CSV"
+                    style="color: #fff; background-color: #9d1c20; border: 1px solid #9d1c20; font-size: 0.875rem;">
+                    <i class="bi bi-download me-1" aria-hidden="true"></i> 
+                    <span class="d-none d-sm-inline">Export </span>CSV
                 </button>
                 <button wire:click="importCustomers"
-                    class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                    aria-label="Import stock details from CSV"
-                    style="color: #fff; background-color: #9d1c20; border: 1px solid #9d1c20;">
+                    class="btn btn-light rounded-pill shadow-sm px-3 py-2 transition-transform hover:scale-105"
+                    aria-label="Import customers from CSV"
+                    style="color: #fff; background-color: #9d1c20; border: 1px solid #9d1c20; font-size: 0.875rem;">
                     <i class="bi bi-upload me-1" aria-hidden="true"></i> Import CSV
                 </button>
             </div>

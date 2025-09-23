@@ -2,19 +2,19 @@
     <div class="card border-0">
         <!-- Card Header -->
 
-        <div class="card-header text-white p-2 rounded-t-4 d-flex align-items-center"
+        <div class="card-header text-white p-3 rounded-t-4 d-flex flex-column flex-md-row align-items-start align-items-md-center"
             style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%); border-radius: 20px 20px 0 0;">
-            <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
-                <i class="bi bi-shield-lock text-white fs-4" aria-hidden="true"></i>
+            <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-2 d-flex align-items-center justify-content-center me-md-3 mb-2 mb-md-0">
+                <i class="bi bi-shield-lock text-white fs-5 fs-md-4" aria-hidden="true"></i>
             </div>
-            <div>
-                <h3 class="mb-1 fw-bold tracking-tight text-white">Product Stock Details</h3>
+            <div class="text-center text-md-start">
+                <h3 class="mb-1 fw-bold tracking-tight text-white fs-5 fs-md-4">Product Stock Details</h3>
                 <p class="text-white opacity-80 mb-0 text-sm">Monitor and manage your product inventorys</p>
             </div>
         </div>
-        <div class="card-header bg-transparent pb-4 mt-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 border-bottom" style="border-color: #233D7F;">
-            <!-- Middle: Search Bar -->
-            <div class="flex-grow-1 d-flex justify-content-lg">
+        <div class="card-header bg-transparent pb-4 mt-4 d-flex flex-column justify-content-between gap-3 border-bottom" style="border-color: #233D7F;">
+            <!-- Search Bar -->
+            <div class="w-100 d-flex justify-content-center justify-content-lg-start">
                 <div class="input-group" style="max-width: 400px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
                     <span class="input-group-text bg-gray-100 border-0 px-3">
                         <i class="bi bi-search text-danger"></i>
@@ -27,26 +27,31 @@
                 </div>
             </div>
 
-            <div class="d-flex gap-2">
+            <!-- Action Buttons -->
+            <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center justify-content-lg-end">
                 <button wire:click="exportToCSV"
-                    class="btn text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
+                    class="btn text-white rounded-pill shadow-sm px-3 py-2 transition-transform hover:scale-105"
                     aria-label="Export stock details to CSV"
-                    style="background-color: #9d1c20; border-color: #9d1c20; color: white;transition: all 0.3s ease; transform: scale-(1.05)">
-                    <i class="bi bi-download me-1" aria-hidden="true"></i> Export CSV
+                    style="background-color: #9d1c20; border-color: #9d1c20; font-size: 0.875rem;">
+                    <i class="bi bi-download me-1" aria-hidden="true"></i> 
+                    <span class="d-none d-sm-inline">Export </span>CSV
                 </button>
                 <button id="printButton"
-                    class="btn text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
+                    class="btn text-white rounded-pill shadow-sm px-3 py-2 transition-transform hover:scale-105"
                     aria-label="Print stock details"
-                    style="background-color: #9d1c20; border-color: #9d1c20; color: white;transition: all 0.3s ease;  transform: scale-(1.05)">
+                    style="background-color: #9d1c20; border-color: #9d1c20; font-size: 0.875rem;">
                     <i class="bi bi-printer me-1" aria-hidden="true"></i> Print
                 </button>
                 <button wire:click="toggleShowAll"
-                    class="btn btn-outline-secondary rounded-full shadow-sm px-4 py-2"
-                    aria-label="Toggle show all or paginated">
+                    class="btn btn-outline-secondary rounded-pill shadow-sm px-3 py-2"
+                    aria-label="Toggle show all or paginated"
+                    style="font-size: 0.875rem;">
                     @if($showAll)
-                        <i class="bi bi-list-nested me-1" aria-hidden="true"></i> Show Paginated
+                        <i class="bi bi-list-nested me-1" aria-hidden="true"></i> 
+                        <span class="d-none d-sm-inline">Show </span>Paginated
                     @else
-                        <i class="bi bi-list-task me-1" aria-hidden="true"></i> Show All
+                        <i class="bi bi-list-task me-1" aria-hidden="true"></i> 
+                        <span class="d-none d-sm-inline">Show </span>All
                     @endif
                 </button>
             </div>
@@ -57,19 +62,19 @@
 
             <!-- Stock Table or Empty State -->
 
-            <div class="table-responsive shadow-sm rounded-2 overflow-auto">
-                <table class="table table-sm ">
-                    <thead>
-                        <tr>
-                            <th class="text-center py-3 ps-4">ID</th>
-                            <th class=" text-center py-3">Image</th>
-                            <th class="text-center py-3">Product Name</th>
-                            <th class="text-center py-3">Product Code</th>
-                            <th class="text-center py-3">Category</th>
-                            <th class="text-center py-3">Sold</th>
-                            <th class="text-center py-3">Available</th>
-                            <th class="text-center py-3">Damage</th>
-                            <th class="text-center py-3">Total</th>
+            <div class="table-responsive shadow-sm rounded-2 overflow-auto" style="min-height: 400px;">
+                <table class="table table-sm table-hover">
+                    <thead class="sticky-top">
+                        <tr style="background-color: #f8f9fa;">
+                            <th class="text-center py-3 ps-2 ps-md-4 d-none d-md-table-cell" style="min-width: 60px;">ID</th>
+                            <th class="text-center py-3 d-none d-lg-table-cell" style="min-width: 80px;">Image</th>
+                            <th class="text-center py-3" style="min-width: 150px;">Product</th>
+                            <th class="text-center py-3 d-none d-sm-table-cell" style="min-width: 120px;">Code</th>
+                            <th class="text-center py-3 d-none d-lg-table-cell" style="min-width: 100px;">Category</th>
+                            <th class="text-center py-3 d-none d-md-table-cell" style="min-width: 80px;">Sold</th>
+                            <th class="text-center py-3" style="min-width: 100px;">Stock</th>
+                            <th class="text-center py-3 d-none d-sm-table-cell" style="min-width: 80px;">Damage</th>
+                            <th class="text-center py-3 d-none d-lg-table-cell" style="min-width: 80px;">Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -78,17 +83,17 @@
                         @endphp
                         @forelse($products as $index => $product)
                         <tr class="transition-all hover:bg-gray-50">
-                            <td class="text-sm text-center ps-4 py-3">
+                            <td class="text-sm text-center ps-2 ps-md-4 py-3 d-none d-md-table-cell">
                                 {{ $isPaginated ? ($products->firstItem() + $index) : ($loop->iteration) }}
                             </td>
-                            <td class="text-sm text-center py-3">
+                            <td class="text-sm text-center py-3 d-none d-lg-table-cell">
                                 @if($product->image)
-                                <div class="image-wrapper rounded-lg shadow-sm transition-transform hover:scale-110">
+                                <div class="image-wrapper rounded-lg shadow-sm transition-transform hover:scale-110 mx-auto">
                                     <img src="{{ asset('storage/' . $product->image) }}"
                                         class="rounded-lg"
-                                        style="width: 48px; height: 48px; object-fit: cover;"
+                                        style="width: 40px; height: 40px; object-fit: cover;"
                                         alt="Image of {{ $product->product_name }}"
-                                        onerror="this.onerror=null; this.src=''; this.parentNode.innerHTML='<div style=\'width:48px;height:48px;background-color:#f3f4f6;border-radius:0.5rem;display:flex;align-items:center;justify-content:center;\'><i class=\'bi bi-watch text-gray-600\'></i></div>';">
+                                        onerror="this.onerror=null; this.src=''; this.parentNode.innerHTML='<div style=\'width:40px;height:40px;background-color:#f3f4f6;border-radius:0.5rem;display:flex;align-items:center;justify-content:center;\'><i class=\'bi bi-watch text-gray-600\'></i></div>';">
                                 </div>
                                 @else
                                 <div style="width:30px;height:30px;background-color:#f3f4f6;border-radius:0.5rem;display:flex;align-items:center;justify-content:center; margin:0 auto;">
@@ -96,30 +101,60 @@
                                 </div>
                                 @endif
                             </td>
-                            <td class="text-sm text-center  py-3">{{ $product->product_name }}</td>
-                            <td class="text-sm text-center py-3">{{ $product->product_code }}</td>
-                            <td class="text-sm text-center py-3">{{ $product->category?->name ?? 'N/A' }}</td>
-                            <td class="text-sm text-center py-3">{{ $product->sold }}</td>
+                            <td class="text-sm py-3">
+                                <div class="d-flex align-items-center">
+                                    <!-- Mobile image -->
+                                    <div class="d-lg-none me-2 flex-shrink-0">
+                                        @if($product->image)
+                                        <img src="{{ asset('storage/' . $product->image) }}"
+                                            class="rounded"
+                                            style="width: 32px; height: 32px; object-fit: cover;"
+                                            alt="{{ $product->product_name }}">
+                                        @else
+                                        <div style="width:32px;height:32px;background-color:#f3f4f6;border-radius:0.5rem;display:flex;align-items:center;justify-content:center;">
+                                            <i class="bi bi-box-seam text-gray-600" style="font-size: 0.8rem;"></i>
+                                        </div>
+                                        @endif
+                                    </div>
+                                    <div class="text-start">
+                                        <div class="fw-medium">{{ $product->product_name }}</div>
+                                        <!-- Mobile info -->
+                                        <div class="d-md-none text-muted small">
+                                            Code: {{ $product->product_code }}<br>
+                                            <span class="d-lg-none">{{ $product->category?->name ?? 'N/A' }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-sm text-center py-3 d-none d-sm-table-cell">{{ $product->product_code }}</td>
+                            <td class="text-sm text-center py-3 d-none d-lg-table-cell">{{ $product->category?->name ?? 'N/A' }}</td>
+                            <td class="text-sm text-center py-3 d-none d-md-table-cell">{{ $product->sold }}</td>
                             <td class="text-sm text-center py-3">
                                 <span class="badge"
                                     style="background-color: {{ $product->stock_quantity > 0 ? '#22c55e' : '#ef4444' }};
-                                             color: #ffffff; padding: 6px 12px; border-radius: 9999px; font-weight: 600;">
+                                             color: #ffffff; padding: 4px 8px; border-radius: 12px; font-weight: 600; font-size: 0.75rem;">
                                     {{ $product->stock_quantity }}
                                 </span>
+                                <!-- Mobile additional info -->
+                                <div class="d-md-none mt-1 text-muted small">
+                                    Sold: {{ $product->sold }} | Damage: {{ $product->damage_quantity }}
+                                </div>
                             </td>
-                            <td class="text-sm text-center py-3">{{ $product->damage_quantity }}</td>
-                            <td class="text-sm text-center py-3">
+                            <td class="text-sm text-center py-3 d-none d-sm-table-cell">{{ $product->damage_quantity }}</td>
+                            <td class="text-sm text-center py-3 d-none d-lg-table-cell">
                                 {{ $product->sold + $product->stock_quantity + $product->damage_quantity }}
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td class="text-sm text-center py-3 w-100" colspan="9">
-                                <div style="width:72px;height:72px;background-color:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;margin-bottom:12px;">
-                                    <i class="bi bi-box-seam text-gray-600 fs-3"></i>
+                            <td class="text-sm text-center py-5 w-100" colspan="9">
+                                <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 200px;">
+                                    <div style="width:72px;height:72px;background-color:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+                                        <i class="bi bi-box-seam text-gray-600 fs-3"></i>
+                                    </div>
+                                    <h5 class="text-gray-600 fw-normal mb-2">No Product Stock Found</h5>
+                                    <p class="text-sm text-gray-500 mb-0 text-center px-3">No matching results found for the current search.</p>
                                 </div>
-                                <h5 class="text-gray-600 fw-normal">No Product Stock Found</h5>
-                                <p class="text-sm text-gray-500 mb-0">No matching results found for the current search.</p>
                             </td>
                         </tr>
                         @endforelse
@@ -175,12 +210,83 @@
             height: 4.5rem;
         }
 
-
         .image-wrapper {
             display: inline-block;
             overflow: hidden;
             border: 1px solid #e5e7eb;
             transition: transform 0.2s ease;
+        }
+
+        /* Responsive Table Styles */
+        @media (max-width: 767.98px) {
+            .table-responsive {
+                font-size: 0.875rem;
+            }
+            
+            .card-header {
+                padding: 1rem !important;
+            }
+            
+            .btn {
+                font-size: 0.8rem !important;
+            }
+            
+            .table td {
+                padding: 0.5rem 0.25rem !important;
+                vertical-align: middle;
+            }
+            
+            .table th {
+                padding: 0.75rem 0.25rem !important;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 575.98px) {
+            .container-fluid {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+            
+            .card {
+                margin: 0;
+            }
+            
+            .input-group {
+                max-width: 100% !important;
+            }
+            
+            .table {
+                font-size: 0.8rem;
+            }
+        }
+
+        /* Sticky header for better mobile experience */
+        .table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: #f8f9fa !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Better scrollbar styling */
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
         }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">

@@ -3,11 +3,27 @@
     <style>
         .search-results-container {
             z-index: 1050;
+            border: 1px solid #dee2e6;
+            border-top: none;
         }
 
         .search-result-item:hover {
             background-color: #f8f9fa;
             cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .search-results-container {
+                font-size: 0.875rem;
+            }
+            
+            .search-result-item .product-info h6 {
+                font-size: 0.875rem;
+            }
+            
+            .search-result-item .badge {
+                font-size: 0.75rem;
+            }
         }
 
         input[type="number"].is-invalid {
@@ -73,7 +89,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row mb-4">
-                            <div class="col-md-6 mx-auto">
+                            <div class="col-md-6 mx-auto position-relative">
                                 <div class="input-group">
                                     <span class="input-group-text">
                                         <i class="bi bi-search text-denger"></i>
@@ -84,8 +100,8 @@
                                 </div>
 
                                 @if ($search && count($searchResults) > 0)
-                                <div class="search-results-container position-absolute mt-1 w-50 bg-white shadow-lg rounded"
-                                    style="max-height: 350px; overflow-y: auto; z-index: 1000;">
+                                <div class="search-results-container position-absolute mt-1 w-100 bg-white shadow-lg rounded"
+                                    style="max-height: 350px; overflow-y: auto; z-index: 1000; top: 100%; left: 0;">
                                     @foreach ($searchResults as $result)
                                     @if($result->status== 'Active')
                                     <div class="search-result-item p-2 border-bottom d-flex align-items-center"
@@ -138,7 +154,8 @@
                                 </div>
                                 @elseif($search && count($searchResults) == 0)
                                 <div
-                                    class="search-results-container position-absolute mt-1 w-50 bg-white shadow-lg rounded p-3">
+                                    class="search-results-container position-absolute mt-1 w-100 bg-white shadow-lg rounded p-3"
+                                    style="top: 100%; left: 0; z-index: 1000;">
                                     <div class="text-center text-muted">
                                         <i class="fas fa-search fa-2x mb-2"></i>
                                         <p>No products found matching "{{ $search }}"</p>

@@ -1,19 +1,19 @@
 <div class="container-fluid py-1">
 
     <!-- Header Section -->
-    <div class="card-header text-white p-2  d-flex align-items-center"
+    <div class="card-header text-white p-3 d-flex flex-column flex-md-row align-items-start align-items-md-center"
         style="background: linear-gradient(90deg, #b5171a 0%, #d34d51ff 100%); border-radius: 20px 20px 0 0;">
-        <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
-            <i class="bi bi-box-seam fs-4 text-white" aria-hidden="true"></i>
+        <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-2 d-flex align-items-center justify-content-center me-md-3 mb-2 mb-md-0">
+            <i class="bi bi-box-seam fs-5 fs-md-4 text-white" aria-hidden="true"></i>
         </div>
-        <div>
-            <h3 class="mb-1 fw-bold tracking-tight text-white">Product Details</h3>
+        <div class="text-center text-md-start">
+            <h3 class="mb-1 fw-bold tracking-tight text-white fs-5 fs-md-4">Product Details</h3>
             <p class="text-white opacity-80 mb-0 text-sm">Monitor and manage your Product Details</p>
         </div>
     </div>
-    <div class="card-header bg-transparent pb-4 mt-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 border-bottom" style="border-color: #233D7F;">
-        <!-- Middle: Search Bar -->
-        <div class="flex-grow-1 d-flex justify-content-lg">
+    <div class="card-header bg-transparent pb-4 mt-4 d-flex flex-column justify-content-between gap-3 border-bottom" style="border-color: #233D7F;">
+        <!-- Search Bar -->
+        <div class="w-100 d-flex justify-content-center justify-content-lg-start">
             <div class="input-group" style="max-width: 600px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
                 <span class="input-group-text bg-gray-100 border-0 px-3" >
                     <i class="bi bi-search text-danger" ></i>
@@ -26,28 +26,32 @@
             </div>
         </div>
 
-        <!-- Right: Buttons -->
-        <div class="d-flex gap-2 flex-shrink-0 justify-content-lg-end">
-            <button class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105 btn-create"
+        <!-- Buttons -->
+        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center justify-content-lg-end">
+            <button class="btn btn-light rounded-pill shadow-sm px-3 py-2 transition-transform hover:scale-105 btn-create"
                 wire:click="toggleAddModal"
-                style="color: #fff; background-color: #b5171a; border: 1px solid #b5171a;transition: all 0.3s ease; ">
-                <i class="bi bi-plus-circle me-2"></i> Add Product
+                style="color: #fff; background-color: #b5171a; border: 1px solid #b5171a; font-size: 0.875rem;">
+                <i class="bi bi-plus-circle me-1"></i> 
+                <span class="d-none d-sm-inline">Add </span>Product
             </button>
             <button wire:click="exportToCSV"
-                class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform transition-transform hover:scale-105"
+                class="btn btn-light rounded-pill shadow-sm px-3 py-2 transition-transform hover:scale-105"
                 aria-label="Export stock details to CSV"
-                style="color: #fff; background-color:  #b5171a; border: 1px solid #b5171a; transition: all 0.3s ease; ">
-                <i class="bi bi-download me-1" aria-hidden="true"></i> Export CSV
+                style="color: #fff; background-color: #b5171a; border: 1px solid #b5171a; font-size: 0.875rem;">
+                <i class="bi bi-download me-1" aria-hidden="true"></i> 
+                <span class="d-none d-sm-inline">Export </span>CSV
             </button>
-
         </div>
     </div>
-    <div class="d-flex  align-items-center justify-content-between gap-4">
-        <p class="ms-4">You can create custom field here <i class="bi bi-arrow-right ms-4"></i></p>
+    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 px-3">
+        <p class="mb-2 mb-md-0 text-center text-md-start">
+            You can create custom field here 
+            <i class="bi bi-arrow-right ms-2 d-none d-md-inline"></i>
+        </p>
         <button
-            class="btn btn-primary rounded-full mt-2 px-4 mb-4 fw-medium transition-all hover:shadow "
+            class="btn btn-primary rounded-pill px-3 py-2 fw-medium transition-all hover:shadow align-self-center"
             wire:click="$set('showAddFieldModal', true)"
-            style="background-color:  #b5171a; border: 1px solid #b5171a; color: white;">
+            style="background-color: #b5171a; border: 1px solid #b5171a; color: white; font-size: 0.875rem;">
             <i class="bi bi-plus-circle me-2"></i>Add Field
         </button>
     </div>

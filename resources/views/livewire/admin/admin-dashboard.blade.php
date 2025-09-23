@@ -1,4 +1,4 @@
-<div class="px-3">
+<div class="px-2 px-md-3">
     @push('styles')
     <style>
         /* ===== Base Layout ===== */
@@ -10,6 +10,13 @@
             margin-left: auto;
             overflow-x: hidden;
         }
+        
+        @media (max-width: 575.98px) {
+            .container-fluid {
+                padding-right: 0.5rem;
+                padding-left: 0.5rem;
+            }
+        }
 
         /* ===== Tabs ===== */
         .content-tabs {
@@ -17,6 +24,21 @@
             margin-bottom: 1.5rem;
             overflow-x: auto;
             white-space: nowrap;
+            scrollbar-width: thin;
+            scrollbar-color: #cbd5e0 transparent;
+        }
+        
+        .content-tabs::-webkit-scrollbar {
+            height: 4px;
+        }
+        
+        .content-tabs::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .content-tabs::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 2px;
         }
 
         .content-tab {
@@ -28,6 +50,8 @@
             font-weight: 500;
             color: #6b7280;
             transition: all 0.3s ease;
+            flex-shrink: 0;
+            display: inline-block;
         }
 
         .content-tab:hover {
@@ -66,11 +90,19 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
             height: 100%;
+            min-height: 120px;
         }
 
         .stat-card:hover {
             transform: translateY(-3px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        @media (max-width: 575.98px) {
+            .stat-card {
+                padding: 1rem;
+                min-height: 100px;
+            }
         }
 
         .stat-label {
@@ -208,14 +240,26 @@
         }
 
         /* ===== Mobile Responsiveness ===== */
-        @media (max-width: 992px) {
-
+        @media (max-width: 991.98px) {
             /* Tabs */
             .content-tabs {
                 display: flex;
                 overflow-x: auto;
                 scrollbar-width: none;
             }
+            
+            .stat-card {
+                margin-bottom: 1rem;
+            }
+            
+            .chart-card {
+                margin-bottom: 1rem;
+            }
+            
+            .widget-container {
+                margin-bottom: 1rem;
+            }
+        }
 
             .content-tabs::-webkit-scrollbar {
                 display: none;
@@ -273,12 +317,32 @@
             }
         }
 
-        @media (max-width: 576px) {
-
+        @media (max-width: 575.98px) {
+            /* Container adjustments */
+            .px-2 {
+                padding-left: 0.5rem !important;
+                padding-right: 0.5rem !important;
+            }
+            
             /* Tabs on extra small */
             .content-tab {
                 font-size: 0.75rem;
-                padding: 0.4rem 0.6rem;
+                padding: 0.4rem 0.8rem;
+                margin-right: 0.25rem;
+            }
+            
+            /* Stat cards */
+            .stat-card {
+                padding: 0.75rem;
+                min-height: 90px;
+            }
+            
+            .stat-label {
+                font-size: 0.8rem;
+            }
+            
+            .stat-value {
+                font-size: 1.1rem;
             }
 
             /* Sales chart select */
@@ -286,6 +350,10 @@
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 0.5rem;
+            }
+            
+            .chart-header h6 {
+                font-size: 0.9rem;
             }
 
             /* Sales items */

@@ -30,11 +30,11 @@
 
         <div class="card-body p-1 pt-5 bg-transparent">
             <div class="table-responsive shadow-sm rounded-2 overflow-auto">
-                <table class="table table-sm">
-                    <thead>
+                <table class="table table-sm align-middle">
+                    <thead class="d-none d-md-table-header-group">
                         <tr>
                             <th class="text-center ps-4 py-3">No</th>
-                            <th class=" py-3">Customer Name</th>
+                            <th class="py-3">Customer Name</th>
                             <th class="text-center py-3">Contact Number</th>
                             <th class="text-center py-3">Total Back-Forward Amount</th>
                             <th class="text-center py-3">Action</th>
@@ -43,14 +43,15 @@
                     <tbody>
                         @if ($customers->count() > 0)
                             @foreach ($customers as $customer)
-                                <tr class="transition-all hover:bg-gray-50">
-                                    <td class="text-sm text-center ps-4 py-3">{{ $loop->iteration }}</td>
-                                    <td class="text-sm py-3">{{ $customer->name ?? '-' }}</td>
-                                    <td class="text-sm text-center py-3">{{ $customer->phone ?? 'N/A' }}</td>
-                                    <td class="text-sm text-center py-3 font-bold {{ $customer->customer_accounts_sum_back_forward_amount >= 0 ? 'text-success' : 'text-danger' }}">
+                                <tr class="transition-all hover:bg-gray-50 d-block d-md-table-row mb-3 mb-md-0" style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                                    <!-- Desktop/Table Layout -->
+                                    <td class="text-sm text-center ps-4 py-3 d-none d-md-table-cell">{{ $loop->iteration }}</td>
+                                    <td class="text-sm py-3 d-none d-md-table-cell">{{ $customer->name ?? '-' }}</td>
+                                    <td class="text-sm text-center py-3 d-none d-md-table-cell">{{ $customer->phone ?? 'N/A' }}</td>
+                                    <td class="text-sm text-center py-3 font-bold d-none d-md-table-cell {{ $customer->customer_accounts_sum_back_forward_amount >= 0 ? 'text-success' : 'text-danger' }}">
                                         {{ number_format($customer->customer_accounts_sum_back_forward_amount ?? 0, 2) }}
                                     </td>
-                                    <td class="text-sm text-center">
+                                    <td class="text-sm text-center d-none d-md-table-cell">
                                         <div class="btn-group btn-group-sm gap-2" role="group">
                                             <button class="btn text-primary bg-outline-primary border border-1 border-primary rounded-pill px-3" wire:click="adjustBackForward({{ $customer->id }})" wire:loading.attr="disabled" title="Add Amount">
                                                 <i class="bi bi-plus" wire:loading.class="d-none" wire:target="adjustBackForward({{ $customer->id }})">Add</i>
@@ -64,6 +65,37 @@
                                                     <i class="spinner-border spinner-border-sm"></i>
                                                 </span>
                                             </button>
+                                        </div>
+                                    </td>
+                                    <!-- Mobile/Card Layout -->
+                                    <td colspan="5" class="d-block d-md-none px-3 py-3">
+                                        <div class="d-flex flex-column gap-2">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span class="fw-bold" style="color:#9d1c20;">{{ $loop->iteration }}. {{ $customer->name ?? '-' }}</span>
+                                                <div class="btn-group btn-group-sm gap-2" role="group">
+                                                    <button class="btn text-primary bg-outline-primary border border-1 border-primary rounded-pill px-3" wire:click="adjustBackForward({{ $customer->id }})" wire:loading.attr="disabled" title="Add Amount">
+                                                        <i class="bi bi-plus" wire:loading.class="d-none" wire:target="adjustBackForward({{ $customer->id }})"></i>
+                                                        <span wire:loading wire:target="adjustBackForward({{ $customer->id }})">
+                                                            <i class="spinner-border spinner-border-sm"></i>
+                                                        </span>
+                                                    </button>
+                                                    <button class="btn text-warning bg-outline-warning border border-1 border-warning rounded-pill px-3" wire:click="editBackForward({{ $customer->id }})" wire:loading.attr="disabled" title="Edit Amount">
+                                                        <i class="bi bi-pencil" wire:loading.class="d-none" wire:target="editBackForward({{ $customer->id }})"></i>
+                                                        <span wire:loading wire:target="editBackForward({{ $customer->id }})">
+                                                            <i class="spinner-border spinner-border-sm"></i>
+                                                        </span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="text-muted small">
+                                                <span><i class="bi bi-telephone me-1"></i>{{ $customer->phone ?? 'N/A' }}</span>
+                                            </div>
+                                            <div>
+                                                <span class="fw-bold {{ $customer->customer_accounts_sum_back_forward_amount >= 0 ? 'text-success' : 'text-danger' }}">
+                                                    {{ number_format($customer->customer_accounts_sum_back_forward_amount ?? 0, 2) }}
+                                                </span>
+                                                <span class="text-muted ms-1">Back-Forward</span>
+                                            </div>
                                         </div>
                                     </td>
                                 </tr>
