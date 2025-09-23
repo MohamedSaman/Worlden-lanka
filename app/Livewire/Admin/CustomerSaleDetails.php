@@ -308,6 +308,76 @@ class CustomerSaleDetails extends Component
             }
 
             fclose($file);
+        };  
+    }
+
+    // For modal CSV export
+    public function exportModalToCSV()
+    {
+        if (!$this->modalData) {
+            return;
+        }
+
+        $customer = $this->modalData['customer'];
+        $salesSummary = $this->modalData['salesSummary'];
+        $paymentSums = $this->modalData['paymentSums'];
+        $invoiceSummaryRows = $this->modalData['invoiceSummaryRows'];
+        $accountTotals = $this->modalData['accountTotals'];
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="customer_sales_summary_' . $customer->id . '_' . date('Y-m-d') . '.csv"',
+        ];
+
+        $callback = function () use ($customer, $salesSummary, $paymentSums, $invoiceSummaryRows, $accountTotals) {
+            $file = fopen('php://output', 'w');
+
+            // Customer Information Header
+            fputcsv($file, ['Customer Information']);
+            fputcsv($file, ['Name', $customer->name]);
+            fputcsv($file, ['Email', $customer->email ?? 'N/A']);
+            fputcsv($file, ['Phone', $customer->phone ?? 'N/A']);
+            fputcsv($file, ['Business Name', $customer->business_name ?? 'N/A']);
+            fputcsv($file, ['Type', ucfirst($customer->type ?? 'N/A')]);
+            fputcsv($file, ['']);
+
+            // Sales Summary Header
+            fputcsv($file, ['Sales Summary']);
+            fputcsv($file, ['Total Sales Amount', 'Rs.' . number_format($salesSummary->total_amount ?? 0, 2)]);
+            fputcsv($file, ['Amount Paid', 'Rs.' . number_format($paymentSums['paid'] ?? 0, 2)]);
+            fputcsv($file, ['Current Paid', 'Rs.' . number_format($paymentSums['current'] ?? 0, 2)]);
+            fputcsv($file, ['Forward Paid', 'Rs.' . number_format($paymentSums['forward'] ?? 0, 2)]);
+            fputcsv($file, ['Total Due Amount', 'Rs.' . number_format($salesSummary->total_due ?? 0, 2)]);
+            fputcsv($file, ['Back-Forward Due', 'Rs.' . number_format($accountTotals['back_forward_due'] ?? 0, 2)]);
+            fputcsv($file, ['Current Due', 'Rs.' . number_format($accountTotals['current_due'] ?? 0, 2)]);
+            fputcsv($file, ['']);
+
+            // Sales Timeline Header
+            fputcsv($file, ['Sales Timeline']);
+            fputcsv($file, ['No', 'Description', 'Date', 'Amount']);
+
+            // Sales Timeline Data
+            foreach ($invoiceSummaryRows as $index => $row) {
+                $date = !empty($row['date']) ? \Carbon\Carbon::parse($row['date'])->format('d M Y') : '—';
+                $amount = ($row['type'] ?? '') === 'paid' ?
+                    '(Rs.' . number_format($row['amount'] ?? 0, 2) . ')' :
+                    'Rs.' . number_format($row['amount'] ?? 0, 2);
+
+                fputcsv($file, [
+                    $index + 1,
+                    $row['description'] ?? '',
+                    $date,
+                    $amount
+                ]);
+            }
+
+            // Balance Total
+            if (isset($accountTotals['total_due'])) {
+                fputcsv($file, ['']);
+                fputcsv($file, ['Balance Total Due Amount', 'Rs.' . number_format($accountTotals['total_due'], 2)]);
+            }
+
+            fclose($file);
         };
 
         return response()->stream($callback, 200, $headers);

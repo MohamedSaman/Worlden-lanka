@@ -283,7 +283,13 @@
                                                     —
                                                 @endif
                                             </td>
-                                            <td class="text-end fw-bold text-sm text-gray-800">Rs.{{ number_format($row['amount'] ?? 0, 2) }}</td>
+                                            <td class="text-end fw-bold text-sm text-gray-800">
+                                                @if(($row['type'] ?? '') === 'paid')
+                                                    <span style="color: #ef4444;">({{ number_format($row['amount'] ?? 0, 2) }})</span>
+                                                @else
+                                                    {{ number_format($row['amount'] ?? 0, 2) }}
+                                                @endif
+                                            </td>
                                         </tr>
                                         @empty
                                         <tr>
@@ -293,7 +299,7 @@
                                         @php $accountTotalDue = $modalData['accountTotals']['total_due'] ?? 0; @endphp
                                         <tr class="bg-[#f1f5f9] fw-bold">
                                             <td colspan="3" class="text-end text-gray-800">Balance Total Due Amount</td>
-                                            <td class="text-end text-gray-800">Rs.{{ number_format($accountTotalDue, 2) }}</td>
+                                            <td class="text-end text-gray-800">{{ number_format($accountTotalDue, 2) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -312,6 +318,10 @@
                     @endif
                 </div>
                 <div class="modal-footer p-4">
+                    <button type="button" class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
+                        wire:click="exportModalToCSV" aria-label="Export sales summary to CSV">
+                        <i class="bi bi-download me-1"></i> Export CSV
+                    </button>
                     <button type="button" class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
                         onclick="printModalContent()" aria-label="Print customer sales details">
                         <i class="bi bi-printer me-1"></i> Print Details

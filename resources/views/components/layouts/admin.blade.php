@@ -338,7 +338,7 @@
                             <li class="nav-item">
                                 <a class="nav-link py-2 {{ request()->routeIs('admin.product-reentry') ? 'active' : '' }}"
                                     href="{{ route('admin.product-reentry') }}">
-                                    <i class="bi bi-collection"></i> <span>Product Re-entry</span>
+                                    <i class="bi bi-collection"></i> <span>Product Return</span>
                                 </a>
                             </li>
                         </ul>
@@ -363,12 +363,7 @@
                                     <i class="bi bi-people"></i> <span>Customer Sales</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.back-forward') ? 'active' : '' }}"
-                                    href="{{ route('admin.back-forward') }}">
-                                    <i class="bi bi-cash-coin"></i> <span>Back Forward</span>
-                                </a>
-                            </li>
+
                             <li class="nav-item">
                                 <a class="nav-link py-2 {{ request()->routeIs('admin.due-payments') ? 'active' : '' }}"
                                     href="{{ route('admin.due-payments') }}">
@@ -391,6 +386,12 @@
                                 <a class="nav-link py-2 {{ request()->routeIs('admin.view-payments') ? 'active' : '' }}"
                                     href="{{ route('admin.view-payments') }}">
                                     <i class="bi bi-credit-card-2-back"></i> <span>View Payments</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link py-2 {{ request()->routeIs('admin.back-forward') ? 'active' : '' }}"
+                                    href="{{ route('admin.back-forward') }}">
+                                    <i class="bi bi-cash-coin"></i> <span>Back Forward</span>
                                 </a>
                             </li>
                         </ul>
@@ -620,7 +621,11 @@
                 // Livewire v3 passes dispatched payload as first arg; sometimes as array
                 const payload = args && args.length ? args[0] : {};
                 const data = Array.isArray(payload) ? payload[0] : payload;
-                const { icon, title, text } = data || {};
+                const {
+                    icon,
+                    title,
+                    text
+                } = data || {};
                 if (typeof Swal !== 'undefined' && icon && title) {
                     Swal.fire({
                         icon: icon,
@@ -633,7 +638,6 @@
                 }
             });
         });
-        
     </script>
 
 
