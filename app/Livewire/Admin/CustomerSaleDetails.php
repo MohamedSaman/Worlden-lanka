@@ -326,7 +326,7 @@ class CustomerSaleDetails extends Component
 
         $headers = [
             'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="customer_sales_summary_' . $customer->id . '_' . date('Y-m-d') . '.csv"',
+            'Content-Disposition' => 'attachment; filename="' . $customer->name . '_sales_summary_' . $customer->id . '_' . date('Y-m-d') . '.csv"',
         ];
 
         $callback = function () use ($customer, $salesSummary, $paymentSums, $invoiceSummaryRows, $accountTotals) {
