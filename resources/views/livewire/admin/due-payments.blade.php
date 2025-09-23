@@ -317,26 +317,49 @@
                                     <div class="row">
                                         <div class="col-md-6 mb-4">
                                             <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">Apply To:</label>
+                                            @if($currentDueAmount > 0)
                                             <div class="form-check">
                                                 <input type="radio" class="form-check-input" name="applyTarget" id="applyToCurrent" value="current" wire:model="applyTarget">
                                                 <label class="form-check-label" for="applyToCurrent">Current Due (Rs.{{ number_format($currentDueAmount, 2) }})</label>
                                             </div>
+                                            @endif
+                                            @if($backForwardAmount > 0)
                                             <div class="form-check">
                                                 <input type="radio" class="form-check-input" name="applyTarget" id="applyToBackForward" value="back_forward" wire:model="applyTarget">
                                                 <label class="form-check-label" for="applyToBackForward">Brought-Forward (Rs.{{ number_format($backForwardAmount, 2) }})</label>
                                             </div>
+                                            @endif
+                                            @if($currentDueAmount <= 0 && $backForwardAmount <= 0)
+                                            <div class="alert alert-info">
+                                                <i class="bi bi-info-circle me-2"></i>
+                                                No outstanding dues found for this customer.
+                                            </div>
+                                            @endif
                                         </div>
                                         <div class="col-md-6 mb-4">
                                             <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">Cash Amount</label>
-                                            <input type="text" class="form-control rounded-4 shadow-sm @error('receivedAmount') is-invalid @enderror" wire:model="receivedAmount" placeholder="Enter cash amount">
+                                            <input type="text" 
+                                                class="form-control rounded-4 shadow-sm @error('receivedAmount') is-invalid @enderror" 
+                                                wire:model="receivedAmount" 
+                                                placeholder="Enter cash amount"
+                                                @if($currentDueAmount <= 0 && $backForwardAmount <= 0) disabled @endif>
                                             @error('receivedAmount')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
+                                            @if($currentDueAmount <= 0 && $backForwardAmount <= 0)
+                                            <small class="text-muted">No outstanding dues to collect payment for.</small>
+                                            @endif
                                         </div>
                                     </div>
 
                                     <div class="border rounded-4 p-3 mb-4 shadow-sm bg-light">
                                         <h6 class="text-sm fw-semibold mb-3" style="color: #9d1c20;">Add Cheque Details</h6>
+                                        @if($currentDueAmount <= 0 && $backForwardAmount <= 0)
+                                        <div class="alert alert-warning">
+                                            <i class="bi bi-exclamation-triangle me-2"></i>
+                                            Cannot add cheques when there are no outstanding dues.
+                                        </div>
+                                        @else
                                         <div class="row g-3 align-items-end">
                                             <div class="col-md-6">
                                                 <label class="form-label text-xs fw-semibold">Cheque No. <span class="text-danger">*</span></label>
@@ -369,6 +392,7 @@
                                                 </button>
                                             </div>
                                         </div>
+                                        @endif
                                     </div>
 
                                     <div class="table-responsive mb-4">
@@ -426,7 +450,9 @@
                                         <button type="button" class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105" data-bs-dismiss="modal">
                                             <i class="bi bi-x me-1"></i> Cancel
                                         </button>
-                                        <button type="submit" class="btn btn-primary text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105">
+                                        <button type="submit" 
+                                            class="btn btn-primary text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
+                                            @if($currentDueAmount <= 0 && $backForwardAmount <= 0) disabled @endif>
                                             <i class="bi bi-send me-1"></i> Submit
                                         </button>
                                     </div>

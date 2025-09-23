@@ -391,7 +391,7 @@
                             <li class="nav-item">
                                 <a class="nav-link py-2 {{ request()->routeIs('admin.back-forward') ? 'active' : '' }}"
                                     href="{{ route('admin.back-forward') }}">
-                                    <i class="bi bi-cash-coin"></i> <span>Back Forward</span>
+                                    <i class="bi bi-cash-coin"></i> <span>Brought Forward</span>
                                 </a>
                             </li>
                         </ul>

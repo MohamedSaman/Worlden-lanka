@@ -208,9 +208,26 @@ class DuePayments extends Component
             'duePaymentAttachment' => 'nullable|file|mimes:jpg,jpeg,png,gif,pdf|max:2048',
         ]);
 
+        // Check if there are any dues to pay against
+        if ($this->currentDueAmount <= 0 && $this->backForwardAmount <= 0) {
+            $this->js("Swal.fire('Error', 'No outstanding dues found for this customer.', 'error')");
+            return;
+        }
+
         // Ensure exactly one target is selected (using applyTarget)
         if (!in_array($this->applyTarget, ['current', 'back_forward'], true)) {
             $this->js("Swal.fire('Error', 'Please select exactly one target: Current Due or Back-Forward.', 'error')");
+            return;
+        }
+
+        // Validate that the selected target has a due amount
+        if ($this->applyTarget === 'current' && $this->currentDueAmount <= 0) {
+            $this->js("Swal.fire('Error', 'Current due amount is zero. Cannot apply payment to current dues.', 'error')");
+            return;
+        }
+
+        if ($this->applyTarget === 'back_forward' && $this->backForwardAmount <= 0) {
+            $this->js("Swal.fire('Error', 'Back-forward amount is zero. Cannot apply payment to back-forward dues.', 'error')");
             return;
         }
 
@@ -247,19 +264,47 @@ class DuePayments extends Component
                 return;
             }
 
+            // Get a valid sale_id - prioritize customer accounts with sales
+            $saleId = null;
+            
+            // First try to get sale_id from customer accounts with dues
+            $customerAccountWithSale = CustomerAccount::where('customer_id', $this->paymentId)
+                ->where('total_due', '>', 0)
+                ->whereNotNull('sale_id')
+                ->latest()
+                ->first();
+                
+            if ($customerAccountWithSale && $customerAccountWithSale->sale_id) {
+                $saleId = $customerAccountWithSale->sale_id;
+            } else {
+                // Fallback: get any recent sale for this customer
+                $recentSale = Sale::where('customer_id', $this->paymentId)
+                    ->latest()
+                    ->first();
+                    
+                if ($recentSale) {
+                    $saleId = $recentSale->id;
+                }
+            }
+
+            // Only create payment record if we have a valid sale_id
+            if (!$saleId) {
+                DB::rollBack();
+                $this->js("Swal.fire('Error', 'No valid sale found for this customer. Cannot process payment.', 'error')");
+                return;
+            }
+
             // Create Payment record
-            $saleId = $this->paymentDetail->sales->first()->id ?? null;
             $paymentStatus = $isCurrent ? 'current' : 'forward';
             $payment = Payment::create([
                 'sale_id' => $saleId,
                 'amount' => $totalPaid,
-                'due_date' => now(), // or appropriate due date
+                'due_date' => now(),
                 'status' => $paymentStatus,
                 'is_completed' => true,
                 'payment_date' => now(),
                 'due_payment_method' => $paymentMethod,
                 'due_payment_attachment' => $attachmentPath,
-                // Persist which bucket was selected
                 'applied_to' => $isCurrent ? 'current' : 'back_forward',
             ]);
 
