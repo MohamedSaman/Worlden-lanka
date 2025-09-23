@@ -173,7 +173,7 @@
                                 <tr>
                                     <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Customer</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Current Due</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Back-Forward Due</th>
+                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Brought-Forward Due</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Total Due</th>
                                     <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Actions</th>
                                 </tr>
@@ -207,7 +207,7 @@
                                         </div>
                                     </td>
                                     <td class="text-center" data-label="Actions">
-                                        @if ($customer->customer_accounts_sum_current_due_amount > 0)
+                                        @if ($customer->customer_accounts_sum_current_due_amount > 0 || $customer->customer_accounts_sum_back_forward_amount > 0)
                                         <button class="btn btn-primary text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
                                             wire:click="getPaymentDetails({{ $customer->id }})">
                                             <i class="bi bi-currency-dollar me-1"></i> Receive
@@ -292,7 +292,7 @@
                                     <span class="fw-bold" style="font-size: 1.5rem; color: #9d1c20;">Rs.{{ number_format($currentDueAmount, 2) }}</span>
                                 </div>
                                 <div class="mt-2">
-                                    <span class="text-sm text-gray-600">Back-Forward:</span>
+                                    <span class="text-sm text-gray-600">Brought-Forward:</span>
                                     <span class="fw-bold" style="font-size: 1.5rem; color: #9d1c20;">Rs.{{ number_format($backForwardAmount, 2) }}</span>
                                 </div>
                             </div>
@@ -323,7 +323,7 @@
                                             </div>
                                             <div class="form-check">
                                                 <input type="radio" class="form-check-input" name="applyTarget" id="applyToBackForward" value="back_forward" wire:model="applyTarget">
-                                                <label class="form-check-label" for="applyToBackForward">Back-Forward (Rs.{{ number_format($backForwardAmount, 2) }})</label>
+                                                <label class="form-check-label" for="applyToBackForward">Brought-Forward (Rs.{{ number_format($backForwardAmount, 2) }})</label>
                                             </div>
                                         </div>
                                         <div class="col-md-6 mb-4">

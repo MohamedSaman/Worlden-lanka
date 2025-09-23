@@ -196,8 +196,8 @@ class CustomerSaleDetails extends Component
         // Start with Back-Forward due (if any), then the ordered timeline
         if ($bfAmount && floatval($bfAmount) != 0.0) {
             $invoiceSummaryRows[] = [
-                'type' => 'backforward',
-                'description' => 'Back-Forward Due',
+                'type' => 'broughtforward',
+                'description' => 'Brought-Forward Due',
                 'date' => null,
                 'amount' => floatval($bfAmount),
             ];
@@ -286,7 +286,7 @@ class CustomerSaleDetails extends Component
             $file = fopen('php://output', 'w');
 
             // Add headers
-            fputcsv($file, ['#', 'Customer Name', 'Invoices', 'Total Sales', 'Paid (All)', 'Paid - Current', 'Paid - Forward', 'Current Due', 'Back-Forward Due', 'Total Due', 'Collection %']);
+            fputcsv($file, ['#', 'Customer Name', 'Invoices', 'Total Sales', 'Paid (All)', 'Paid - Current', 'Paid - Brought-Forward', 'Current Due', 'Brought-Forward Due', 'Total Due', 'Collection %']);
 
             // Add data rows
             foreach ($customerSales as $index => $customer) {
@@ -346,9 +346,9 @@ class CustomerSaleDetails extends Component
             fputcsv($file, ['Total Sales Amount', 'Rs.' . number_format($salesSummary->total_amount ?? 0, 2)]);
             fputcsv($file, ['Amount Paid', 'Rs.' . number_format($paymentSums['paid'] ?? 0, 2)]);
             fputcsv($file, ['Current Paid', 'Rs.' . number_format($paymentSums['current'] ?? 0, 2)]);
-            fputcsv($file, ['Forward Paid', 'Rs.' . number_format($paymentSums['forward'] ?? 0, 2)]);
+            fputcsv($file, ['Brought-Forward Paid', 'Rs.' . number_format($paymentSums['forward'] ?? 0, 2)]);
             fputcsv($file, ['Total Due Amount', 'Rs.' . number_format($salesSummary->total_due ?? 0, 2)]);
-            fputcsv($file, ['Back-Forward Due', 'Rs.' . number_format($accountTotals['back_forward_due'] ?? 0, 2)]);
+            fputcsv($file, ['Brought-Forward Due', 'Rs.' . number_format($accountTotals['back_forward_due'] ?? 0, 2)]);
             fputcsv($file, ['Current Due', 'Rs.' . number_format($accountTotals['current_due'] ?? 0, 2)]);
             fputcsv($file, ['']);
 
