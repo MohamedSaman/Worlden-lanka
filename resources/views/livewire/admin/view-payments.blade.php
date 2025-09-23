@@ -263,17 +263,25 @@
 
                         <div class="row">
                             <div class="mb-1 col-md-6">
-                                <h6 class="text-muted mb-2" style="font-size: 1rem;">CUSTOMER INFORMATION</h6>
-                                <div class="card border-0 shadow-sm">
+                                <h6 class="text-muted mb-2" style="font-size: 1rem;">INVOICE INFORMATION</h6>
+                                <div class="card border-0 shadow-sm mb-3">
                                     <div class="card-body p-3">
-                                        @if($selectedPayment->sale && $selectedPayment->sale->customer)
-                                        <h6 class="mb-1" style="font-size: 1rem;">{{ $selectedPayment->sale->customer->name ?? 'Guest Customer' }}</h6>
-                                        <p class="mb-1 small" style="font-size: 0.9rem;"><i class="bi bi-telephone me-2"></i>{{ $selectedPayment->sale->customer->phone ?? 'N/A' }}</p>
-                                        @if($selectedPayment->sale->customer->address)
-                                        <p class="mb-0 small" style="font-size: 0.9rem;"><i class="bi bi-geo-alt me-2"></i>{{ $selectedPayment->sale->customer->address }}</p>
-                                        @endif
+                                        @if($selectedPayment->sale)
+                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Invoice:</strong> {{ $selectedPayment->sale->invoice_number ?? 'N/A' }}</p>
+                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Sale Date:</strong> {{ $selectedPayment->sale->created_at ? $selectedPayment->sale->created_at->format('d/m/Y h:i A') : 'N/A' }}</p>
+                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Total:</strong> Rs.{{ number_format($selectedPayment->sale->total_amount ?? 0, 2) }}</p>
+                                        @php
+                                            $paid = $selectedPayment->sale->payments->where('is_completed', true)->sum('amount');
+                                            $remaining = $selectedPayment->sale->total_amount - $paid;
+                                        @endphp
+                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Remaining:</strong> Rs.{{ number_format($remaining, 2) }}</p>
+                                        <p class="mb-0" style="font-size: 0.9rem;"><strong>Payment Status:</strong>
+                                            <span class="badge bg-{{ $selectedPayment->sale->payment_status == 'paid' ? 'success' : ($selectedPayment->sale->payment_status == 'partial' ? 'warning' : 'danger') }}">
+                                                {{ $selectedPayment->sale->payment_status ? ucfirst($selectedPayment->sale->payment_status) : 'Unknown' }}
+                                            </span>
+                                        </p>
                                         @else
-                                        <p class="mb-0 text-muted" style="font-size: 0.9rem;">No customer information available.</p>
+                                        <p class="mb-1 text-muted" style="font-size: 0.9rem;">No invoice details available for this payment.</p>
                                         @endif
                                     </div>
                                 </div>
@@ -342,6 +350,23 @@
 
                         <div class="row">
                             <div class="mb-1 col-md-6">
+                                <h6 class="text-muted mb-2" style="font-size: 1rem;">CUSTOMER INFORMATION</h6>
+                                <div class="card border-0 shadow-sm">
+                                    <div class="card-body p-3">
+                                        @if($selectedPayment->sale && $selectedPayment->sale->customer)
+                                        <h6 class="mb-1" style="font-size: 1rem;">{{ $selectedPayment->sale->customer->name ?? 'Guest Customer' }}</h6>
+                                        <p class="mb-1 small" style="font-size: 0.9rem;"><i class="bi bi-telephone me-2"></i>{{ $selectedPayment->sale->customer->phone ?? 'N/A' }}</p>
+                                        @if($selectedPayment->sale->customer->address)
+                                        <p class="mb-0 small" style="font-size: 0.9rem;"><i class="bi bi-geo-alt me-2"></i>{{ $selectedPayment->sale->customer->address }}</p>
+                                        @endif
+                                        @else
+                                        <p class="mb-0 text-muted" style="font-size: 0.9rem;">No customer information available.</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-1 col-md-6">
                                 <h6 class="text-muted mb-2" style="font-size: 1rem;">PAYMENT INFORMATION</h6>
                                 <div class="card border-0 shadow-sm mb-3">
                                     <div class="card-body p-3">
@@ -360,26 +385,6 @@
                                                 {{ $selectedPayment->status ? ucfirst($selectedPayment->status) : ($selectedPayment->is_completed ? 'Paid' : 'Scheduled') }}
                                             </span>
                                         </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mb-1 col-md-6">
-                                <h6 class="text-muted mb-2" style="font-size: 1rem;">INVOICE INFORMATION</h6>
-                                <div class="card border-0 shadow-sm mb-3">
-                                    <div class="card-body p-3">
-                                        @if($selectedPayment->sale)
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Invoice:</strong> {{ $selectedPayment->sale->invoice_number ?? 'N/A' }}</p>
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Sale Date:</strong> {{ $selectedPayment->sale->created_at ? $selectedPayment->sale->created_at->format('d/m/Y h:i A') : 'N/A' }}</p>
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Total:</strong> Rs.{{ number_format($selectedPayment->sale->total_amount ?? 0, 2) }}</p>
-                                        <p class="mb-0" style="font-size: 0.9rem;"><strong>Payment Status:</strong>
-                                            <span class="badge bg-{{ $selectedPayment->sale->payment_status == 'paid' ? 'success' : ($selectedPayment->sale->payment_status == 'partial' ? 'warning' : 'danger') }}">
-                                                {{ $selectedPayment->sale->payment_status ? ucfirst($selectedPayment->sale->payment_status) : 'Unknown' }}
-                                            </span>
-                                        </p>
-                                        @else
-                                        <p class="mb-1 text-muted" style="font-size: 0.9rem;">No invoice details available for this payment.</p>
-                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -577,8 +582,6 @@
             Livewire.on('openModal', (modalId) => {
                 const modalElement = document.getElementById(modalId);
                 if (modalElement) {
-                    // Clear modal content before showing
-                    modalElement.querySelector('.modal-body').innerHTML = '';
                     const modal = new bootstrap.Modal(modalElement);
                     modal.show();
                 }

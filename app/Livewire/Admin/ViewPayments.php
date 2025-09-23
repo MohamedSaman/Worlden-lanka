@@ -8,6 +8,7 @@ use Livewire\WithPagination;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 #[Layout('components.layouts.admin')]
 #[Title('View Payments')]
@@ -34,11 +35,12 @@ class ViewPayments extends Component
                 'sale.customer',
                 'sale.user',
                 'sale.items',
-                'sale.items.product'
+                'sale.items.product',
+                'sale.payments' // Added to load all payments for remaining calculation
             ])->findOrFail($paymentId);
 
             // Log for debugging
-            \Log::info('Selected Payment:', [
+            Log::info('Selected Payment:', [
                 'payment_id' => $paymentId,
                 'sale_id' => $this->selectedPayment->sale_id,
                 'sale_exists' => !is_null($this->selectedPayment->sale),
@@ -55,12 +57,12 @@ class ViewPayments extends Component
             }
 
             if ($this->selectedPayment->sale->items->isEmpty()) {
-                \Log::warning('No items found for sale ID: ' . $this->selectedPayment->sale_id);
+                Log::warning('No items found for sale ID: ' . $this->selectedPayment->sale_id);
             }
 
             $this->dispatch('openModal', 'payment-receipt-modal');
         } catch (\Exception $e) {
-            \Log::error('Error loading payment: ' . $e->getMessage());
+            Log::error('Error loading payment: ' . $e->getMessage());
             $this->dispatch('showToast', [
                 'type' => 'error',
                 'message' => 'Error loading payment: ' . $e->getMessage()
@@ -178,7 +180,7 @@ class ViewPayments extends Component
                         });
                     }
                 } catch (\Throwable $e) {
-                    \Log::warning('Date filter parse error: ' . $e->getMessage());
+                    Log::warning('Date filter parse error: ' . $e->getMessage());
                 }
             })
             ->when($this->filters['dateRange'], function ($q) {
@@ -206,7 +208,7 @@ class ViewPayments extends Component
                         });
                     }
                 } catch (\Throwable $e) {
-                    \Log::warning('Date range parse error: ' . $e->getMessage());
+                    Log::warning('Date range parse error: ' . $e->getMessage());
                 }
             });
 
