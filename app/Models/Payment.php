@@ -11,6 +11,7 @@ class Payment extends Model
 
     protected $fillable = [
         'sale_id',
+        'customer_id',
         'amount',
         'payment_method',
         'payment_reference',
@@ -22,6 +23,7 @@ class Payment extends Model
         'due_payment_method',
         'due_payment_attachment',
         'status',
+        'applied_to',
     ];
 
     protected $casts = [
@@ -33,6 +35,11 @@ class Payment extends Model
     public function sale()
     {
         return $this->belongsTo(Sale::class);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
     }
 
     public function getStatusBadgeAttribute()

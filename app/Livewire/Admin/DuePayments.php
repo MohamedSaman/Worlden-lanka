@@ -292,6 +292,7 @@ class DuePayments extends Component
             $paymentStatus = $isCurrent ? 'current' : 'forward';
             $payment = Payment::create([
                 'sale_id' => $saleId,
+                'customer_id' => $this->paymentId, // Add customer_id for back-forward payments
                 'amount' => $totalPaid,
                 'due_date' => now(),
                 'status' => $paymentStatus,

@@ -36,15 +36,24 @@ class CustomerSaleDetails extends Component
             )
             ->first();
 
-        // Payment sums by logical status for this customer's sales
-        $paymentsBase = Payment::whereHas('sale', function($q) use ($customerId) {
-            $q->where('customer_id', $customerId);
+        // Payment sums by logical status for this customer's sales and back-forward payments
+        $paymentsBase = Payment::where(function ($query) use ($customerId) {
+            $query->whereHas('sale', function($q) use ($customerId) {
+                $q->where('customer_id', $customerId);
+            })
+            ->orWhere('customer_id', $customerId);
         });
 
         $paidSum = (clone $paymentsBase)
             ->where(function($q){
                 $q->where('is_completed', true)
                   ->orWhereIn('status', ['Paid','paid']);
+            })
+            ->sum('amount');
+        $paidForwardSum = (clone $paymentsBase)
+            ->where(function($q){
+                $q->where('applied_to', 'back_forward')
+                  ->orWhere('status', 'forward');
             })
             ->sum('amount');
 
@@ -129,11 +138,16 @@ class CustomerSaleDetails extends Component
             ->orderBy('sales.created_at', 'desc')
             ->get();
 
-        // Get paid records related to this customer's sales
+        // Get paid records related to this customer's sales and back-forward payments
         $payments = DB::table('payments')
-            ->join('sales', 'payments.sale_id', '=', 'sales.id')
-            ->where('sales.customer_id', $customerId)
+            ->leftJoin('sales', 'payments.sale_id', '=', 'sales.id')
+            ->leftJoin('customers', 'payments.customer_id', '=', 'customers.id')
+            ->where(function ($query) use ($customerId) {
+                $query->where('sales.customer_id', $customerId)
+                      ->orWhere('payments.customer_id', $customerId);
+            })
             ->select(
+                'payments.id',
                 'payments.amount',
                 'payments.due_payment_method',
                 'payments.payment_reference',
@@ -141,7 +155,10 @@ class CustomerSaleDetails extends Component
                 'payments.created_at',
                 'payments.is_completed',
                 'payments.status',
-                'payments.applied_to'
+                'payments.applied_to',
+                'payments.sale_id',
+                'sales.invoice_number',
+                'customers.name as customer_name'
             )
             ->orderBy('payments.created_at', 'desc')
             ->get();
@@ -149,7 +166,7 @@ class CustomerSaleDetails extends Component
         // Build unified invoice summary rows timeline: Back-Forward first, then Invoices and Paid ordered by date
         $invoiceSummaryRows = [];
 
-        $bfAmount = $accountTotals->back_forward_due ?? 0;
+        $bfAmount = ($accountTotals->back_forward_due + $paidForwardSum ) ?? 0;
 
         // Collect invoice and payment events with comparable dates
         $events = [];
@@ -164,15 +181,28 @@ class CustomerSaleDetails extends Component
         foreach ($payments as $p) {
             $isPaid = ($p->is_completed === 1) || (strtolower((string)$p->status) === 'paid');
             if (!$isPaid) continue;
+
             // Build label: Paid (Current/Forward) - Method
             $target = ($p->applied_to === 'back_forward' || strtolower((string)$p->status) === 'forward') ? 'Forward' : 'Current';
             $label = 'Paid (' . $target . ')';
+
+            // Add invoice number if available (for sale-related payments)
+            if (!empty($p->invoice_number)) {
+                $label .= ' - Invoice ' . $p->invoice_number;
+            }
+
             if (!empty($p->due_payment_method)) {
                 $label .= ' - ' . ucfirst(str_replace('_',' ', $p->due_payment_method));
             }
             if (!empty($p->payment_reference)) {
                 $label .= ' (' . $p->payment_reference . ')';
             }
+
+            // For back-forward payments without sale_id, show customer context
+            if (empty($p->sale_id) && !empty($p->customer_name)) {
+                $label .= ' - ' . $p->customer_name;
+            }
+
             $events[] = [
                 'type' => 'paid',
                 'description' => $label,
@@ -259,8 +289,9 @@ class CustomerSaleDetails extends Component
                        SUM(CASE WHEN p.applied_to = "current" OR LOWER(p.status) = "current" THEN p.amount ELSE 0 END) AS paid_current,
                        SUM(CASE WHEN p.applied_to = "back_forward" OR LOWER(p.status) = "forward" THEN p.amount ELSE 0 END) AS paid_forward
                 FROM payments p
-                INNER JOIN sales s ON p.sale_id = s.id
-                GROUP BY s.customer_id
+                LEFT JOIN sales s ON p.sale_id = s.id
+                WHERE p.customer_id IS NOT NULL OR s.customer_id IS NOT NULL
+                GROUP BY COALESCE(s.customer_id, p.customer_id)
             ) AS pay_summaries'), 'customers.id', '=', 'pay_summaries.customer_id')
             ->select(
                 'customers.id as customer_id',

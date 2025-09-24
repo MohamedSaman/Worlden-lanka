@@ -19,6 +19,7 @@ class ViewPayments extends Component
 
     public $search = '';
     public $selectedPayment = null;
+    public $isLoadingPayment = false;
     public $filters = [
         'status' => '',
         'paymentMethod' => '',
@@ -30,39 +31,56 @@ class ViewPayments extends Component
     public function viewPaymentDetails($paymentId)
     {
         try {
+            $this->isLoadingPayment = true;
+            $this->selectedPayment = null; // Clear previous data first
+
             $this->selectedPayment = Payment::with([
                 'sale',
                 'sale.customer',
                 'sale.user',
                 'sale.items',
                 'sale.items.product',
-                'sale.payments' // Added to load all payments for remaining calculation
+                'sale.payments', // Added to load all payments for remaining calculation
+                'customer' // Added to load customer for payments without sales
             ])->findOrFail($paymentId);
 
             // Log for debugging
             Log::info('Selected Payment:', [
                 'payment_id' => $paymentId,
                 'sale_id' => $this->selectedPayment->sale_id,
+                'customer_id' => $this->selectedPayment->customer_id,
                 'sale_exists' => !is_null($this->selectedPayment->sale),
+                'customer_exists' => !is_null($this->selectedPayment->customer),
                 'items_count' => $this->selectedPayment->sale ? $this->selectedPayment->sale->items->count() : 0,
                 'invoice_number' => $this->selectedPayment->sale ? $this->selectedPayment->sale->invoice_number : 'N/A',
             ]);
 
-            if (!$this->selectedPayment->sale) {
+            // For payments without sales, we still need to show the payment details
+            // The sale validation is not required for back-forward payments
+            if (!$this->selectedPayment->sale && !$this->selectedPayment->customer) {
                 $this->dispatch('showToast', [
                     'type' => 'warning',
-                    'message' => 'No sale associated with this payment.'
+                    'message' => 'No sale or customer associated with this payment.'
                 ]);
+                $this->isLoadingPayment = false;
                 return;
             }
 
-            if ($this->selectedPayment->sale->items->isEmpty()) {
+            if ($this->selectedPayment->sale && $this->selectedPayment->sale->items->isEmpty()) {
                 Log::warning('No items found for sale ID: ' . $this->selectedPayment->sale_id);
             }
 
+            // Set loading to false after data is loaded
+            $this->isLoadingPayment = false;
+
+            // Dispatch event to open modal after data is loaded
             $this->dispatch('openModal', 'payment-receipt-modal');
+
+            // Force a component refresh to ensure data is available
+            $this->dispatch('payment-data-loaded');
         } catch (\Exception $e) {
             Log::error('Error loading payment: ' . $e->getMessage());
+            $this->isLoadingPayment = false;
             $this->dispatch('showToast', [
                 'type' => 'error',
                 'message' => 'Error loading payment: ' . $e->getMessage()
@@ -107,7 +125,7 @@ class ViewPayments extends Component
     public function render()
     {
         $query = Payment::query()
-            ->with(['sale', 'sale.customer', 'sale.user'])
+            ->with(['sale', 'sale.customer', 'sale.user', 'customer'])
             ->where(function ($q) {
                 $q->where('is_completed', true)
                   ->orWhereIn('status', ['Paid', 'paid', 'forward', 'current']);
@@ -119,6 +137,10 @@ class ViewPayments extends Component
                         $sq->where('invoice_number', 'like', "%{$search}%");
                     })
                         ->orWhereHas('sale.customer', function ($cq) use ($search) {
+                            $cq->where('name', 'like', "%{$search}%")
+                                ->orWhere('phone', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('customer', function ($cq) use ($search) {
                             $cq->where('name', 'like', "%{$search}%")
                                 ->orWhere('phone', 'like', "%{$search}%");
                         });

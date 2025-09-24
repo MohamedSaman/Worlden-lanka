@@ -191,7 +191,15 @@
                         <tbody>
                             @forelse ($payments as $payment)
                             <tr wire:key="payment-{{ $payment->id }}">
-                                <td class="fw-bold ps-4">{{ $payment->sale->customer->name ?? 'Walk-in Customer' }}</td>
+                                <td class="fw-bold ps-4">
+                                    @if($payment->sale && $payment->sale->customer)
+                                        {{ $payment->sale->customer->name ?? 'Walk-in Customer' }}
+                                    @elseif($payment->customer)
+                                        {{ $payment->customer->name ?? 'Walk-in Customer' }}
+                                    @else
+                                        {{ $payment->sale->customer->name ?? 'Walk-in Customer' }}
+                                    @endif
+                                </td>
                                 <td class="text-center fw-bold">Rs.{{ number_format($payment->amount, 2) }}</td>
                                 <td class="text-center">
                                     @php $method = $payment->due_payment_method ?? $payment->payment_method; @endphp
@@ -252,7 +260,15 @@
                     </div>
                 </div>
                 <div class="modal-body p-4" id="receiptContent">
-                    @if ($selectedPayment)
+                    @if ($isLoadingPayment)
+                    <div class="text-center py-5">
+                        <div style="width:72px;height:72px;background-color:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;margin-bottom:12px;">
+                            <i class="bi bi-receipt text-gray-600 fs-3"></i>
+                        </div>
+                        <h5 class="text-gray-600 fw-normal" style="font-size: 1.25rem;">Loading Receipt Details</h5>
+                        <p class="text-sm text-gray-500 mb-0" style="font-size: 0.9rem;">Please wait while data is being loaded...</p>
+                    </div>
+                    @elseif ($selectedPayment)
                     <div class="receipt-container">
                         <div class="text-center mb-4">
                             <h3 class="mb-2 fw-bold" style="font-size: 1.75rem;">PLUS</h3>
@@ -281,7 +297,11 @@
                                             </span>
                                         </p>
                                         @else
-                                        <p class="mb-1 text-muted" style="font-size: 0.9rem;">No invoice details available for this payment.</p>
+                                        <p class="mb-1 text-muted" style="font-size: 0.9rem;">This is a Brought-forward payment not associated with a specific sale.</p>
+                                        @if($selectedPayment->customer)
+                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Customer:</strong> {{ $selectedPayment->customer->name }}</p>
+                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Phone:</strong> {{ $selectedPayment->customer->phone ?? 'N/A' }}</p>
+                                        @endif
                                         @endif
                                     </div>
                                 </div>
@@ -295,7 +315,7 @@
                                         <h6 class="mb-0" style="font-size: 1rem;">{{ $selectedPayment->sale->user->name ?? 'Unknown' }}</h6>
                                         <p class="mb-1 small" style="font-size: 0.9rem;"><i class="bi bi-envelope me-2"></i>{{ $selectedPayment->sale->user->email ?? 'N/A' }}</p>
                                         @else
-                                        <p class="mb-0 text-muted" style="font-size: 0.9rem;">No staff information available.</p>
+                                        <p class="mb-0 text-muted" style="font-size: 0.9rem;">No staff information available for this payment type.</p>
                                         @endif
                                     </div>
                                 </div>
@@ -337,7 +357,7 @@
                                     @if(!$selectedPayment)
                                         No payment selected.
                                     @elseif(!$selectedPayment->sale)
-                                        No sale associated with this payment.
+                                        This is a Brought-forward payment - no specific items associated with this payment.
                                     @elseif(!$selectedPayment->sale->items || $selectedPayment->sale->items->count() == 0)
                                         No items found for this sale.
                                     @else
@@ -400,8 +420,8 @@
                         <div style="width:72px;height:72px;background-color:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;margin-bottom:12px;">
                             <i class="bi bi-receipt text-gray-600 fs-3"></i>
                         </div>
-                        <h5 class="text-gray-600 fw-normal" style="font-size: 1.25rem;">Loading Receipt Details</h5>
-                        <p class="text-sm text-gray-500 mb-0" style="font-size: 0.9rem;">Please wait while data is being loaded...</p>
+                        <h5 class="text-gray-600 fw-normal" style="font-size: 1.25rem;">No Payment Selected</h5>
+                        <p class="text-sm text-gray-500 mb-0" style="font-size: 0.9rem;">Please click the View button to load payment details.</p>
                     </div>
                     @endif
                 </div>
@@ -585,6 +605,20 @@
                     const modal = new bootstrap.Modal(modalElement);
                     modal.show();
                 }
+            });
+
+            Livewire.on('payment-data-loaded', () => {
+                // Force a re-render of the modal content to show the loaded data
+                setTimeout(() => {
+                    // This ensures the modal content is updated with the loaded payment data
+                    const modalBody = document.querySelector('#payment-receipt-modal .modal-body');
+                    if (modalBody) {
+                        modalBody.style.opacity = '0.7';
+                        setTimeout(() => {
+                            modalBody.style.opacity = '1';
+                        }, 100);
+                    }
+                }, 100);
             });
 
             Livewire.on('showToast', (event) => {
