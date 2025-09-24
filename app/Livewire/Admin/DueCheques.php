@@ -62,8 +62,18 @@ class DueCheques extends Component
     public function computeStatistics()
     {
         $baseQuery = Cheque::query()
-            ->whereHas('payment.sale', function ($query) {
-                $query->where('user_id', auth()->id());
+            ->where(function ($query) {
+                // Include cheques with valid sales for current user
+                $query->whereHas('payment.sale', function ($q) {
+                    $q->where('user_id', auth()->id());
+                })
+                // OR include cheques with pending status (even if sale_id is null)
+                ->orWhere(function ($q) {
+                    $q->where('status', 'pending')
+                      ->whereHas('payment', function ($paymentQuery) {
+                          $paymentQuery->whereNull('sale_id');
+                      });
+                });
             });
 
         $filteredQuery = clone $baseQuery;
@@ -112,12 +122,14 @@ class DueCheques extends Component
                 'status' => 'complete',
             ]);
 
-            // Add a note to the related sale
-            $sale = $cheque->payment->sale;
-            $sale->update([
-                'notes' => ($sale->notes ? $sale->notes . "\n" : '') .
-                    "Cheque marked as complete on " . now()->format('Y-m-d H:i') . "."
-            ]);
+            // Add a note to the related sale if it exists
+            if ($cheque->payment && $cheque->payment->sale) {
+                $sale = $cheque->payment->sale;
+                $sale->update([
+                    'notes' => ($sale->notes ? $sale->notes . "\n" : '') .
+                        "Cheque marked as complete on " . now()->format('Y-m-d H:i') . "."
+                ]);
+            }
 
             DB::commit();
 
@@ -151,12 +163,14 @@ class DueCheques extends Component
                 'status' => 'return',
             ]);
 
-            // Add a note to the related sale
-            $sale = $cheque->payment->sale;
-            $sale->update([
-                'notes' => ($sale->notes ? $sale->notes . "\n" : '') .
-                    "Cheque marked as returned on " . now()->format('Y-m-d H:i') . "."
-            ]);
+            // Add a note to the related sale if it exists
+            if ($cheque->payment && $cheque->payment->sale) {
+                $sale = $cheque->payment->sale;
+                $sale->update([
+                    'notes' => ($sale->notes ? $sale->notes . "\n" : '') .
+                        "Cheque marked as returned on " . now()->format('Y-m-d H:i') . "."
+                ]);
+            }
 
             DB::commit();
 
@@ -177,8 +191,13 @@ class DueCheques extends Component
     public function render()
     {
         $baseQuery = Cheque::with(['customer', 'payment.sale'])
-            ->whereHas('payment.sale', function ($query) {
-                $query->where('user_id', auth()->id());
+            ->where(function ($query) {
+                // Include cheques with valid sales for current user
+                $query->whereHas('payment.sale', function ($q) {
+                    $q->where('user_id', auth()->id());
+                })
+                // OR include all cheques with pending status (even if sale_id is null)
+                ->orWhere('status', 'pending');
             });
 
         $filteredQuery = clone $baseQuery;
@@ -186,17 +205,29 @@ class DueCheques extends Component
         // Search filter
         if ($this->search) {
             $filteredQuery->where(function ($q) {
-                $q->whereHas('payment.sale', function ($q2) {
-                    $q2->where('invoice_number', 'like', "%{$this->search}%");
-                })->orWhereHas('customer', function ($q2) {
+                $q->whereHas('customer', function ($q2) {
                     $q2->where('name', 'like', "%{$this->search}%")
-                        ->orWhere('phone', 'like', "%{$this->search}%");
+                      ->orWhere('phone', 'like', "%{$this->search}%");
+                })
+                ->orWhere('cheque_number', 'like', "%{$this->search}%")
+                ->orWhereHas('payment.sale', function ($q2) {
+                    $q2->where('invoice_number', 'like', "%{$this->search}%");
                 });
             });
         }
-
-        // ❗️ Only include cheques with status 'pending'
-        $filteredQuery->whereIn('status', ['pending', 'complete']);
+        
+        // Show cheques based on status filter
+        if ($this->filters['status']) {
+            if ($this->filters['status'] === 'null') {
+                $filteredQuery->whereNull('status');
+            } else {
+                $filteredQuery->where('status', $this->filters['status']);
+            }
+        } else {
+            // Show all statuses including pending, complete, return, and null
+            $filteredQuery->whereIn('status', ['pending', 'complete', 'return'])
+                         ->orWhereNull('status');
+        }
 
         // Date range filter
         if ($this->filters['dateRange']) {

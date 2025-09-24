@@ -252,27 +252,40 @@
                         <div class="col-md-3 bg-light p-4 border-end rounded-start-4">
                             <div class="text-center mb-4">
                                 <div class="icon-shape icon-xl rounded-circle bg-primary bg-opacity-10 mx-auto d-flex align-items-center justify-content-center">
-                                    <span class="text-primary fw-bold" style="font-size: 2rem;">{{ substr($paymentDetail->sale->customer->name, 0, 1) }}</span>
+                                    @if($paymentDetail->sale && $paymentDetail->sale->customer)
+                                        <span class="text-primary fw-bold" style="font-size: 2rem;">{{ substr($paymentDetail->sale->customer->name, 0, 1) }}</span>
+                                    @else
+                                        <i class="bi bi-person text-primary"></i>
+                                    @endif
                                 </div>
-                                <h6 class="mt-3 mb-0 fw-bold text-gray-800">{{ $paymentDetail->sale->customer->name }}</h6>
-                                <p class="text-sm text-gray-600 mb-0">{{ $paymentDetail->sale->customer->phone }}</p>
+                                @if($paymentDetail->sale && $paymentDetail->sale->customer)
+                                    <h6 class="mt-3 mb-0 fw-bold text-gray-800">{{ $paymentDetail->sale->customer->name }}</h6>
+                                    <p class="text-sm text-gray-600 mb-0">{{ $paymentDetail->sale->customer->phone }}</p>
+                                @else
+                                    <h6 class="mt-3 mb-0 fw-bold text-gray-800">No Sale Record</h6>
+                                    <p class="text-sm text-gray-600 mb-0">Direct Cheque Payment</p>
+                                @endif
                             </div>
-                            <h6 class="text-uppercase text-sm fw-semibold mb-3 border-bottom pb-2" style="color: #1e3a8a;">Invoice Details</h6>
+                            <h6 class="text-uppercase text-sm fw-semibold mb-3 border-bottom pb-2" style="color: #1e3a8a;">Payment Details</h6>
                             <div class="mb-3">
                                 <p class="mb-2 d-flex justify-content-between text-sm">
                                     <span class="text-gray-600">Invoice:</span>
-                                    <span class="fw-bold text-gray-800">{{ $paymentDetail->sale->invoice_number }}</span>
+                                    <span class="fw-bold text-gray-800">{{ $paymentDetail->sale->invoice_number ?? 'No Invoice' }}</span>
                                 </p>
-                                <p class="mb-2 d-flex justify-content-between text-sm">
-                                    <span class="text-gray-600">Sale Date:</span>
-                                    <span class="text-gray-800">{{ $paymentDetail->sale->created_at->format('d/m/Y') }}</span>
-                                </p>
-                                <p class="mb-2 d-flex justify-content-between text-sm">
-                                    <span class="text-gray-600">Due Date:</span>
-                                    <span class="{{ now()->gt($paymentDetail->due_date) ? 'text-danger fw-bold' : 'text-gray-800' }}">
-                                        {{ $paymentDetail->due_date->format('d/m/Y') }}
-                                    </span>
-                                </p>
+                                @if($paymentDetail->sale)
+                                    <p class="mb-2 d-flex justify-content-between text-sm">
+                                        <span class="text-gray-600">Sale Date:</span>
+                                        <span class="text-gray-800">{{ $paymentDetail->sale->created_at->format('d/m/Y') }}</span>
+                                    </p>
+                                @endif
+                                @if($paymentDetail->due_date)
+                                    <p class="mb-2 d-flex justify-content-between text-sm">
+                                        <span class="text-gray-600">Due Date:</span>
+                                        <span class="{{ now()->gt($paymentDetail->due_date) ? 'text-danger fw-bold' : 'text-gray-800' }}">
+                                            {{ $paymentDetail->due_date->format('d/m/Y') }}
+                                        </span>
+                                    </p>
+                                @endif
                                 <div class="card border-0 shadow-sm rounded-4 p-3 mt-3">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <span class="text-sm text-gray-600">Amount Due:</span>
@@ -280,7 +293,7 @@
                                     </div>
                                 </div>
                             </div>
-                            @if (strpos($paymentDetail->sale->notes ?? '', 'Due date extended') !== false)
+                            @if ($paymentDetail->sale && strpos($paymentDetail->sale->notes ?? '', 'Due date extended') !== false)
                             <div class="alert alert-warning bg-warning bg-opacity-10 border-0 rounded-4 mt-3 p-3 text-sm">
                                 <div class="d-flex">
                                     <div class="me-2">
