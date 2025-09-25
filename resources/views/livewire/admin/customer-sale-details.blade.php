@@ -181,6 +181,7 @@
                     <!-- Sales Summary Cards -->
                     <div class="row mb-4 no-print g-3">
                         <!-- Total Sales Card -->
+                         @php $accountTotalDue = $modalData['accountTotals']['total_due'] ?? 0; @endphp
                         <div class="col-md-4 col-sm-6">
                             <div class="card border-0 shadow-sm rounded-4 h-100">
                                 <div class="card-body text-center p-4">
@@ -217,12 +218,12 @@
                             <div class="card border-0 shadow-sm rounded-4 h-100">
                                 <div class="card-body text-center p-4">
                                     <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #ef4444;">Total Due</h6>
-                                    <h3 class="fw-bold" style="color: #ef4444;">Rs.{{ number_format($modalData['salesSummary']->total_due, 2) }}</h3>
+                                    <h3 class="fw-bold" style="color: #ef4444;">Rs.{{ number_format($accountTotalDue, 2) }}</h3>
                                     <p class="text-sm text-gray-500 mb-0">
                                         Current Due: Rs.{{ number_format($modalData['accountTotals']['current_due'] ?? 0, 2) }}
                                         
                                     </p>
-                                    <p class="text-sm text-gray-500 mb-0">Brought-Forward Due: Rs.{{ number_format($modalData['accountTotals']['brought_forward'] ?? 0, 2) }}</p>
+                                    <p class="text-sm text-gray-500 mb-0">Brought-Forward: Rs.{{ number_format($modalData['accountTotals']['back_forward_due'] ?? 0, 2) }}</p>
                                 </div>
                             </div>
                         </div>
