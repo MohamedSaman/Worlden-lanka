@@ -192,10 +192,11 @@
                                     $todaySalesAmount = $todaySales->sum('total_amount');
                                     $todayInvoiceCount = $todaySales->count();
                                     @endphp
-                                    <p class="text-sm text-gray-500 mb-0">
-                                        Today: Rs.{{ number_format($todaySalesAmount, 2) }}
-                                    </p>
+                                    
                                     <p class="text-sm text-gray-500 mb-0">Today Invoices: {{ $todayInvoiceCount }} invoices</p>
+                                    <p class="text-sm text-gray-500 mb-0">
+                                        Today Sales Amount: Rs.{{ number_format($todaySalesAmount, 2) }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -233,7 +234,7 @@
                     <!-- Payment Progress Bar -->
                     @php
                     $paymentPercentage = $modalData['salesSummary']->total_amount > 0
-                    ? round(($modalData['salesSummary']->total_paid / $modalData['salesSummary']->total_amount) * 100)
+                    ? round(($modalData['paymentSums']['paid'] / ($accountTotalDue +$modalData['paymentSums']['paid'])) * 100)
                     : 0;
                     @endphp
                     <div class="card border-0 shadow-sm rounded-4 mb-4 no-print">
