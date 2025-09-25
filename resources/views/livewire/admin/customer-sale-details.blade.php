@@ -189,6 +189,16 @@
                                 </div>
                             </div>
                         </div>
+                       
+                        <div class="col-md-3 col-sm-6">
+                            <div class="card border-0 shadow-sm rounded-4 h-100">
+                                <div class="card-body text-center p-4">
+                                    <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #0ea5e9;">Brought-Forward Due</h6>
+                                    <h3 class="fw-bold" style="color: #0ea5e9;">Rs.{{ number_format($modalData['accountTotals']['back_forward_due'] ?? 0, 2) }}</h3>
+                                    <p class="text-sm text-gray-500 mb-0">From customer accounts</p>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-md-3 col-sm-6">
                             <div class="card border-0 shadow-sm rounded-4 h-100">
                                 <div class="card-body text-center p-4">
@@ -211,15 +221,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3 col-sm-6">
-                            <div class="card border-0 shadow-sm rounded-4 h-100">
-                                <div class="card-body text-center p-4">
-                                    <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #0ea5e9;">Brought-Forward Due</h6>
-                                    <h3 class="fw-bold" style="color: #0ea5e9;">Rs.{{ number_format($modalData['accountTotals']['back_forward_due'] ?? 0, 2) }}</h3>
-                                    <p class="text-sm text-gray-500 mb-0">From customer accounts</p>
-                                </div>
-                            </div>
-                        </div>
+                         
                     </div>
 
                     <!-- Payment Progress Bar -->
