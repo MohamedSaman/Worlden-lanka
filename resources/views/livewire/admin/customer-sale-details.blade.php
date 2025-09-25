@@ -180,49 +180,54 @@
 
                     <!-- Sales Summary Cards -->
                     <div class="row mb-4 no-print g-3">
-                        <div class="col-md-3 col-sm-6">
+                        <!-- Total Sales Card -->
+                        <div class="col-md-4 col-sm-6">
                             <div class="card border-0 shadow-sm rounded-4 h-100">
                                 <div class="card-body text-center p-4">
-                                    <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #9d1c20;">Total Sales Amount</h6>
+                                    <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #9d1c20;">Total Sales</h6>
                                     <h3 class="fw-bold text-gray-800">Rs.{{ number_format($modalData['salesSummary']->total_amount, 2) }}</h3>
-                                    <p class="text-sm text-gray-500 mb-0">Across {{ count($modalData['invoices']) }} invoices</p>
+                                    @php
+                                    $todaySales = collect($modalData['invoices'])->where('created_at', '>=', now()->startOfDay());
+                                    $todaySalesAmount = $todaySales->sum('total_amount');
+                                    $todayInvoiceCount = $todaySales->count();
+                                    @endphp
+                                    <p class="text-sm text-gray-500 mb-0">
+                                        Today: Rs.{{ number_format($todaySalesAmount, 2) }}
+                                    </p>
+                                    <p class="text-sm text-gray-500 mb-0">Today Invoices: {{ $todayInvoiceCount }} invoices</p>
                                 </div>
                             </div>
                         </div>
-                       
-                        <div class="col-md-3 col-sm-6">
+
+                        <!-- Total Paid Card -->
+                        <div class="col-md-4 col-sm-6">
                             <div class="card border-0 shadow-sm rounded-4 h-100">
                                 <div class="card-body text-center p-4">
-                                    <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #0ea5e9;">Brought-Forward Due</h6>
-                                    <h3 class="fw-bold" style="color: #0ea5e9;">Rs.{{ number_format($modalData['accountTotals']['back_forward_due'] ?? 0, 2) }}</h3>
-                                    <p class="text-sm text-gray-500 mb-0">From customer accounts</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3 col-sm-6">
-                            <div class="card border-0 shadow-sm rounded-4 h-100">
-                                <div class="card-body text-center p-4">
-                                    <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #22c55e;">Amount Paid</h6>
+                                    <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #22c55e;">Total Paid</h6>
                                     <h3 class="fw-bold" style="color: #22c55e;">Rs.{{ number_format($modalData['paymentSums']['paid'] ?? 0, 2) }}</h3>
                                     <p class="text-xs text-gray-500 mb-0">
-                                        Current: Rs.{{ number_format($modalData['paymentSums']['current'] ?? 0, 2) }} | Brought-Forward: Rs.{{ number_format($modalData['paymentSums']['forward'] ?? 0, 2) }}
+                                        Current Paid: Rs.{{ number_format($modalData['paymentSums']['current'] ?? 0, 2) }}
                                     </p>
+                                    <p class="text-xs text-gray-500 mb-0">Brought-Forward Paid: Rs.{{ number_format($modalData['paymentSums']['forward'] ?? 0, 2) }}</p>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-3 col-sm-6">
+                        <!-- Total Due Card -->
+                        <div class="col-md-4 col-sm-6">
                             <div class="card border-0 shadow-sm rounded-4 h-100">
                                 <div class="card-body text-center p-4">
-                                    <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #ef4444;">Total Due Amount</h6>
+                                    <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #ef4444;">Total Due</h6>
                                     <h3 class="fw-bold" style="color: #ef4444;">Rs.{{ number_format($modalData['salesSummary']->total_due, 2) }}</h3>
                                     <p class="text-sm text-gray-500 mb-0">
-                                        outstanding
+                                        Current Due: Rs.{{ number_format($modalData['accountTotals']['current_due'] ?? 0, 2) }}
+                                        
                                     </p>
+                                    <p class="text-sm text-gray-500 mb-0">Brought-Forward Due: Rs.{{ number_format($modalData['accountTotals']['brought_forward'] ?? 0, 2) }}</p>
                                 </div>
                             </div>
                         </div>
-                         
                     </div>
+
 
                     <!-- Payment Progress Bar -->
                     @php
@@ -268,28 +273,28 @@
                                         @php $grandTotal = 0; @endphp
                                         @forelse($modalData['invoiceSummaryRows'] ?? [] as $row)
                                         @php
-                                            $amt = floatval($row['amount'] ?? 0);
-                                            if (($row['type'] ?? '') === 'paid') {
-                                                $grandTotal -= $amt; // subtract paid amounts
-                                            } else {
-                                                $grandTotal += $amt; // add back-forward and invoice amounts
-                                            }
+                                        $amt = floatval($row['amount'] ?? 0);
+                                        if (($row['type'] ?? '') === 'paid') {
+                                        $grandTotal -= $amt; // subtract paid amounts
+                                        } else {
+                                        $grandTotal += $amt; // add back-forward and invoice amounts
+                                        }
                                         @endphp
                                         <tr class="border-bottom transition-all hover:bg-[#f1f5f9] {{ $loop->iteration % 2 == 0 ? 'bg-[#f9fafb]' : '' }}">
                                             <td class="ps-4 text-center text-sm text-gray-800">{{ $loop->iteration }}</td>
                                             <td class="text-sm text-gray-600">{{ $row['description'] }}</td>
                                             <td class="text-sm text-gray-600">
                                                 @if(!empty($row['date']))
-                                                    {{ \Carbon\Carbon::parse($row['date'])->format('d M Y') }}
+                                                {{ \Carbon\Carbon::parse($row['date'])->format('d M Y') }}
                                                 @else
-                                                    —
+                                                —
                                                 @endif
                                             </td>
                                             <td class="text-end fw-bold text-sm text-gray-800">
                                                 @if(($row['type'] ?? '') === 'paid')
-                                                    <span style="color: #ef4444;">({{ number_format($row['amount'] ?? 0, 2) }})</span>
+                                                <span style="color: #ef4444;">({{ number_format($row['amount'] ?? 0, 2) }})</span>
                                                 @else
-                                                    {{ number_format($row['amount'] ?? 0, 2) }}
+                                                {{ number_format($row['amount'] ?? 0, 2) }}
                                                 @endif
                                             </td>
                                         </tr>
@@ -342,36 +347,52 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 <style>
     /* Hidden by default, visible only in print */
-    .print-only { display: none; }
+    .print-only {
+        display: none;
+    }
+
     /* Print only the modal content */
     @media print {
         body * {
             visibility: hidden !important;
         }
-        #customerSalesModal, #customerSalesModal *,
-        #mainCustomerSalesPrint, #mainCustomerSalesPrint * {
+
+        #customerSalesModal,
+        #customerSalesModal *,
+        #mainCustomerSalesPrint,
+        #mainCustomerSalesPrint * {
             visibility: visible !important;
         }
-        .print-only { display: block !important; }
-        #customerSalesModal, #mainCustomerSalesPrint {
+
+        .print-only {
+            display: block !important;
+        }
+
+        #customerSalesModal,
+        #mainCustomerSalesPrint {
             position: absolute !important;
             left: 0 !important;
             top: 0 !important;
             width: 100% !important;
         }
+
         .modal-backdrop {
             display: none !important;
         }
+
         .modal-dialog {
             max-width: 100% !important;
             margin: 0 !important;
         }
+
         .modal-content {
             border: none !important;
             box-shadow: none !important;
         }
+
         /* Optional: hide modal close button on print */
-        .modal-header .btn-close, .no-print {
+        .modal-header .btn-close,
+        .no-print {
             display: none !important;
         }
 
@@ -387,10 +408,13 @@
             size: auto;
             margin: 10mm;
         }
-        html, body {
+
+        html,
+        body {
             height: auto !important;
             overflow: visible !important;
         }
+
         #customerSalesModal .modal-body,
         #customerSalesModal .card-body,
         #customerSalesModal .table-responsive,
@@ -398,13 +422,24 @@
             max-height: none !important;
             overflow: visible !important;
         }
+
         #customerSalesModal thead,
         #mainCustomerSalesPrint thead {
-            position: static !important; /* disable sticky header for print */
+            position: static !important;
+            /* disable sticky header for print */
         }
+
         /* Avoid breaking rows across pages */
-        #customerSalesModal table, #mainCustomerSalesPrint table { page-break-inside: auto; }
-        #customerSalesModal tr, #mainCustomerSalesPrint tr { page-break-inside: avoid; page-break-after: auto; }
+        #customerSalesModal table,
+        #mainCustomerSalesPrint table {
+            page-break-inside: auto;
+        }
+
+        #customerSalesModal tr,
+        #mainCustomerSalesPrint tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
     }
 </style>
 @endpush
