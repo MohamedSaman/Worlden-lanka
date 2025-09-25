@@ -33,7 +33,7 @@
                     class="btn text-white rounded-pill shadow-sm px-3 py-2 transition-transform hover:scale-105"
                     aria-label="Export stock details to CSV"
                     style="background-color: #9d1c20; border-color: #9d1c20; font-size: 0.875rem;">
-                    <i class="bi bi-download me-1" aria-hidden="true"></i> 
+                    <i class="bi bi-download me-1" aria-hidden="true"></i>
                     <span class="d-none d-sm-inline">Export </span>CSV
                 </button>
                 <button id="printButton"
@@ -47,11 +47,11 @@
                     aria-label="Toggle show all or paginated"
                     style="font-size: 0.875rem;">
                     @if($showAll)
-                        <i class="bi bi-list-nested me-1" aria-hidden="true"></i> 
-                        <span class="d-none d-sm-inline">Show </span>Paginated
+                    <i class="bi bi-list-nested me-1" aria-hidden="true"></i>
+                    <span class="d-none d-sm-inline">Show </span>Paginated
                     @else
-                        <i class="bi bi-list-task me-1" aria-hidden="true"></i> 
-                        <span class="d-none d-sm-inline">Show </span>All
+                    <i class="bi bi-list-task me-1" aria-hidden="true"></i>
+                    <span class="d-none d-sm-inline">Show </span>All
                     @endif
                 </button>
             </div>
@@ -67,57 +67,30 @@
                     <thead class="sticky-top">
                         <tr style="background-color: #f8f9fa;">
                             <th class="text-center py-3 ps-2 ps-md-4 d-none d-md-table-cell" style="min-width: 60px;">ID</th>
-                            <th class="text-center py-3 d-none d-lg-table-cell" style="min-width: 80px;">Image</th>
-                            <th class="text-center py-3" style="min-width: 150px;">Product</th>
+                            <th class=" py-3" style="min-width: 150px;">Product</th>
                             <th class="text-center py-3 d-none d-sm-table-cell" style="min-width: 120px;">Code</th>
                             <th class="text-center py-3 d-none d-lg-table-cell" style="min-width: 100px;">Category</th>
                             <th class="text-center py-3 d-none d-md-table-cell" style="min-width: 80px;">Sold</th>
                             <th class="text-center py-3" style="min-width: 100px;">Stock</th>
                             <th class="text-center py-3 d-none d-sm-table-cell" style="min-width: 80px;">Damage</th>
                             <th class="text-center py-3 d-none d-lg-table-cell" style="min-width: 80px;">Total</th>
+                            <th class="text-center py-3 d-none d-lg-table-cell" style="min-width: 80px;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         @php
-                            $isPaginated = $products instanceof \Illuminate\Pagination\AbstractPaginator;
+                        $isPaginated = $products instanceof \Illuminate\Pagination\AbstractPaginator;
                         @endphp
                         @forelse($products as $index => $product)
                         <tr class="transition-all hover:bg-gray-50">
                             <td class="text-sm text-center ps-2 ps-md-4 py-3 d-none d-md-table-cell">
                                 {{ $isPaginated ? ($products->firstItem() + $index) : ($loop->iteration) }}
                             </td>
-                            <td class="text-sm text-center py-3 d-none d-lg-table-cell">
-                                @if($product->image)
-                                <div class="image-wrapper rounded-lg shadow-sm transition-transform hover:scale-110 mx-auto">
-                                    <img src="{{ asset('storage/' . $product->image) }}"
-                                        class="rounded-lg"
-                                        style="width: 40px; height: 40px; object-fit: cover;"
-                                        alt="Image of {{ $product->product_name }}"
-                                        onerror="this.onerror=null; this.src=''; this.parentNode.innerHTML='<div style=\'width:40px;height:40px;background-color:#f3f4f6;border-radius:0.5rem;display:flex;align-items:center;justify-content:center;\'><i class=\'bi bi-watch text-gray-600\'></i></div>';">
-                                </div>
-                                @else
-                                <div style="width:30px;height:30px;background-color:#f3f4f6;border-radius:0.5rem;display:flex;align-items:center;justify-content:center; margin:0 auto;">
-                                    <i class="bi bi-box-seam text-gray-600"></i>
-                                </div>
-                                @endif
-                            </td>
                             <td class="text-sm py-3">
+                                <div class="fw-medium text-center d-none d-sm-table-cell">{{ $product->product_name }}</div>
                                 <div class="d-flex align-items-center">
-                                    <!-- Mobile image -->
-                                    <div class="d-lg-none me-2 flex-shrink-0">
-                                        @if($product->image)
-                                        <img src="{{ asset('storage/' . $product->image) }}"
-                                            class="rounded"
-                                            style="width: 32px; height: 32px; object-fit: cover;"
-                                            alt="{{ $product->product_name }}">
-                                        @else
-                                        <div style="width:32px;height:32px;background-color:#f3f4f6;border-radius:0.5rem;display:flex;align-items:center;justify-content:center;">
-                                            <i class="bi bi-box-seam text-gray-600" style="font-size: 0.8rem;"></i>
-                                        </div>
-                                        @endif
-                                    </div>
-                                    <div class="text-start">
-                                        <div class="fw-medium">{{ $product->product_name }}</div>
+                                    <div class="text-start ms-4">
+                                        <div class="fw-medium d-md-none text-muted small">{{ $product->product_name }}</div>
                                         <!-- Mobile info -->
                                         <div class="d-md-none text-muted small">
                                             Code: {{ $product->product_code }}<br>
@@ -144,6 +117,14 @@
                             <td class="text-sm text-center py-3 d-none d-lg-table-cell">
                                 {{ $product->sold + $product->stock_quantity + $product->damage_quantity }}
                             </td>
+                            <td class="text-sm text-center py-3">
+                                <button wire:click="viewProductSales({{ $product->id }})"
+                                    class="btn text-primary btn-sm"
+                                    aria-label="View customer sales details">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                            </td>
+
                         </tr>
                         @empty
                         <tr>
@@ -163,12 +144,65 @@
             </div>
             <!-- Pagination -->
             @if($products instanceof \Illuminate\Pagination\AbstractPaginator)
-                <div class="d-flex justify-content-end mt-4">
-                    {{ $products->links('livewire::bootstrap') }}
-                </div>
+            <div class="d-flex justify-content-end mt-4">
+                {{ $products->links('livewire::bootstrap') }}
+            </div>
             @endif
 
         </div>
+
+        <!-- show product customer wise  -->
+        @if($showModal)
+        <div class="modal fade show d-block" tabindex="-1" role="dialog" aria-labelledby="salesModalLabel" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content rounded-3 shadow-lg">
+                    <div class="modal-header text-white" style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%); border-top-left-radius: 0.3rem; border-top-right-radius: 0.3rem;">
+                        <h5 class="modal-title fw-bold" id="salesModalLabel">Sales Details for: {{ $selectedProduct->product_name }}</h5>
+                        <button type="button" class="btn-close btn-close-white" wire:click="$set('showModal', false)" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body p-4">
+                        <div class="mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <div class="fs-6 fw-semibold"><span class="text-muted">Total Sold Quantity:</span> {{ $totalSold }}</div>
+                            <div class="fs-6 fw-semibold"><span class="text-muted">Available Quantity:</span> {{ $availableQuantity }}</div>
+                        </div>
+
+                        @if($saleItems->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col" class="fw-semibold">Customer Name</th>
+                                        <th scope="col" class="fw-semibold">Invoice</th>
+                                        <th scope="col" class="fw-semibold">Quantity</th>
+                                        <th scope="col" class="fw-semibold">Unit Price</th>
+                                        <th scope="col" class="fw-semibold">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($saleItems as $item)
+                                    <tr class="animate__animated animate__fadeIn" style="animation-duration: 0.3s;">
+                                        <td>{{ $item->customer_name }}</td>
+                                        <td>{{ $item->invoice_number }}</td>
+                                        <td>{{ $item->quantity }}</td>
+                                        <td>${{ number_format($item->price, 2) }}</td>
+                                        <td>${{ number_format($item->quantity * $item->price, 2) }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        @else
+                        <p class="text-center text-muted my-4">No sales found for this product.</p>
+                        @endif
+                    </div>
+                    <div class="modal-footer border-0 pt-0">
+                        <button type="button" class="btn btn-secondary px-4 py-2 rounded-3" wire:click="$set('showModal', false)">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
     </div>
     @push('styles')
     <style>
@@ -217,25 +251,78 @@
             transition: transform 0.2s ease;
         }
 
+        .modal-content {
+            border: none;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .modal-dialog {
+            max-width: 900px;
+        }
+
+        .modal-body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            vertical-align: middle;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            border: none;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+        }
+
+        @media (max-width: 576px) {
+            .modal-dialog {
+                margin: 1rem;
+            }
+
+            .d-flex.justify-content-between {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+
         /* Responsive Table Styles */
         @media (max-width: 767.98px) {
             .table-responsive {
                 font-size: 0.875rem;
             }
-            
+
             .card-header {
                 padding: 1rem !important;
             }
-            
+
             .btn {
                 font-size: 0.8rem !important;
             }
-            
+
             .table td {
                 padding: 0.5rem 0.25rem !important;
                 vertical-align: middle;
             }
-            
+
             .table th {
                 padding: 0.75rem 0.25rem !important;
                 font-size: 0.8rem;
@@ -247,15 +334,15 @@
                 padding-left: 0.5rem;
                 padding-right: 0.5rem;
             }
-            
+
             .card {
                 margin: 0;
             }
-            
+
             .input-group {
                 max-width: 100% !important;
             }
-            
+
             .table {
                 font-size: 0.8rem;
             }
@@ -267,7 +354,7 @@
             top: 0;
             z-index: 10;
             background-color: #f8f9fa !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         /* Better scrollbar styling */
@@ -292,6 +379,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     @endpush
 
     @push('scripts')

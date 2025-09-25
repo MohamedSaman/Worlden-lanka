@@ -8,6 +8,7 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\ProductDetail;
+use Illuminate\Support\Facades\DB;
 
 #[Layout('components.layouts.admin')]
 #[Title('Product Management')]
@@ -76,6 +77,41 @@ class ProductStocks extends Component
             ]);
         }
     }
+
+    // Inside ProductStocks.php
+    public $selectedProduct;
+    public $saleItems = [];
+    public $showModal = false;
+    public $totalSold = 0;
+    public $availableQuantity = 0;
+
+
+    // Open modal and load customer list for a specific product
+    public function viewProductSales($productId)
+    {
+        $this->selectedProduct = ProductDetail::with('category')->find($productId);
+
+        $this->saleItems = DB::table('sales_items')
+            ->join('sales', 'sales.id', '=', 'sales_items.sale_id')
+            ->join('customers', 'customers.id', '=', 'sales.customer_id')
+            ->select(
+                'sales.invoice_number',
+                'customers.name as customer_name',
+                'sales_items.quantity',
+                'sales_items.price'
+            )
+            ->where('sales_items.product_id', $productId)
+            ->get();
+
+        // Total sold quantity
+        $this->totalSold = $this->saleItems->sum('quantity');
+
+        // Available quantity from product stock
+        $this->availableQuantity = $this->selectedProduct->stock_quantity ?? 0;
+
+        $this->showModal = true;
+    }
+
 
     public function render()
     {
