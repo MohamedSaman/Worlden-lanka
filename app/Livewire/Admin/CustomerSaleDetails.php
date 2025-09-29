@@ -36,7 +36,7 @@ class CustomerSaleDetails extends Component
             )
             ->first();
 
-        // Payment sums by logical status for this customer's sales and back-forward payments
+        // Payment sums by logical status for this customer's sales and Brought-forward payments
         $paymentsBase = Payment::where(function ($query) use ($customerId) {
             $query->whereHas('sale', function($q) use ($customerId) {
                 $q->where('customer_id', $customerId);
@@ -138,7 +138,7 @@ class CustomerSaleDetails extends Component
             ->orderBy('sales.created_at', 'desc')
             ->get();
 
-        // Get paid records related to this customer's sales and back-forward payments
+        // Get paid records related to this customer's sales and Brought-forward payments
         $payments = DB::table('payments')
             ->leftJoin('sales', 'payments.sale_id', '=', 'sales.id')
             ->leftJoin('customers', 'payments.customer_id', '=', 'customers.id')
@@ -198,7 +198,7 @@ class CustomerSaleDetails extends Component
                 $label .= ' (' . $p->payment_reference . ')';
             }
 
-            // For back-forward payments without sale_id, show customer context
+            // For Brought-forward payments without sale_id, show customer context
             if (empty($p->sale_id) && !empty($p->customer_name)) {
                 $label .= ' - ' . $p->customer_name;
             }
@@ -223,7 +223,7 @@ class CustomerSaleDetails extends Component
             return $da <=> $db;
         });
 
-        // Start with Back-Forward due (if any), then the ordered timeline
+        // Start with Brought-Forward due (if any), then the ordered timeline
         if ($bfAmount && floatval($bfAmount) != 0.0) {
             $invoiceSummaryRows[] = [
                 'type' => 'broughtforward',

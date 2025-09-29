@@ -259,7 +259,7 @@
             .widget-container {
                 margin-bottom: 1rem;
             }
-        }
+        
 
             .content-tabs::-webkit-scrollbar {
                 display: none;

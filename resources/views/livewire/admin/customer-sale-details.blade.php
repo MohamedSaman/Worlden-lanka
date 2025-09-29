@@ -255,7 +255,7 @@
                         </div>
                     </div>
 
-                    <!-- Invoice Summary (Back-Forward, Invoices, and Paid) -->
+                    <!-- Invoice Summary (Brought-Forward, Invoices, and Paid) -->
                     <div class="card border-0 shadow-sm rounded-4">
                         <div class="card-header p-4" style="background-color: #eff6ff;">
                             <h5 class="card-title mb-0 fw-bold text-sm" style="color: #9d1c20;">Sales Summary</h5>

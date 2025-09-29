@@ -227,7 +227,7 @@ class DuePayments extends Component
         }
 
         if ($this->applyTarget === 'back_forward' && $this->backForwardAmount <= 0) {
-            $this->js("Swal.fire('Error', 'Back-forward amount is zero. Cannot apply payment to back-forward dues.', 'error')");
+            $this->js("Swal.fire('Error', 'Brought-forward amount is zero. Cannot apply payment to Brought-forward dues.', 'error')");
             return;
         }
 
@@ -292,7 +292,7 @@ class DuePayments extends Component
             $paymentStatus = $isCurrent ? 'current' : 'forward';
             $payment = Payment::create([
                 'sale_id' => $saleId,
-                'customer_id' => $this->paymentId, // Add customer_id for back-forward payments
+                'customer_id' => $this->paymentId, // Add customer_id for Brought-forward payments
                 'amount' => $totalPaid,
                 'due_date' => now(),
                 'status' => $paymentStatus,
@@ -358,7 +358,7 @@ class DuePayments extends Component
                         'payment_date' => now(),
                     ]);
                 } else {
-                    // Paying against back-forward due: reduce back_forward_amount by the payment
+                    // Paying against Brought-forward due: reduce Brought-forward amount     by the payment
                     $dueForThis = max(0, floatval($acc->back_forward_amount));
                     $payForThis = min($dueForThis, $remainingPayment);
                     $newBackForward = max(0, $dueForThis - $payForThis);

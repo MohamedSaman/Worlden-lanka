@@ -607,6 +607,39 @@
                 }
             });
 
+            // Handle delayed modal opening to ensure data is loaded
+            Livewire.on('openPaymentModal', () => {
+                // Small delay to ensure Livewire has processed the property updates
+                setTimeout(() => {
+                    const modalElement = document.getElementById('payment-receipt-modal');
+                    if (modalElement) {
+                        // Double-check that the payment data is actually loaded
+                        if (window.Livewire && window.Livewire.find) {
+                            try {
+                                const component = window.Livewire.find(document.querySelector('[wire\\:id]').getAttribute('wire:id'));
+                                if (component && component.selectedPayment) {
+                                    const modal = new bootstrap.Modal(modalElement);
+                                    modal.show();
+                                } else {
+                                    // If data still not available, try again in 100ms
+                                    setTimeout(() => {
+                                        const modal = new bootstrap.Modal(modalElement);
+                                        modal.show();
+                                    }, 100);
+                                }
+                            } catch (e) {
+                                // Fallback if component lookup fails
+                                const modal = new bootstrap.Modal(modalElement);
+                                modal.show();
+                            }
+                        } else {
+                            const modal = new bootstrap.Modal(modalElement);
+                            modal.show();
+                        }
+                    }
+                }, 50); // 50ms delay should be sufficient
+            });
+
             Livewire.on('payment-data-loaded', () => {
                 // Force a re-render of the modal content to show the loaded data
                 setTimeout(() => {

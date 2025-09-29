@@ -73,11 +73,8 @@ class ViewPayments extends Component
             // Set loading to false after data is loaded
             $this->isLoadingPayment = false;
 
-            // Dispatch event to open modal after data is loaded
-            $this->dispatch('openModal', 'payment-receipt-modal');
-
-            // Force a component refresh to ensure data is available
-            $this->dispatch('payment-data-loaded');
+            // Delay modal opening to ensure data is processed by Livewire
+            $this->dispatch('openPaymentModal');
         } catch (\Exception $e) {
             Log::error('Error loading payment: ' . $e->getMessage());
             $this->isLoadingPayment = false;
