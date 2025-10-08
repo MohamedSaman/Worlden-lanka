@@ -402,7 +402,7 @@
                     <div class="stat-value">Rs.{{ number_format($totalSales, 2) }}</div>
                     <div class="stat-info mt-1">
                         <div class="d-flex justify-content-between mb-1">
-                            <small>Total Paid Amount</small>
+                            <small>Paid Amount</small>
                             <small>{{ $revenuePercentage }}% of total sales</small>
                         </div>
                         <div class="progress">
