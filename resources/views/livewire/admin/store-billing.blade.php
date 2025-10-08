@@ -817,10 +817,8 @@
                                             <tr>
                                                 <th scope="col" class="text-center py-2">No</th>
                                                 <th scope="col" class="text-center py-2">Item</th>
-                                                <th scope="col" class="text-center py-2">Code</th>
                                                 <th scope="col" class="text-center py-2">Price</th>
                                                 <th scope="col" class="text-center py-2">Qty</th>
-                                                <th scope="col" class="text-center py-2">Qty Type</th>
                                                 <th scope="col" class="text-center py-2">Discount</th>
                                                 <th scope="col" class="text-center py-2">Total</th>
                                             </tr>
@@ -831,12 +829,10 @@
                                                 <td class="text-center py-2">{{ $index + 1 }}</td>
                                                 <td class="text-center py-2">{{ $item->product->product_name ?? 'N/A' }}
                                                 </td>
-                                                <td class="text-center py-2">{{ $item->product->product_code ?? 'N/A' }}
-                                                </td>
+                                                
                                                 <td class="text-center py-2">Rs.{{ number_format($item->price, 2) }}
                                                 </td>
                                                 <td class="text-center py-2">{{ $item->quantity }}</td>
-                                                <td class="text-center py-2">{{ ucfirst($item->quantity_type) }}</td>
                                                 <td class="text-center py-2">Rs.{{ number_format($item->discount *
                                                     $item->quantity, 2) }}</td>
                                                 <td class="text-center py-2">Rs.{{ number_format(($item->price *

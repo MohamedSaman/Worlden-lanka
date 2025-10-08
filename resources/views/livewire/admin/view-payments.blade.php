@@ -346,7 +346,7 @@
                                         <td style="font-size: 0.85rem;">Rs.{{ number_format($item->price ?? 0, 2) }}</td>
                                         <td style="font-size: 0.85rem;">{{ $item->quantity ?? 0 }}</td>
                                         <td style="font-size: 0.85rem;">{{ ucfirst($item->quantity_type ?? 'N/A') }}</td>
-                                        <td style="font-size: 0.85rem;">Rs.{{ number_format($item->total ?? 0, 2) }}</td>
+                                        <td style="font-size: 0.85rem;">Rs.{{ number_format(($item->price * $item->quantity ) ?? 0, 2) }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
