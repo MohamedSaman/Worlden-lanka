@@ -425,7 +425,7 @@
             <div class="col-sm-6 col-lg-3 mb-3">
                 <div class="stat-card">
                     <div class="d-flex justify-content-between align-items-center mb-2">
-                        <div class="stat-label">Total Due Amount</div>
+                        <div class="stat-label">Total Current Due Amount</div>
                     </div>
                     <div class="stat-value">Rs.{{ number_format($totalDueAmount, 2) }}</div>
                     <div class="stat-change-alert">

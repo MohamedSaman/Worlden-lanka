@@ -379,7 +379,7 @@ class DuePayments extends Component
                 if ($acc->sale_id) {
                     $sale = Sale::find($acc->sale_id);
                     if ($sale) {
-                        $sale->update(['due_amount' => $acc->total_due]);
+                        $sale->update(['due_amount' => $acc->current_due_amount]);
                     }
                 }
 
