@@ -56,7 +56,7 @@ class ViewPayments extends Component
             ]);
 
             // For payments without sales, we still need to show the payment details
-            // The sale validation is not required for back-forward payments
+            // The sale validation is not required for Brought-forward payments
             if (!$this->selectedPayment->sale && !$this->selectedPayment->customer) {
                 $this->dispatch('showToast', [
                     'type' => 'warning',

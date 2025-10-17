@@ -129,12 +129,13 @@ class CustomerSaleDetails extends Component
             ->select(
                 'sales.id',
                 'sales.invoice_number',
+                'sales.notes',
                 'sales.created_at as sale_date',
                 DB::raw('SUM(sales_items.price * sales_items.quantity - sales_items.discount) as total_invoice_amount'),
                 'customers.name as customer_name'
             )
             ->join('sales_items', 'sales.id', '=', 'sales_items.sale_id')
-            ->groupBy('sales.id', 'sales.invoice_number', 'sales.created_at', 'customers.name')
+            ->groupBy('sales.id', 'sales.invoice_number', 'sales.notes', 'sales.created_at', 'customers.name')
             ->orderBy('sales.created_at', 'desc')
             ->get();
 
@@ -163,7 +164,7 @@ class CustomerSaleDetails extends Component
             ->orderBy('payments.created_at', 'desc')
             ->get();
 
-        // Build unified invoice summary rows timeline: Back-Forward first, then Invoices and Paid ordered by date
+        // Build unified invoice summary rows timeline: Brought-Forward first, then Invoices and Paid ordered by date
         $invoiceSummaryRows = [];
 
         $bfAmount = ($accountTotals->back_forward_due + $paidForwardSum ) ?? 0;
@@ -173,7 +174,7 @@ class CustomerSaleDetails extends Component
         foreach ($invoiceSales as $inv) {
             $events[] = [
                 'type' => 'invoice',
-                'description' => 'Invoice ' . $inv->invoice_number,
+                'description' => 'Invoice ' . $inv->invoice_number.'(' . ($inv->notes ? $inv->notes : 'No notes.') . ')',
                 'date' => $inv->sale_date,
                 'amount' => floatval($inv->total_invoice_amount ?? 0),
             ];

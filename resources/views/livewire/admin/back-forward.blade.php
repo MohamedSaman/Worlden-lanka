@@ -1,4 +1,4 @@
-<!-- File: resources/views/livewire/admin/back-forward.blade.php -->
+<!-- File: resources/views/livewire/admin/Brought-forward.blade.php -->
 <div class="container-fluid py-2">
     <div class="card border-0">
         <!-- Header -->
@@ -8,8 +8,8 @@
                 <i class="bi bi-currency-exchange fs-4 text-white" aria-hidden="true"></i>
             </div>
             <div>
-                <h3 class="mb-1 fw-bold tracking-tight text-white">Back-Forward Management</h3>
-                <p class="text-white opacity-80 mb-0 text-sm">Monitor and adjust customer back-forward amounts</p>
+                <h3 class="mb-1 fw-bold tracking-tight text-white">Brought-Forward Management</h3>
+                <p class="text-white opacity-80 mb-0 text-sm">Monitor and adjust customer Brought-forward amounts</p>
             </div>
         </div>
         <div class="card-header bg-transparent pb-4 mt-2 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
@@ -36,7 +36,7 @@
                             <th class="text-center ps-4 py-3">No</th>
                             <th class="py-3">Customer Name</th>
                             <th class="text-center py-3">Contact Number</th>
-                            <th class="text-center py-3">Total Back-Forward Amount</th>
+                            <th class="text-center py-3">Total Brought-Forward Amount</th>
                             <th class="text-center py-3">Action</th>
                         </tr>
                     </thead>
@@ -94,7 +94,7 @@
                                                 <span class="fw-bold {{ $customer->customer_accounts_sum_back_forward_amount >= 0 ? 'text-success' : 'text-danger' }}">
                                                     {{ number_format($customer->customer_accounts_sum_back_forward_amount ?? 0, 2) }}
                                                 </span>
-                                                <span class="text-muted ms-1">Back-Forward</span>
+                                                <span class="text-muted ms-1">Brought-Forward</span>
                                             </div>
                                         </div>
                                     </td>
@@ -116,12 +116,12 @@
         </div>
     </div>
 
-    <!-- Adjust Back-Forward Modal -->
+    <!-- Adjust BBroughtack-Forward Modal -->
     <div wire:ignore.self class="modal fade" id="adjustBackForwardModal" tabindex="-1" aria-labelledby="adjustBackForwardModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
                 <div class="modal-header py-3 px-4" style="background-color: #9d1c20; color: white;">
-                    <h1 class="modal-title fs-5 fw-bold tracking-tight" id="adjustBackForwardModalLabel">{{ $isEditing ? 'Edit Back-Forward Amount' : 'Adjust Back-Forward Amount' }}</h1>
+                    <h1 class="modal-title fs-5 fw-bold tracking-tight" id="adjustBackForwardModalLabel">{{ $isEditing ? 'Edit Brought-Forward Amount' : 'Adjust Brought-Forward Amount' }}</h1>
                     <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-5">

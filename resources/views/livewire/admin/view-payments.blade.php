@@ -246,22 +246,26 @@
     </div>
 
     <div wire:ignore.self class="modal fade" id="payment-receipt-modal" tabindex="-1" aria-labelledby="payment-receipt-modal-label" aria-hidden="true" wire:key="payment-receipt-{{ $selectedPayment ? $selectedPayment->id : 'none' }}">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
-            <div class="modal-content border-0 shadow-lg rounded-4">
-                <div class="modal-header text-white p-4" style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%);">
-                    <h5 class="modal-title fw-bold tracking-tight" id="payment-receipt-modal-label" style="font-size: 1.5rem;">
-                        <i class="bi bi-receipt-cutoff me-2"></i>Payment Receipt
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content rounded-4 shadow-xl"
+                style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #FFFFFF, #F8F9FA);">
+                <div class="modal-header"
+                    style="background-color: #9d1c20; color: #FFFFFF; border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem;">
+                    <h5 class="modal-title fw-bold tracking-tight" id="payment-receipt-modal-label">
+                        <i class="bi bi-receipt me-2"></i>Payment Receipt
                     </h5>
-                    <div>
-                        <button type="button" class="btn btn-sm btn-light me-2 rounded-full" onclick="printReceiptContent()">
+                    <div class="ms-auto d-flex gap-2">
+                        <button type="button" class="btn btn-sm rounded-full px-3 transition-all hover:shadow"
+                            id="printButton" style="background-color: #9d1c20;border-color:#fff; color: #fff;" onclick="printReceiptContent()">
                             <i class="bi bi-printer me-1"></i>Print
                         </button>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" wire:click="$set('selectedPayment', null)"></button>
+                        <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100"
+                            data-bs-dismiss="modal" aria-label="Close" wire:click="$set('selectedPayment', null)"></button>
                     </div>
                 </div>
                 <div class="modal-body p-4" id="receiptContent">
                     @if ($isLoadingPayment)
-                    <div class="text-center py-5">
+                    <div class="text-center p-5">
                         <div style="width:72px;height:72px;background-color:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;margin-bottom:12px;">
                             <i class="bi bi-receipt text-gray-600 fs-3"></i>
                         </div>
@@ -271,82 +275,94 @@
                     @elseif ($selectedPayment)
                     <div class="receipt-container">
                         <div class="text-center mb-4">
-                            <h3 class="mb-2 fw-bold" style="font-size: 1.75rem;">PLUS</h3>
-                            <p class="mb-1 text-muted small" style="font-size: 0.85rem;">NO 20/2/1, 2nd FLOOR, HUNTER BUILDING, BANKSHALL STREET, COLOMBO-11</p>
-                            <p class="mb-2 text-muted small" style="font-size: 0.85rem;">Phone: 011 - 2332786 | Email: plusaccessories.lk@gmail.com</p>
-                            <h4 class="mt-3 border-bottom border-2 pb-2 fw-semibold" style="font-size: 1.25rem;">PAYMENT RECEIPT</h4>
+                            <h3 class="mb-1 fw-bold tracking-tight" style="color: #9d1c20;">PLUS</h3>
+                            <p class="mb-0 text-muted small" style="color: #6B7280;">NO 20/2/1, 2nd FLOOR,HUNTER
+                                BUILDING,BANKSHALLL STREET,COLOMBO-11</p>
+                            <p class="mb-0 text-muted small" style="color: #6B7280;">Phone: 011 - 2332786 |
+                                Email: plusaccessories.lk@gmail.com</p>
+                            <h4 class="mt-3 border-bottom border-2 pb-2 fw-bold"
+                                style="color: #9d1c20; border-color: #9d1c20;">PAYMENT RECEIPT</h4>
                         </div>
 
-                        <div class="row">
-                            <div class="mb-1 col-md-6">
-                                <h6 class="text-muted mb-2" style="font-size: 1rem;">INVOICE INFORMATION</h6>
-                                <div class="card border-0 shadow-sm mb-3">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-2 fw-medium" style="color: #6B7280;">INVOICE INFORMATION
+                                </h6>
+                                <div class="card border-1 rounded-3 shadow-sm" style="border-color: #9d1c20;">
                                     <div class="card-body p-3">
                                         @if($selectedPayment->sale)
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Invoice:</strong> {{ $selectedPayment->sale->invoice_number ?? 'N/A' }}</p>
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Sale Date:</strong> {{ $selectedPayment->sale->created_at ? $selectedPayment->sale->created_at->format('d/m/Y h:i A') : 'N/A' }}</p>
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Total:</strong> Rs.{{ number_format($selectedPayment->sale->total_amount ?? 0, 2) }}</p>
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Invoice:</strong> {{ $selectedPayment->sale->invoice_number ?? 'N/A' }}</p>
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Sale Date:</strong> {{ $selectedPayment->sale->created_at ? $selectedPayment->sale->created_at->format('d/m/Y h:i A') : 'N/A' }}</p>
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Total:</strong> Rs.{{ number_format($selectedPayment->sale->total_amount ?? 0, 2) }}</p>
                                         @php
                                             $paid = $selectedPayment->sale->payments->where('is_completed', true)->sum('amount');
                                             $remaining = $selectedPayment->sale->total_amount - $paid;
                                         @endphp
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Remaining:</strong> Rs.{{ number_format($remaining, 2) }}</p>
-                                        <p class="mb-0" style="font-size: 0.9rem;"><strong>Payment Status:</strong>
-                                            <span class="badge bg-{{ $selectedPayment->sale->payment_status == 'paid' ? 'success' : ($selectedPayment->sale->payment_status == 'partial' ? 'warning' : 'danger') }}">
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Remaining:</strong> Rs.{{ number_format($remaining, 2) }}</p>
+                                        <p class="mb-0" style="color: #9d1c20;"><strong>Payment Status:</strong>
+                                            <span class="badge"
+                                                style="background-color: {{ $selectedPayment->sale->payment_status == 'paid' ? '#0F5132' : ($selectedPayment->sale->payment_status == 'partial' ? '#664D03' : '#842029') }}; color: #FFFFFF;">
                                                 {{ $selectedPayment->sale->payment_status ? ucfirst($selectedPayment->sale->payment_status) : 'Unknown' }}
                                             </span>
                                         </p>
                                         @else
-                                        <p class="mb-1 text-muted" style="font-size: 0.9rem;">This is a Brought-forward payment not associated with a specific sale.</p>
+                                        <p class="text-muted" style="color: #6B7280;">This is a Brought-forward payment not associated with a specific sale.</p>
                                         @if($selectedPayment->customer)
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Customer:</strong> {{ $selectedPayment->customer->name }}</p>
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Phone:</strong> {{ $selectedPayment->customer->phone ?? 'N/A' }}</p>
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Customer:</strong> {{ $selectedPayment->customer->name }}</p>
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Phone:</strong> {{ $selectedPayment->customer->phone ?? 'N/A' }}</p>
                                         @endif
                                         @endif
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="mb-1 col-md-6">
-                                <h6 class="text-muted mb-2" style="font-size: 1rem;">STAFF INFORMATION</h6>
-                                <div class="card border-0 shadow-sm">
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-2 fw-medium" style="color: #6B7280;">CUSTOMER INFORMATION</h6>
+                                <div class="card border-1 rounded-3 shadow-sm" style="border-color: #9d1c20;">
                                     <div class="card-body p-3">
-                                        @if($selectedPayment->sale && $selectedPayment->sale->user)
-                                        <h6 class="mb-0" style="font-size: 1rem;">{{ $selectedPayment->sale->user->name ?? 'Unknown' }}</h6>
-                                        <p class="mb-1 small" style="font-size: 0.9rem;"><i class="bi bi-envelope me-2"></i>{{ $selectedPayment->sale->user->email ?? 'N/A' }}</p>
+                                        @if($selectedPayment->sale && $selectedPayment->sale->customer)
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Name:</strong> {{ $selectedPayment->sale->customer->name ?? 'Guest Customer' }}</p>
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Phone:</strong> {{ $selectedPayment->sale->customer->phone ?? 'N/A' }}</p>
+                                        @if($selectedPayment->sale->customer->address)
+                                        <p class="mb-0" style="color: #9d1c20;"><strong>Address:</strong> {{ $selectedPayment->sale->customer->address }}</p>
+                                        @endif
                                         @else
-                                        <p class="mb-0 text-muted" style="font-size: 0.9rem;">No staff information available for this payment type.</p>
+                                        <p class="text-muted" style="color: #6B7280;">No customer information available.</p>
                                         @endif
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <h6 class="text-muted mb-2" style="font-size: 1rem;">PURCHASED ITEMS</h6>
+                        <h6 class="text-muted mb-2 fw-medium" style="color: #6B7280;">PURCHASED ITEMS</h6>
                         <div class="table-responsive mb-4">
                             @if($selectedPayment && $selectedPayment->sale && $selectedPayment->sale->items && $selectedPayment->sale->items->count() > 0)
-                            <table class="table table-bordered table-sm">
-                                <thead class="table-light">
+                            <table class="table table-bordered table-sm border-1"
+                                style="border-color: #9d1c20;">
+                                <thead style="background-color: #9d1c20; color: #FFFFFF;">
                                     <tr>
-                                        <th style="font-size: 0.9rem;">ID</th>
-                                        <th style="font-size: 0.9rem;">Item</th>
-                                        <th style="font-size: 0.9rem;">Code</th>
-                                        <th style="font-size: 0.9rem;">Price</th>
-                                        <th style="font-size: 0.9rem;">Qty</th>
-                                        <th style="font-size: 0.9rem;">Qty Type</th>
-                                        <th style="font-size: 0.9rem;">Total</th>
+                                        <th scope="col" class="text-center py-2">No</th>
+                                        <th scope="col" class="text-center py-2">Item</th>
+                                        <th scope="col" class="text-center py-2">Price</th>
+                                        <th scope="col" class="text-center py-2">Qty</th>
+                                        <th scope="col" class="text-center py-2">Discount</th>
+                                        <th scope="col" class="text-center py-2">Total</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody style="color: #9d1c20;">
                                     @foreach ($selectedPayment->sale->items as $index => $item)
-                                    <tr>
-                                        <td style="font-size: 0.85rem;">{{ $index + 1 }}</td>
-                                        <td style="font-size: 0.85rem;">{{ $item->product->product_name ?? 'N/A' }}</td>
-                                        <td style="font-size: 0.85rem;">{{ $item->product->product_code ?? 'N/A' }}</td>
-                                        <td style="font-size: 0.85rem;">Rs.{{ number_format($item->price ?? 0, 2) }}</td>
-                                        <td style="font-size: 0.85rem;">{{ $item->quantity ?? 0 }}</td>
-                                        <td style="font-size: 0.85rem;">{{ ucfirst($item->quantity_type ?? 'N/A') }}</td>
-                                        <td style="font-size: 0.85rem;">Rs.{{ number_format(($item->price * $item->quantity ) ?? 0, 2) }}</td>
+                                    <tr class="transition-all hover:bg-gray-50">
+                                        <td class="text-center py-2">{{ $index + 1 }}</td>
+                                        <td class="text-center py-2">{{ $item->product->product_name ?? 'N/A' }}
+                                        </td>
+
+                                        <td class="text-center py-2">Rs.{{ number_format($item->price, 2) }}
+                                        </td>
+                                        <td class="text-center py-2">{{ $item->quantity }}</td>
+                                        <td class="text-center py-2">Rs.{{ number_format($item->discount *
+                                                    $item->quantity, 2) }}</td>
+                                        <td class="text-center py-2">Rs.{{ number_format(($item->price *
+                                                    $item->quantity) - ($item->discount * $item->quantity), 2) }}</td>
                                     </tr>
                                     @endforeach
                                 </tbody>
@@ -369,61 +385,88 @@
                         </div>
 
                         <div class="row">
-                            <div class="mb-1 col-md-6">
-                                <h6 class="text-muted mb-2" style="font-size: 1rem;">CUSTOMER INFORMATION</h6>
-                                <div class="card border-0 shadow-sm">
-                                    <div class="card-body p-3">
-                                        @if($selectedPayment->sale && $selectedPayment->sale->customer)
-                                        <h6 class="mb-1" style="font-size: 1rem;">{{ $selectedPayment->sale->customer->name ?? 'Guest Customer' }}</h6>
-                                        <p class="mb-1 small" style="font-size: 0.9rem;"><i class="bi bi-telephone me-2"></i>{{ $selectedPayment->sale->customer->phone ?? 'N/A' }}</p>
-                                        @if($selectedPayment->sale->customer->address)
-                                        <p class="mb-0 small" style="font-size: 0.9rem;"><i class="bi bi-geo-alt me-2"></i>{{ $selectedPayment->sale->customer->address }}</p>
-                                        @endif
-                                        @else
-                                        <p class="mb-0 text-muted" style="font-size: 0.9rem;">No customer information available.</p>
-                                        @endif
-                                    </div>
+                            <div class="col-md-6">
+                                <h6 class="text-muted mb-2 fw-medium" style="color: #6B7280;">PAYMENT
+                                    INFORMATION</h6>
+                                <div class="mb-2 p-2 border-start border-3 rounded-2"
+                                    style="border-color: {{ $selectedPayment->is_completed ? '#0F5132' : '#664D03' }}; background-color: #F8F9FA;">
+                                    <p class="mb-1" style="color: #9d1c20;">
+                                        <strong>{{ $selectedPayment->is_completed ? 'Payment' : 'Scheduled Payment'
+                                            }}:</strong>
+                                        Rs.{{ number_format($selectedPayment->amount, 2) }}
+                                    </p>
+                                    <p class="mb-1" style="color: #9d1c20;">
+                                        <strong>Method:</strong> {{ ucfirst(str_replace('_', ' ',
+                                        $selectedPayment->payment_method)) }}
+                                    </p>
+                                    @if ($selectedPayment->payment_reference)
+                                    <p class="mb-1" style="color: #9d1c20;">
+                                        <strong>Reference:</strong> {{ $selectedPayment->payment_reference }}
+                                    </p>
+                                    @endif
+                                    @if ($selectedPayment->payment_date)
+                                    <p class="mb-0" style="color: #9d1c20;">
+                                        <strong>Date:</strong> {{
+                                        \Carbon\Carbon::parse($selectedPayment->payment_date)->format('d/m/Y') }}
+                                    </p>
+                                    @endif
+                                    @if ($selectedPayment->due_date)
+                                    <p class="mb-0" style="color: #9d1c20;">
+                                        <strong>Due Date:</strong> {{
+                                        \Carbon\Carbon::parse($selectedPayment->due_date)->format('d/m/Y') }}
+                                    </p>
+                                    @endif
                                 </div>
-                            </div>
 
-                            <div class="mb-1 col-md-6">
-                                <h6 class="text-muted mb-2" style="font-size: 1rem;">PAYMENT INFORMATION</h6>
-                                <div class="card border-0 shadow-sm mb-3">
+                                @if ($selectedPayment->payment_reference)
+                                <h6 class="text-muted mt-3 mb-2 fw-medium" style="color: #6B7280;">NOTES</h6>
+                                <p class="font-italic" style="color: #6B7280;">{{ $selectedPayment->payment_reference }}</p>
+                                @endif
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card border-1 rounded-3 shadow-sm" style="border-color: #9d1c20;">
                                     <div class="card-body p-3">
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Payment ID:</strong> #{{ $selectedPayment->id }}</p>
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Amount:</strong> Rs.{{ number_format($selectedPayment->amount, 2) }}</p>
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Method:</strong> {{ ucfirst(str_replace('_', ' ', $selectedPayment->payment_method ?? 'N/A')) }}</p>
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Date:</strong>
-                                            {{ $selectedPayment->payment_date ? $selectedPayment->payment_date->format('d/m/Y h:i A') : 'N/A' }}
-                                        </p>
-                                        <p class="mb-1" style="font-size: 0.9rem;"><strong>Status:</strong>
-                                            <span class="badge bg-{{ 
-                                                $selectedPayment->status === 'pending' ? 'warning' : 
-                                                ($selectedPayment->status === 'approved' ? 'success' : 
-                                                ($selectedPayment->status === 'rejected' ? 'danger' : 
-                                                ($selectedPayment->is_completed ? 'success' : 'secondary'))) }}">
-                                                {{ $selectedPayment->status ? ucfirst($selectedPayment->status) : ($selectedPayment->is_completed ? 'Paid' : 'Scheduled') }}
-                                            </span>
-                                        </p>
+                                        <h6 class="card-title fw-bold tracking-tight" style="color: #9d1c20;">
+                                            ORDER SUMMARY</h6>
+                                        <div class="d-flex justify-content-between mb-2"
+                                            style="color: #9d1c20;">
+                                            <span>Subtotal:</span>
+                                            <span>Rs.{{ number_format($selectedPayment->sale->subtotal ?? 0, 2) }}</span>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2"
+                                            style="color: #9d1c20;">
+                                            <span>Total Discount:</span>
+                                            <span>Rs.{{ number_format($selectedPayment->sale->discount_amount ?? 0, 2) }}</span>
+                                        </div>
+                                        <hr style="border-color: #9d1c20;">
+                                        <div class="d-flex justify-content-between" style="color: #9d1c20;">
+                                            <span class="fw-bold">Grand Total:</span>
+                                            <span class="fw-bold">Rs.{{ number_format($selectedPayment->sale->total_amount ?? 0, 2)
+                                                }}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="text-center mt-4 pt-3 border-top">
-                            <p class="mb-1 text-muted small" style="font-size: 0.85rem;">This is a computer-generated receipt.</p>
-                            <p class="mb-0 text-muted small" style="font-size: 0.85rem;">{{ now()->format('d/m/Y h:i A') }}</p>
+                        <div class="text-center mt-4 pt-3 border-top" style="border-color: #9d1c20;">
+                            <p class="mb-0 text-muted small" style="color: #6B7280;">Thank you for your
+                                payment!</p>
                         </div>
                     </div>
                     @else
-                    <div class="text-center py-5">
-                        <div style="width:72px;height:72px;background-color:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;margin-bottom:12px;">
-                            <i class="bi bi-receipt text-gray-600 fs-3"></i>
-                        </div>
-                        <h5 class="text-gray-600 fw-normal" style="font-size: 1.25rem;">No Payment Selected</h5>
-                        <p class="text-sm text-gray-500 mb-0" style="font-size: 0.9rem;">Please click the View button to load payment details.</p>
+                    <div class="text-center p-5">
+                        <p class="text-muted" style="color: #6B7280;">No payment data available</p>
                     </div>
                     @endif
+                </div>
+                <div class="modal-footer border-top py-3" style="border-color: #9d1c20; background: #F8F9FA;">
+                    <button type="button"
+                        class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow"
+                        data-bs-dismiss="modal"
+                        style="background-color: #6B7280; border-color: #6B7280; color: #FFFFFF;"
+                        onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';"
+                        onmouseout="this.style.backgroundColor='#6B7280'; this.style.borderColor='#6B7280';">Close</button>
                 </div>
             </div>
         </div>
@@ -538,55 +581,47 @@
     @push('scripts')
     <script>
         window.printReceiptContent = function() {
-            const printContent = document.getElementById('receiptContent').cloneNode(true);
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            document.body.appendChild(iframe);
-            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            const receiptContent = document.querySelector('#receiptContent')?.innerHTML || '';
+            const printWindow = window.open('', '_blank', 'height=600,width=800');
 
-            iframeDoc.open();
-            iframeDoc.write(`
+            printWindow.document.write(`
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <title>Print Payment Receipt</title>
+                    <title>Payment Receipt - Print</title>
+                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
                     <style>
-                        body { font-family: Arial, sans-serif; margin: 20px; font-size: 14px; }
-                        .receipt-container { max-width: 800px; margin: auto; }
-                        .row { display: flex; flex-wrap: wrap; margin: 0 -15px; }
-                        .col-md-6 { flex: 0 0 45%; max-width: 45%; padding: 0 15px; }
-                        .card { border: 1px solid #eee; border-radius: 8px; margin-bottom: 15px; }
-                        .card-body { padding: 15px; }
-                        .table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
-                        .table th, .table td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                        .table thead th { background-color: #f5f5f5; }
-                        .text-center { text-align: center; }
-                        .border-top { border-top: 1px solid #dee2e6 !important; }
-                        .pt-3 { padding-top: 1rem !important; }
-                        .mt-4 { margin-top: 1.5rem !important; }
-                        .mb-4 { margin-bottom: 1.5rem !important; }
-                        .mb-0 { margin-bottom: 0 !important; }
-                        .mb-1 { margin-bottom: 0.25rem !important; }
-                        .mb-2 { margin-bottom: 0.5rem !important; }
-                        h3,h4,h6,p,strong { margin:0; padding:0; }
-                    </style>
+                    body { font-family: sans-serif; padding: 20px; font-size: 14px; }
+                    .table-bordered th, .table-bordered td { border: 1px solid #9d1c20 !important; padding: 2px 6px !important; font-size: 12px !important; }
+                    .receipt-container { max-width: 700px; margin: 0 auto; }
+                    .d-flex.flex-row { display: flex; flex-direction: row; gap: 2rem; }
+                    .d-flex.flex-row > .flex-fill { width: 50%; min-width: 0; }
+                    .row > .col-md-6 { width: 50%; float: left; min-width: 0; }
+                    @media print {
+                        .no-print, .btn, .modal-footer { display: none !important; }
+                        body { padding: 0; }
+                        .receipt-container { box-shadow: none; border: none; }
+                        .d-flex.flex-row { display: flex !important; flex-direction: row !important; gap: 2rem !important; }
+                        .d-flex.flex-row > .flex-fill { width: 50% !important; min-width: 0 !important; }
+                        .row { display: flex !important; flex-wrap: wrap !important; }
+                        .row > .col-md-6 { width: 50% !important; float: none !important; min-width: 0 !important; }
+                    }
+                </style>
                 </head>
-                <body>${printContent.innerHTML}</body>
+                <body>
+                    ${receiptContent}
+                </body>
                 </html>
             `);
-            iframeDoc.close();
 
-            iframe.onload = function() {
-                try {
-                    iframe.contentWindow.focus();
-                    iframe.contentWindow.print();
-                } catch (e) {
-                    console.error('Print error:', e);
-                }
-                setTimeout(() => document.body.removeChild(iframe), 1000);
-            };
+            printWindow.document.close();
+            printWindow.focus();
 
-            window.postMessage('electron-print', '*');
+            // Use a timeout to ensure content is loaded before printing
+            setTimeout(() => {
+                printWindow.print();
+                printWindow.close();
+            }, 250);
         };
 
         function openFullImage(imageUrl) {

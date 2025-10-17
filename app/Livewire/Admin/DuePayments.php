@@ -296,6 +296,7 @@ class DuePayments extends Component
                 'amount' => $totalPaid,
                 'due_date' => now(),
                 'status' => $paymentStatus,
+                'payment_reference' =>$this->paymentNote,
                 'is_completed' => true,
                 'payment_date' => now(),
                 'due_payment_method' => $paymentMethod,
@@ -390,7 +391,7 @@ class DuePayments extends Component
             if ($remainingPayment > 0) {
                 $lastAccount = CustomerAccount::where('customer_id', $this->paymentId)->latest()->first();
                 if ($lastAccount) {
-                    $newBackForward = $lastAccount->back_forward_amount - $remainingPayment; // Decrease back-forward
+                    $newBackForward = $lastAccount->back_forward_amount - $remainingPayment; // Decrease Brought-forward
                     $newTotalDue = max(0, $lastAccount->current_due_amount + $newBackForward);
                     $lastAccount->update([
                         'back_forward_amount' => $newBackForward,

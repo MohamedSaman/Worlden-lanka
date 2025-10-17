@@ -13,7 +13,7 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\On;
 
-#[Title("Back-Forward Management")]
+#[Title("Brought-Forward Management")]
 #[Layout('components.layouts.admin')]
 class BackForward extends Component
 {
@@ -89,7 +89,7 @@ class BackForward extends Component
                     // Do not modify paid_due here
                     $account->save();
                 } else {
-                    // Create a new account row for this customer with only back-forward amount
+                    // Create a new account row for this customer with only Brought-forward amount
                     CustomerAccount::create([
                         'customer_id'         => $this->editCustomerId,
                         'sale_id'             => null, // Adjustment without sale
@@ -101,7 +101,7 @@ class BackForward extends Component
                 }
             }
 
-            $this->js("Swal.fire('Success!', 'Back-forward adjustment saved successfully.', 'success')");
+            $this->js("Swal.fire('Success!', 'Brought-forward adjustment saved successfully.', 'success')");
             $this->dispatch('hide-adjust-modal');
             $this->reset(['editCustomerId', 'adjustmentAmount', 'adjustmentNotes', 'isEditing']);
         } catch (Exception $e) {
