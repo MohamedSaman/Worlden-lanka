@@ -634,6 +634,8 @@ class StoreBilling extends Component
         $this->balancePaymentReceiptImage = null;
         $this->balancePaymentReceiptImagePreview = null;
         $this->balanceBankName = '';
+        $this->saleNotes= '';
+        $this->customerId = null;
     }
 
     public function render()
