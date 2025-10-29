@@ -779,10 +779,6 @@
                                         <p class="mb-1" style="color: #9d1c20;"><strong>Date:</strong> {{
                                             $receipt->created_at->setTimezone('Asia/Colombo')->format('d/m/Y h:i A') }}
                                         </p>
-                                        <p class="mb-1" style="color: #9d1c20;"><strong>Delivery Note:</strong> {{
-                                            $receipt->notes }}
-                                        </p>
-                                        
                                         <p class="mb-1"><strong>Payment Status:</strong>
                                             @if(ucfirst($receipt->payment_status) == 'Paid')
                                             <span class="badge"
@@ -886,6 +882,11 @@
                                         @else
                                         <p class="text-muted" style="color: #6B7280;">No payment information available
                                         </p>
+                                        @endif
+
+                                        @if ($receipt->notes)
+                                        <h6 class="text-muted mt-3 mb-2 fw-medium" style="color: #6B7280;">NOTES</h6>
+                                        <p class="font-italic" style="color: #6B7280;">{{ $receipt->notes }}</p>
                                         @endif
                                     </div>
                                     <div class="col-md-6">
