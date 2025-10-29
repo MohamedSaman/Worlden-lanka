@@ -181,7 +181,7 @@
                     <!-- Sales Summary Cards -->
                     <div class="row mb-4 no-print g-3">
                         <!-- Total Sales Card -->
-                         @php $accountTotalDue = $modalData['accountTotals']['total_due'] ?? 0; @endphp
+                        @php $accountTotalDue = $modalData['accountTotals']['total_due'] ?? 0; @endphp
                         <div class="col-md-4 col-sm-6">
                             <div class="card border-0 shadow-sm rounded-4 h-100">
                                 <div class="card-body text-center p-4">
@@ -192,7 +192,7 @@
                                     $todaySalesAmount = $todaySales->sum('total_amount');
                                     $todayInvoiceCount = $todaySales->count();
                                     @endphp
-                                    
+
                                     <p class="text-sm text-gray-500 mb-0">Today Invoices: {{ $todayInvoiceCount }} invoices</p>
                                     <p class="text-sm text-gray-500 mb-0">
                                         Today Sales Amount: Rs.{{ number_format($todaySalesAmount, 2) }}
@@ -222,7 +222,7 @@
                                     <h3 class="fw-bold" style="color: #ef4444;">Rs.{{ number_format($accountTotalDue, 2) }}</h3>
                                     <p class="text-sm text-gray-500 mb-0">
                                         Current Due: Rs.{{ number_format($modalData['accountTotals']['current_due'] ?? 0, 2) }}
-                                        
+
                                     </p>
                                     <p class="text-sm text-gray-500 mb-0">Brought-Forward: Rs.{{ number_format($modalData['accountTotals']['back_forward_due'] ?? 0, 2) }}</p>
                                 </div>
@@ -233,9 +233,12 @@
 
                     <!-- Payment Progress Bar -->
                     @php
-                    $paymentPercentage = $modalData['salesSummary']->total_amount > 0
-                    ? round(($modalData['paymentSums']['paid'] / ($accountTotalDue +$modalData['paymentSums']['paid'])) * 100)
-                    : 0;
+                    $paid = $modalData['paymentSums']['paid'] ?? 0;
+                    $due = $accountTotalDue ?? 0;
+
+                    $denominator = $due + $paid;
+
+                    $paymentPercentage = $denominator > 0 ? round(($paid / $denominator) * 100) : 0;
                     @endphp
                     <div class="card border-0 shadow-sm rounded-4 mb-4 no-print">
                         <div class="card-body p-4">
