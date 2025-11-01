@@ -193,21 +193,21 @@
                                     </td>
                                     <td class="text-center" data-label="Current Due">
                                         <div class="d-flex align-items-center justify-content-center">
-                                            <span class="text-sm fw-semibold text-gray-800">Rs.{{ number_format($customer->customer_accounts_sum_current_due_amount, 2) }}</span>
+                                            <span class="text-sm fw-semibold text-gray-800">Rs.{{ number_format($customer->adjusted_current_due ?? 0, 2) }}</span>
                                         </div>
                                     </td>
                                     <td class="text-center" data-label="Back-Forward Due">
                                         <div class="d-flex align-items-center justify-content-center">
-                                            <span class="text-sm fw-semibold text-gray-800">Rs.{{ number_format($customer->customer_accounts_sum_back_forward_amount, 2) }}</span>
+                                            <span class="text-sm fw-semibold text-gray-800">Rs.{{ number_format($customer->customer_accounts_sum_back_forward_amount ?? 0, 2) }}</span>
                                         </div>
                                     </td>
                                     <td class="text-center" data-label="Total Due">
                                         <div class="d-flex align-items-center justify-content-center">
-                                            <span class="text-sm fw-semibold text-gray-800">Rs.{{ number_format($customer->customer_accounts_sum_total_due, 2) }}</span>
+                                            <span class="text-sm fw-semibold text-gray-800">Rs.{{ number_format($customer->adjusted_total_due ?? 0, 2) }}</span>
                                         </div>
                                     </td>
                                     <td class="text-center" data-label="Actions">
-                                        @if ($customer->customer_accounts_sum_current_due_amount > 0 || $customer->customer_accounts_sum_back_forward_amount > 0)
+                                        @if (($customer->adjusted_current_due ?? 0) > 0 || ($customer->customer_accounts_sum_back_forward_amount ?? 0) > 0)
                                         <button class="btn btn-primary text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
                                             wire:click="getPaymentDetails({{ $customer->id }})">
                                             <i class="bi bi-currency-dollar me-1"></i> Receive
@@ -329,213 +329,213 @@
                                                 <label class="form-check-label" for="applyToBackForward">Brought-Forward (Rs.{{ number_format($backForwardAmount, 2) }})</label>
                                             </div>
                                             @endif
-                                            @if($currentDueAmount <= 0 && $backForwardAmount <= 0)
-                                            <div class="alert alert-info">
+                                            @if($currentDueAmount <= 0 && $backForwardAmount <=0)
+                                                <div class="alert alert-info">
                                                 <i class="bi bi-info-circle me-2"></i>
                                                 No outstanding dues found for this customer.
-                                            </div>
-                                            @endif
-                                        </div>
-                                        <div class="col-md-6 mb-4">
-                                            <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">Cash Amount</label>
-                                            <input type="text" 
-                                                class="form-control rounded-4 shadow-sm @error('receivedAmount') is-invalid @enderror" 
-                                                wire:model="receivedAmount" 
-                                                placeholder="Enter cash amount"
-                                                @if($currentDueAmount <= 0 && $backForwardAmount <= 0) disabled @endif>
-                                            @error('receivedAmount')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                            @if($currentDueAmount <= 0 && $backForwardAmount <= 0)
-                                            <small class="text-muted">No outstanding dues to collect payment for.</small>
-                                            @endif
-                                        </div>
-                                    </div>
-
-                                    <div class="border rounded-4 p-3 mb-4 shadow-sm bg-light">
-                                        <h6 class="text-sm fw-semibold mb-3" style="color: #9d1c20;">Add Cheque Details</h6>
-                                        @if($currentDueAmount <= 0 && $backForwardAmount <= 0)
-                                        <div class="alert alert-warning">
-                                            <i class="bi bi-exclamation-triangle me-2"></i>
-                                            Cannot add cheques when there are no outstanding dues.
-                                        </div>
-                                        @else
-                                        <div class="row g-3 align-items-end">
-                                            <div class="col-md-6">
-                                                <label class="form-label text-xs fw-semibold">Cheque No. <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control form-control-sm rounded-3 shadow-sm" wire:model="chequeNumber" placeholder="Cheque Number">
-                                                @error('chequeNumber') <span class="text-danger text-xs">{{ $message }}</span> @enderror
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label text-xs fw-semibold">Bank Name <span class="text-danger">*</span></label>
-                                                <select class="form-control form-control-sm rounded-3 shadow-sm" wire:model="bankName">
-                                                    <option value="">-- Select a bank --</option>
-                                                    @foreach($banks as $bank)
-                                                    <option value="{{ $bank }}">{{ $bank }}</option>
-                                                    @endforeach
-                                                </select>
-                                                @error('bankName') <span class="text-danger text-xs">{{ $message }}</span> @enderror
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label text-xs fw-semibold">Amount <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control form-control-sm rounded-3 shadow-sm" wire:model="chequeAmount" placeholder="Amount">
-                                                @error('chequeAmount') <span class="text-danger text-xs">{{ $message }}</span> @enderror
-                                            </div>
-                                            <div class="col-md-6">
-                                                <label class="form-label text-xs fw-semibold">Cheque Date <span class="text-danger">*</span></label>
-                                                <input type="date" class="form-control form-control-sm rounded-3 shadow-sm" wire:model="chequeDate">
-                                                @error('chequeDate') <span class="text-danger text-xs">{{ $message }}</span> @enderror
-                                            </div>
-                                            <div class="col-md-2">
-                                                <button type="button" wire:click="addCheque" class="btn btn-primary btn-sm w-100 rounded-3 shadow-sm">
-                                                    <i class="bi bi-plus-circle me-1"></i> Add
-                                                </button>
-                                            </div>
                                         </div>
                                         @endif
                                     </div>
-
-                                    <div class="table-responsive mb-4">
-                                        <table class="table table-bordered table-sm align-middle">
-                                            <thead class="table-light">
-                                                <tr>
-                                                    <th class="text-xs fw-semibold text-center">Cheque No.</th>
-                                                    <th class="text-xs fw-semibold">Bank</th>
-                                                    <th class="text-xs fw-semibold text-center">Date</th>
-                                                    <th class="text-xs fw-semibold text-end">Amount</th>
-                                                    <th class="text-xs fw-semibold text-center">Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @forelse($cheques as $index => $cheque)
-                                                <tr>
-                                                    <td class="text-center">{{ $cheque['number'] }}</td>
-                                                    <td>{{ $cheque['bank'] }}</td>
-                                                    <td class="text-center">{{ \Carbon\Carbon::parse($cheque['date'])->format('d/m/Y') }}</td>
-                                                    <td class="text-end">Rs.{{ number_format($cheque['amount'], 2) }}</td>
-                                                    <td class="text-center">
-                                                        <button type="button" wire:click="removeCheque({{ $index }})" class="btn btn-danger btn-sm p-0" style="width: 24px; height: 24px; line-height: 1;">
-                                                            <i class="bi bi-trash"></i>
-                                                        </button>
-                                                    </td>
-                                                </tr>
-                                                @empty
-                                                <tr>
-                                                    <td colspan="5" class="text-center text-muted py-3">No cheques added yet.</td>
-                                                </tr>
-                                                @endforelse
-                                            </tbody>
-                                            @if(!empty($cheques))
-                                            <tfoot>
-                                                <tr>
-                                                    <td colspan="3" class="text-end fw-bold">Total Cheque Amount:</td>
-                                                    <td class="text-end fw-bold">Rs.{{ number_format(collect($cheques)->sum('amount'), 2) }}</td>
-                                                    <td></td>
-                                                </tr>
-                                            </tfoot>
+                                    <div class="col-md-6 mb-4">
+                                        <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">Cash Amount</label>
+                                        <input type="text"
+                                            class="form-control rounded-4 shadow-sm @error('receivedAmount') is-invalid @enderror"
+                                            wire:model="receivedAmount"
+                                            placeholder="Enter cash amount"
+                                            @if($currentDueAmount <=0 && $backForwardAmount <=0) disabled @endif>
+                                        @error('receivedAmount')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        @if($currentDueAmount <= 0 && $backForwardAmount <=0)
+                                            <small class="text-muted">No outstanding dues to collect payment for.</small>
                                             @endif
-                                        </table>
-                                    </div>
-
-                                    <div class="row">
-                                        <div class="col-md-12 mb-4">
-                                            <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">Payment Notes</label>
-                                            <textarea class="form-control rounded-4 shadow-sm" rows="3" wire:model="paymentNote" placeholder="Add any notes about this payment (optional)"></textarea>
-                                        </div>
                                     </div>
                                 </div>
 
-                                <div class="p-4 bg-white border-top rounded-bottom-end-4">
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <button type="button" class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105" data-bs-dismiss="modal">
-                                            <i class="bi bi-x me-1"></i> Cancel
-                                        </button>
-                                        <button type="submit" 
-                                            class="btn btn-primary text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                                            @if($currentDueAmount <= 0 && $backForwardAmount <= 0) disabled @endif>
-                                            <i class="bi bi-send me-1"></i> Submit
+                                <div class="border rounded-4 p-3 mb-4 shadow-sm bg-light">
+                                    <h6 class="text-sm fw-semibold mb-3" style="color: #9d1c20;">Add Cheque Details</h6>
+                                    @if($currentDueAmount <= 0 && $backForwardAmount <=0)
+                                        <div class="alert alert-warning">
+                                        <i class="bi bi-exclamation-triangle me-2"></i>
+                                        Cannot add cheques when there are no outstanding dues.
+                                </div>
+                                @else
+                                <div class="row g-3 align-items-end">
+                                    <div class="col-md-6">
+                                        <label class="form-label text-xs fw-semibold">Cheque No. <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control form-control-sm rounded-3 shadow-sm" wire:model="chequeNumber" placeholder="Cheque Number">
+                                        @error('chequeNumber') <span class="text-danger text-xs">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-xs fw-semibold">Bank Name <span class="text-danger">*</span></label>
+                                        <select class="form-control form-control-sm rounded-3 shadow-sm" wire:model="bankName">
+                                            <option value="">-- Select a bank --</option>
+                                            @foreach($banks as $bank)
+                                            <option value="{{ $bank }}">{{ $bank }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('bankName') <span class="text-danger text-xs">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-xs fw-semibold">Amount <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control form-control-sm rounded-3 shadow-sm" wire:model="chequeAmount" placeholder="Amount">
+                                        @error('chequeAmount') <span class="text-danger text-xs">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label text-xs fw-semibold">Cheque Date <span class="text-danger">*</span></label>
+                                        <input type="date" class="form-control form-control-sm rounded-3 shadow-sm" wire:model="chequeDate">
+                                        @error('chequeDate') <span class="text-danger text-xs">{{ $message }}</span> @enderror
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button type="button" wire:click="addCheque" class="btn btn-primary btn-sm w-100 rounded-3 shadow-sm">
+                                            <i class="bi bi-plus-circle me-1"></i> Add
                                         </button>
                                     </div>
                                 </div>
-                            </form>
+                                @endif
                         </div>
-                    </div>
-                    @else
-                    <div class="text-center py-5">
-                        <div style="width:72px;height:72px;background-color:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;margin-bottom:12px;">
-                            <i class="bi bi-credit-card text-gray-600 fs-3"></i>
-                        </div>
-                        <h5 class="text-gray-600 fw-normal">Loading Payment Details</h5>
-                        <p class="text-sm text-gray-500 mb-0">Please wait while data is being loaded...</p>
-                    </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Extend Due Date Modal -->
-    <div wire:ignore.self class="modal fade" id="extend-due-modal" tabindex="-1" aria-labelledby="extend-due-modal-label" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content border-0 shadow-lg rounded-4">
-                <div class="modal-header text-white p-4"
-                    style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%);">
-                    <h5 class="modal-title fw-bold tracking-tight" id="extend-due-modal-label">
-                        <i class="bi bi-calendar-plus me-2"></i> Extend Due Date
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-5">
-                    <form wire:submit.prevent="extendDueDate">
-                        <div class="text-center mb-4">
-                            <div class="icon-shape icon-xl bg-warning bg-opacity-10 rounded-circle mx-auto mb-3">
-                                <i class="bi bi-calendar-week text-warning fs-2"></i>
+                        <div class="table-responsive mb-4">
+                            <table class="table table-bordered table-sm align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th class="text-xs fw-semibold text-center">Cheque No.</th>
+                                        <th class="text-xs fw-semibold">Bank</th>
+                                        <th class="text-xs fw-semibold text-center">Date</th>
+                                        <th class="text-xs fw-semibold text-end">Amount</th>
+                                        <th class="text-xs fw-semibold text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($cheques as $index => $cheque)
+                                    <tr>
+                                        <td class="text-center">{{ $cheque['number'] }}</td>
+                                        <td>{{ $cheque['bank'] }}</td>
+                                        <td class="text-center">{{ \Carbon\Carbon::parse($cheque['date'])->format('d/m/Y') }}</td>
+                                        <td class="text-end">Rs.{{ number_format($cheque['amount'], 2) }}</td>
+                                        <td class="text-center">
+                                            <button type="button" wire:click="removeCheque({{ $index }})" class="btn btn-danger btn-sm p-0" style="width: 24px; height: 24px; line-height: 1;">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    @empty
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-3">No cheques added yet.</td>
+                                    </tr>
+                                    @endforelse
+                                </tbody>
+                                @if(!empty($cheques))
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="3" class="text-end fw-bold">Total Cheque Amount:</td>
+                                        <td class="text-end fw-bold">Rs.{{ number_format(collect($cheques)->sum('amount'), 2) }}</td>
+                                        <td></td>
+                                    </tr>
+                                </tfoot>
+                                @endif
+                            </table>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 mb-4">
+                                <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">Payment Notes</label>
+                                <textarea class="form-control rounded-4 shadow-sm" rows="3" wire:model="paymentNote" placeholder="Add any notes about this payment (optional)"></textarea>
                             </div>
-                            <h5 class="fw-bold text-gray-800" style="color: #9d1c20;">Extend Payment Due Date</h5>
-                            <p class="text-sm text-gray-600">Provide a new due date and reason for extension</p>
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">New Due Date <span class="text-danger">*</span></label>
-                            <div class="input-group shadow-sm rounded-4">
-                                <span class="input-group-text bg-white border-end-0">
-                                    <i class="bi bi-calendar-date text-primary"></i>
-                                </span>
-                                <input type="date"
-                                    class="form-control border-start-0 ps-0 rounded-end-4 @error('newDueDate') is-invalid @enderror"
-                                    wire:model="newDueDate"
-                                    min="{{ date('Y-m-d') }}">
-                                @error('newDueDate')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">Reason for Extension <span class="text-danger">*</span></label>
-                            <textarea class="form-control rounded-4 shadow-sm @error('extensionReason') is-invalid @enderror"
-                                wire:model="extensionReason"
-                                rows="3"
-                                placeholder="Explain why the due date needs to be extended..."></textarea>
-                            @error('extensionReason')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                            <div class="form-text text-sm text-gray-600">This information will be added to the sale notes.</div>
-                        </div>
-                        <div class="d-flex justify-content-end gap-2 mt-4">
-                            <button type="button"
-                                class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                                data-bs-dismiss="modal">
+                    </div>
+
+                    <div class="p-4 bg-white border-top rounded-bottom-end-4">
+                        <div class="d-flex justify-content-end gap-2">
+                            <button type="button" class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105" data-bs-dismiss="modal">
                                 <i class="bi bi-x me-1"></i> Cancel
                             </button>
                             <button type="submit"
-                                class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105">
-                                <i class="bi bi-check2-circle me-1"></i> Confirm Extension
+                                class="btn btn-primary text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
+                                @if($currentDueAmount <=0 && $backForwardAmount <=0) disabled @endif>
+                                <i class="bi bi-send me-1"></i> Submit
                             </button>
                         </div>
+                    </div>
                     </form>
                 </div>
             </div>
+            @else
+            <div class="text-center py-5">
+                <div style="width:72px;height:72px;background-color:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;margin-bottom:12px;">
+                    <i class="bi bi-credit-card text-gray-600 fs-3"></i>
+                </div>
+                <h5 class="text-gray-600 fw-normal">Loading Payment Details</h5>
+                <p class="text-sm text-gray-500 mb-0">Please wait while data is being loaded...</p>
+            </div>
+            @endif
         </div>
     </div>
+</div>
+</div>
+
+<!-- Extend Due Date Modal -->
+<div wire:ignore.self class="modal fade" id="extend-due-modal" tabindex="-1" aria-labelledby="extend-due-modal-label" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header text-white p-4"
+                style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%);">
+                <h5 class="modal-title fw-bold tracking-tight" id="extend-due-modal-label">
+                    <i class="bi bi-calendar-plus me-2"></i> Extend Due Date
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-5">
+                <form wire:submit.prevent="extendDueDate">
+                    <div class="text-center mb-4">
+                        <div class="icon-shape icon-xl bg-warning bg-opacity-10 rounded-circle mx-auto mb-3">
+                            <i class="bi bi-calendar-week text-warning fs-2"></i>
+                        </div>
+                        <h5 class="fw-bold text-gray-800" style="color: #9d1c20;">Extend Payment Due Date</h5>
+                        <p class="text-sm text-gray-600">Provide a new due date and reason for extension</p>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">New Due Date <span class="text-danger">*</span></label>
+                        <div class="input-group shadow-sm rounded-4">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="bi bi-calendar-date text-primary"></i>
+                            </span>
+                            <input type="date"
+                                class="form-control border-start-0 ps-0 rounded-end-4 @error('newDueDate') is-invalid @enderror"
+                                wire:model="newDueDate"
+                                min="{{ date('Y-m-d') }}">
+                            @error('newDueDate')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">Reason for Extension <span class="text-danger">*</span></label>
+                        <textarea class="form-control rounded-4 shadow-sm @error('extensionReason') is-invalid @enderror"
+                            wire:model="extensionReason"
+                            rows="3"
+                            placeholder="Explain why the due date needs to be extended..."></textarea>
+                        @error('extensionReason')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                        <div class="form-text text-sm text-gray-600">This information will be added to the sale notes.</div>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <button type="button"
+                            class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
+                            data-bs-dismiss="modal">
+                            <i class="bi bi-x me-1"></i> Cancel
+                        </button>
+                        <button type="submit"
+                            class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105">
+                            <i class="bi bi-check2-circle me-1"></i> Confirm Extension
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 </div>
 
 @push('styles')

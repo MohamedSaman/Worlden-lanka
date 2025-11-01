@@ -16,11 +16,11 @@
             .search-results-container {
                 font-size: 0.875rem;
             }
-            
+
             .search-result-item .product-info h6 {
                 font-size: 0.875rem;
             }
-            
+
             .search-result-item .badge {
                 font-size: 0.75rem;
             }
@@ -459,11 +459,19 @@
                                         </div>
                                         @endif
 
-                                        <div class="mb-3">
-                                            <label class="form-label fw-bold">Notes</label>
-                                            <textarea class="form-control" rows="3"
-                                                placeholder="Add any notes about this sale"
-                                                wire:model="saleNotes"></textarea>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold">Notes</label>
+                                                <input text="text" class="form-control" 
+                                                    placeholder="Add any notes about this sale"
+                                                    wire:model="saleNotes"></input>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-bold">Delivery Notes</label>
+                                                <input type="text" class="form-control"
+                                                    placeholder="Add any delivery notes about this sale"
+                                                    wire:model="deliveryNote"></input>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -762,9 +770,9 @@
                             <div class="receipt-container">
                                 <div class="text-center mb-4">
                                     <h3 class="mb-1 fw-bold tracking-tight" style="color: #9d1c20;">PLUS</h3>
-                                    <p class="mb-0 text-muted small" style="color: #6B7280;">NO 20/2/1, 2nd FLOOR,HUNTER
+                                    <p class="mb-0  small" style="color: #6B7280;">NO 20/2/1, 2nd FLOOR,HUNTER
                                         BUILDING,BANKSHALLL STREET,COLOMBO-11</p>
-                                    <p class="mb-0 text-muted small" style="color: #6B7280;">Phone: 011 - 2332786 |
+                                    <p class="mb-0  small" style="color: #6B7280;">Phone: 011 - 2332786 |
                                         Email: plusaccessories.lk@gmail.com</p>
                                     <h4 class="mt-3 border-bottom border-2 pb-2 fw-bold"
                                         style="color: #9d1c20; border-color: #9d1c20;">SALES RECEIPT</h4>
@@ -772,39 +780,31 @@
 
                                 <div class="row mb-4">
                                     <div class="col-md-6">
-                                        <h6 class="text-muted mb-2 fw-medium" style="color: #6B7280;">INVOICE DETAILS
+                                        <h6 class=" mb-2 fw-medium" style="color: #6B7280;">INVOICE DETAILS
                                         </h6>
-                                        <p class="mb-1" style="color: #9d1c20;"><strong>Invoice Number:</strong> {{
-                                            $receipt->invoice_number }}</p>
-                                        <p class="mb-1" style="color: #9d1c20;"><strong>Date:</strong> {{
-                                            $receipt->created_at->setTimezone('Asia/Colombo')->format('d/m/Y h:i A') }}
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Invoice Number: {{
+                                            $receipt->invoice_number }}</strong></p>
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Date: {{
+                                            $receipt->created_at->setTimezone('Asia/Colombo')->format('d/m/Y h:i A') }}</strong>
                                         </p>
-                                        <p class="mb-1"><strong>Payment Status:</strong>
-                                            @if(ucfirst($receipt->payment_status) == 'Paid')
-                                            <span class="badge"
-                                                style="background-color: {{ $receipt->payment_status == 'paid' ? '#0F5132' : ($receipt->payment_status == 'partial' ? '#664D03' : '#842029') }}; color: #FFFFFF;">
-                                                Paid
-                                            </span>
-                                            @else
-                                            <span class="badge"
-                                                style="background-color: {{ $receipt->payment_status == 'paid' ? '#0F5132' : ($receipt->payment_status == 'partial' ? '#664D03' : '#842029') }}; color: #FFFFFF;">
-                                                Credit
-                                            </span>
-                                            @endif
+                                        <p class="mb-1" style="color: #9d1c20;">
+                                            <strong>Payment Status:{{ ucfirst($receipt->payment_status) }}
+                                            </strong>
                                         </p>
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Delivery Note: {{ $receipt->delivery_note ?? 'N/A' }}</strong></p>
                                     </div>
                                     <div class="col-md-6">
-                                        <h6 class="text-muted mb-2 fw-medium" style="color: #6B7280;">CUSTOMER DETAILS
+                                        <h6 class=" mb-2 fw-medium" style="color: #6B7280;">CUSTOMER DETAILS
                                         </h6>
                                         @if ($receipt->customer)
-                                        <p class="mb-1" style="color: #9d1c20;"><strong>Name:</strong> {{
-                                            $receipt->customer->name }}</p>
-                                        <p class="mb-1" style="color: #9d1c20;"><strong>Phone:</strong> {{
-                                            $receipt->customer->phone ?? 'N/A' }}</p>
-                                        <p class="mb-1" style="color: #9d1c20;"><strong>Type:</strong> {{
-                                            ucfirst($receipt->customer_type) ?? 'N/A' }}</p>
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Name: {{
+                                            $receipt->customer->name }}</strong></p>
+                                        <p class="mb-1" style="color: #9d1c20;"><strong>Phone: {{
+                                            $receipt->customer->phone ?? 'N/A' }}</strong></p>
+                                        <strong class="mb-1" style="color: #9d1c20;"><strong>Type:</strong> {{
+                                            ucfirst($receipt->customer_type) ?? 'N/A' }}</strong></p>
                                         @else
-                                        <p class="text-muted" style="color: #6B7280;">Walk-in Customer</p>
+                                        <p class="text-muted" style="color: #6B7280;"><strong>Walk-in Customer</strong></p>
                                         @endif
                                     </div>
                                 </div>
@@ -829,7 +829,7 @@
                                                 <td class="text-center py-2">{{ $index + 1 }}</td>
                                                 <td class="text-center py-2">{{ $item->product->product_name ?? 'N/A' }}
                                                 </td>
-                                                
+
                                                 <td class="text-center py-2">Rs.{{ number_format($item->price, 2) }}
                                                 </td>
                                                 <td class="text-center py-2">{{ $item->quantity }}</td>
@@ -853,28 +853,28 @@
                                             style="border-color: {{ $payment->is_completed ? '#0F5132' : '#664D03' }}; background-color: #F8F9FA;">
                                             <p class="mb-1" style="color: #9d1c20;">
                                                 <strong>{{ $payment->is_completed ? 'Payment' : 'Scheduled Payment'
-                                                    }}:</strong>
-                                                Rs.{{ number_format($payment->amount, 2) }}
+                                                    }}:
+                                                    Rs.{{ number_format($payment->amount, 2) }}</strong>
                                             </p>
                                             <p class="mb-1" style="color: #9d1c20;">
-                                                <strong>Method:</strong> {{ ucfirst(str_replace('_', ' ',
-                                                $payment->payment_method)) }}
+                                                <strong>Method: {{ ucfirst(str_replace('_', ' ',
+                                                $payment->payment_method)) }}</strong>
                                             </p>
                                             @if ($payment->payment_reference)
                                             <p class="mb-1" style="color: #9d1c20;">
-                                                <strong>Reference:</strong> {{ $payment->payment_reference }}
+                                                <strong>Reference: {{ $payment->payment_reference }}</strong>
                                             </p>
                                             @endif
                                             @if ($payment->payment_date)
                                             <p class="mb-0" style="color: #9d1c20;">
-                                                <strong>Date:</strong> {{
-                                                \Carbon\Carbon::parse($payment->payment_date)->format('d/m/Y') }}
+                                                <strong>Date: {{
+                                                \Carbon\Carbon::parse($payment->payment_date)->format('d/m/Y') }}</strong>
                                             </p>
                                             @endif
                                             @if ($payment->due_date)
                                             <p class="mb-0" style="color: #9d1c20;">
-                                                <strong>Due Date:</strong> {{
-                                                \Carbon\Carbon::parse($payment->due_date)->format('d/m/Y') }}
+                                                <strong>Due Date: {{
+                                                \Carbon\Carbon::parse($payment->due_date)->format('d/m/Y') }}</strong>
                                             </p>
                                             @endif
                                         </div>
@@ -896,13 +896,13 @@
                                                     ORDER SUMMARY</h6>
                                                 <div class="d-flex justify-content-between mb-2"
                                                     style="color: #9d1c20;">
-                                                    <span>Subtotal:</span>
-                                                    <span>Rs.{{ number_format($receipt->subtotal, 2) }}</span>
+                                                    <span ><strong>Subtotal:</strong></span>
+                                                    <span><strong>Rs.{{ number_format($receipt->subtotal, 2) }}</strong></span>
                                                 </div>
                                                 <div class="d-flex justify-content-between mb-2"
                                                     style="color: #9d1c20;">
-                                                    <span>Total Discount:</span>
-                                                    <span>Rs.{{ number_format($receipt->discount_amount, 2) }}</span>
+                                                    <span><strong>Total Discount:</strong></span>
+                                                    <span><strong>Rs.{{ number_format($receipt->discount_amount, 2) }}</strong></span>
                                                 </div>
                                                 <hr style="border-color: #9d1c20;">
                                                 <div class="d-flex justify-content-between" style="color: #9d1c20;">

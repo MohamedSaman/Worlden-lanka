@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\Sale;
 use App\Models\SalesItem;
 use App\Models\CustomerAccount;
+use App\Models\ReturnProduct;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -32,6 +33,7 @@ class ProductReEntry extends Component
     public $selectedInvoiceId = null;
     public $selectedInvoice = null; // Sale with relations
     public $selectedInvoiceItems = [];
+    public $returnedProducts = []; // Previously returned products for selected invoice
 
     // Product search/selection on right
     public $productSearch = '';
@@ -42,6 +44,7 @@ class ProductReEntry extends Component
     // Re-entry inputs
     public $addStock = 0;      // re-entry into available stock
     public $addDamage = 0;     // increases damage only
+    public $returnNotes = '';  // notes for return
 
     public function updatedProductSearch(): void
     {
@@ -122,21 +125,51 @@ class ProductReEntry extends Component
             // Ensure customer context matches invoice
             $this->selectedCustomerId = $sale->customer_id;
             $this->selectedCustomer = $sale->customer;
+
+            // Load previously returned products for this invoice
+            $this->returnedProducts = ReturnProduct::with('product')
+                ->where('sale_id', $sale->id)
+                ->get()
+                ->map(function ($r) {
+                    return [
+                        'id' => $r->id,
+                        'product_id' => $r->product_id,
+                        'product_name' => $r->product->product_name ?? 'Unknown',
+                        'return_quantity' => $r->return_quantity,
+                        'selling_price' => $r->selling_price,
+                        'total_amount' => $r->total_amount,
+                        'notes' => $r->notes,
+                        'created_at' => $r->created_at->format('Y-m-d H:i'),
+                    ];
+                })
+                ->toArray();
+
             // Load invoice items for display (product name, quantity, amount)
+            // Calculate available quantity (sold - returned)
             $items = SalesItem::with('product')
                 ->where('sale_id', $sale->id)
                 ->orderBy('id')
                 ->get();
-            $this->selectedInvoiceItems = $items->map(function ($i) {
+            $this->selectedInvoiceItems = $items->map(function ($i) use ($sale) {
                 $qty = (int)($i->quantity ?? 0);
                 $price = (float)($i->price ?? 0);
                 $discount = (float)($i->discount ?? 0);
                 $amount = max(0, ($price * $qty) - $discount);
+
+                // Calculate already returned quantity for this product
+                $returnedQty = ReturnProduct::where('sale_id', $sale->id)
+                    ->where('product_id', $i->product_id)
+                    ->sum('return_quantity');
+
+                $availableQty = max(0, $qty - $returnedQty);
+
                 return [
                     'id' => $i->id,
                     'product_id' => $i->product_id,
                     'product_name' => $i->product->product_name ?? ($i->product->name ?? 'Product'),
                     'quantity' => $qty,
+                    'returned_quantity' => $returnedQty,
+                    'available_quantity' => $availableQty,
                     'price' => $price,
                     'discount' => $discount,
                     'amount' => $amount,
@@ -156,6 +189,7 @@ class ProductReEntry extends Component
         $this->selectedProduct = ProductDetail::with('category')->find($productId);
         $this->addStock = 0;
         $this->addDamage = 0;
+        $this->returnNotes = '';
         // Clear product search/results so the selection is focused
         $this->productSearch = '';
         $this->productResults = [];
@@ -166,6 +200,7 @@ class ProductReEntry extends Component
         $this->validate([
             'addStock' => 'required|integer|min:0',
             'addDamage' => 'required|integer|min:0',
+            'returnNotes' => 'nullable|string|max:500',
         ]);
 
         if (!$this->selectedProduct) {
@@ -189,277 +224,93 @@ class ProductReEntry extends Component
             return;
         }
 
-        // Require selecting a customer or an invoice context for re-entry
-        if (!$this->selectedCustomerId && !$this->selectedInvoiceId) {
-            $this->addError('selectedCustomerId', 'Please select a customer or an invoice before processing re-entry.');
+        // Require selecting an invoice for returns
+        if (!$this->selectedInvoiceId) {
+            $this->addError('selectedInvoiceId', 'Please select an invoice before processing return.');
             $this->dispatch('swal', [
                 'icon' => 'error',
-                'title' => 'Missing Selection',
-                'text' => 'Please select a customer or an invoice before processing re-entry.'
+                'title' => 'Invoice Required',
+                'text' => 'Please select an invoice before processing return.'
             ]);
             return;
         }
 
         DB::beginTransaction();
         try {
-            // 1) Update product stock/damage and sold
-            $product = ProductDetail::lockForUpdate()->find($this->selectedProduct->id);
             $reEntryUnits = max(0, (int)$this->addStock);
             $damageUnits = max(0, (int)$this->addDamage);
             $totalReturnUnits = $reEntryUnits + $damageUnits;
 
+            // Check if this product was sold in the selected invoice
+            $salesItem = SalesItem::where('sale_id', $this->selectedInvoiceId)
+                ->where('product_id', $this->selectedProduct->id)
+                ->first();
+
+            if (!$salesItem) {
+                throw new \Exception('This product was not sold in the selected invoice.');
+            }
+
+            // Calculate already returned quantity
+            $alreadyReturned = ReturnProduct::where('sale_id', $this->selectedInvoiceId)
+                ->where('product_id', $this->selectedProduct->id)
+                ->sum('return_quantity');
+
+            $availableForReturn = $salesItem->quantity - $alreadyReturned;
+
+            if ($totalReturnUnits > $availableForReturn) {
+                throw new \Exception("Cannot return {$totalReturnUnits} units. Only {$availableForReturn} units available for return.");
+            }
+
+            // 1) Update product stock/damage (only add to stock, don't decrease sale quantities)
+            $product = ProductDetail::lockForUpdate()->find($this->selectedProduct->id);
             $product->stock_quantity = ($product->stock_quantity ?? 0) + $reEntryUnits;
             $product->damage_quantity = ($product->damage_quantity ?? 0) + $damageUnits;
             // Decrease sold for all returned units (re-entry + damage)
             $product->sold = max(0, (int)($product->sold ?? 0) - $totalReturnUnits);
             $product->save();
 
-            // 2) Compute financials
-            $unitPrice = floatval($product->selling_price ?? 0);
-            $creditUnits = $reEntryUnits; // used for account current-due reductions only
-            $creditAmount = $creditUnits * $unitPrice;
-            // Total return value (re-entry + damage) affects sale total and payments
-            $returnValue = ($reEntryUnits + $damageUnits) * $unitPrice;
+            // 2) Create return product record
+            $unitPrice = floatval($salesItem->price ?? 0);
+            $returnAmount = $totalReturnUnits * $unitPrice;
 
-            // 3) Reduce dues if applicable (only re-entry portion)
-            if ($creditAmount > 0 && $this->selectedCustomerId) {
-                $remaining = $creditAmount;
+            ReturnProduct::create([
+                'sale_id' => $this->selectedInvoiceId,
+                'product_id' => $this->selectedProduct->id,
+                'return_quantity' => $totalReturnUnits,
+                'selling_price' => $unitPrice,
+                'total_amount' => $returnAmount,
+                'notes' => $this->returnNotes,
+            ]);
 
-                // Check if customer actually has dues > 0
-                $hasDue = CustomerAccount::where('customer_id', $this->selectedCustomerId)
-                    ->where('total_due', '>', 0)
-                    ->exists();
-
-                if (!$hasDue) {
-                    // Fully paid scenario: update sale total and adjust payments/cheques; don't touch accounts
-                    if ($this->selectedInvoiceId) {
-                        $sale = Sale::find($this->selectedInvoiceId);
-                        if ($sale) {
-                            // Helper function to recalculate sale total
-                            $this->recalculateSaleTotal($sale->id);
-
-                            // Reduce sale total by the full return value (re-entry + damage)
-                            $sale->total_amount = max(0, floatval($sale->total_amount) - $returnValue);
-                            $sale->save();
-
-                            // Reduce payments amounts by the return value (latest first)
-                            $remainingPay = $returnValue;
-                            $payments = \App\Models\Payment::where('sale_id', $sale->id)
-                                ->orderBy('created_at', 'desc')
-                                ->get();
-                            foreach ($payments as $p) {
-                                if ($remainingPay <= 0) break;
-                                $deduct = min($remainingPay, floatval($p->amount));
-                                $p->amount = max(0, floatval($p->amount) - $deduct);
-                                $p->save();
-
-                                // If this payment is cheque-backed and now zero, mark cheques as returned
-                                if ($p->amount <= 0) {
-                                    $cheques = \App\Models\Cheque::where('payment_id', $p->id)->get();
-                                    foreach ($cheques as $ch) {
-                                        $ch->status = 'cancel';
-                                        $ch->save();
-                                    }
-                                }
-                                $remainingPay -= $deduct;
-                            }
-
-                            // If still remaining after reducing payments (rare), add as advance credit to accounts
-                            if ($remainingPay > 0) {
-                                $lastAccount = CustomerAccount::where('customer_id', $this->selectedCustomerId)->latest()->first();
-                                if ($lastAccount) {
-                                    $lastAccount->back_forward_amount = floatval($lastAccount->back_forward_amount) - $remainingPay; // negative for advance
-                                    $lastAccount->total_due = max(0, floatval($lastAccount->current_due_amount) + max(0, floatval($lastAccount->back_forward_amount)));
-                                    $lastAccount->save();
-                                } else {
-                                    CustomerAccount::create([
-                                        'customer_id' => $this->selectedCustomerId,
-                                        'sale_id' => null,
-                                        'back_forward_amount' => -$remainingPay,
-                                        'current_due_amount' => 0,
-                                        'paid_due' => 0,
-                                        'total_due' => 0,
-                                        'notes' => 'Advance from return re-entry on ' . now()->format('Y-m-d H:i:s'),
-                                    ]);
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    // Has dues: apply to selected invoice current due first
-                    if ($this->selectedInvoiceId) {
-                        $acc = CustomerAccount::where('customer_id', $this->selectedCustomerId)
-                            ->where('sale_id', $this->selectedInvoiceId)
-                            ->orderBy('created_at')
-                            ->first();
-                        if ($acc) {
-                            $payForCurrent = min($remaining, floatval($acc->current_due_amount));
-                            $acc->current_due_amount = floatval($acc->current_due_amount) - $payForCurrent;
-                            $remaining -= $payForCurrent;
-
-                            $acc->total_due = max(0, floatval($acc->current_due_amount) + max(0, floatval($acc->back_forward_amount)));
-                            $acc->save();
-
-                            if ($acc->sale_id) {
-                                $sale = Sale::find($acc->sale_id);
-                                if ($sale) {
-                                    // FIXED: Update quantities for this product in the sale
-                                    $remainingUnitsToRevert = $totalReturnUnits;
-                                    $items = SalesItem::where('sale_id', $sale->id)
-                                        ->where('product_id', $this->selectedProduct->id)
-                                        ->orderBy('id', 'asc')
-                                        ->lockForUpdate()
-                                        ->get();
-
-                                    foreach ($items as $item) {
-                                        if ($remainingUnitsToRevert <= 0) break;
-                                        $reduce = min($remainingUnitsToRevert, (int)$item->quantity);
-                                        $item->quantity = max(0, (int)$item->quantity - $reduce);
-                                        // FIXED: Don't update 'total' column - just save quantity
-                                        $item->save();
-
-                                        if ((int)$item->quantity === 0) {
-                                            // Optionally delete empty rows
-                                            // $item->delete();
-                                        }
-                                        $remainingUnitsToRevert -= $reduce;
-                                    }
-
-                                    // Recalculate the sale total from all items
-                                    $this->recalculateSaleTotal($sale->id);
-
-                                    $sale->due_amount = $acc->total_due;
-                                    $sale->save();
-
-                                    // Reduce payments by full return value
-                                    $remainingPay = $returnValue;
-                                    $payments = \App\Models\Payment::where('sale_id', $sale->id)
-                                        ->orderBy('created_at', 'desc')
-                                        ->get();
-                                    foreach ($payments as $p) {
-                                        if ($remainingPay <= 0) break;
-                                        $deduct = min($remainingPay, floatval($p->amount));
-                                        $p->amount = max(0, floatval($p->amount) - $deduct);
-                                        $p->save();
-                                        if ($p->amount <= 0) {
-                                            $cheques = \App\Models\Cheque::where('payment_id', $p->id)->get();
-                                            foreach ($cheques as $ch) {
-                                                $ch->status = 'cancel';
-                                                $ch->save();
-                                            }
-                                        }
-                                        $remainingPay -= $deduct;
-                                    }
-
-                                    // If leftover after reducing payments, add to accounts as advance
-                                    if ($remainingPay > 0) {
-                                        $lastAccount = CustomerAccount::where('customer_id', $this->selectedCustomerId)->latest()->first();
-                                        if ($lastAccount) {
-                                            $lastAccount->back_forward_amount = floatval($lastAccount->back_forward_amount) - $remainingPay;
-                                            $lastAccount->total_due = max(0, floatval($lastAccount->current_due_amount) + max(0, floatval($lastAccount->back_forward_amount)));
-                                            $lastAccount->save();
-                                        } else {
-                                            CustomerAccount::create([
-                                                'customer_id' => $this->selectedCustomerId,
-                                                'sale_id' => null,
-                                                'back_forward_amount' => -$remainingPay,
-                                                'current_due_amount' => 0,
-                                                'paid_due' => 0,
-                                                'total_due' => 0,
-                                                'notes' => 'Advance from return re-entry on ' . now()->format('Y-m-d H:i:s'),
-                                            ]);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        // IMPORTANT: When an invoice is selected, do NOT reduce other accounts; if any credit remains, store as advance
-                        if ($remaining > 0) {
-                            $lastAccount = CustomerAccount::where('customer_id', $this->selectedCustomerId)->latest()->first();
-                            if ($lastAccount) {
-                                $lastAccount->back_forward_amount = floatval($lastAccount->back_forward_amount) - $remaining;
-                                $lastAccount->total_due = max(0, floatval($lastAccount->current_due_amount) + max(0, floatval($lastAccount->back_forward_amount)));
-                                $lastAccount->save();
-                            } else {
-                                CustomerAccount::create([
-                                    'customer_id' => $this->selectedCustomerId,
-                                    'sale_id' => null,
-                                    'back_forward_amount' => -$remaining,
-                                    'current_due_amount' => 0,
-                                    'paid_due' => 0,
-                                    'total_due' => 0,
-                                    'notes' => 'Advance from return re-entry on ' . now()->format('Y-m-d H:i:s'),
-                                ]);
-                            }
-                            $remaining = 0;
-                        }
-                    }
-
-                    // If no invoice selected, and remaining credit, reduce across other dues (current only)
-                    if (!$this->selectedInvoiceId && $remaining > 0) {
-                        $accounts = CustomerAccount::where('customer_id', $this->selectedCustomerId)
-                            ->where('total_due', '>', 0)
-                            ->orderBy('created_at')
-                            ->get();
-                        foreach ($accounts as $acc) {
-                            if ($remaining <= 0) break;
-                            $dueForCurrent = floatval($acc->current_due_amount);
-                            $payForCurrent = min($remaining, $dueForCurrent);
-                            $acc->current_due_amount = $dueForCurrent - $payForCurrent;
-                            $remaining -= $payForCurrent;
-
-                            $acc->total_due = max(0, floatval($acc->current_due_amount) + max(0, floatval($acc->back_forward_amount)));
-                            $acc->save();
-
-                            if ($acc->sale_id) {
-                                $sale = Sale::find($acc->sale_id);
-                                if ($sale) {
-                                    $sale->due_amount = $acc->total_due;
-                                    $sale->save();
-                                }
-                            }
-                        }
-                        // Note: No creation of advance/negative back_forward; leftover credit is ignored per requirement
-                    }
-                }
-            }
+            // 3) Do NOT modify sales or sales_items tables
+            // Returns are tracked separately in return_products table
 
             DB::commit();
 
             // Reset inputs, refresh selections
             $this->addStock = 0;
             $this->addDamage = 0;
+            $this->returnNotes = '';
             $this->selectedProduct = $product->fresh('category');
+
+            // Reload invoice to show updated return data
+            $this->selectInvoice($this->selectedInvoiceId);
 
             // Success alert via SweetAlert
             $this->dispatch('swal', [
                 'icon' => 'success',
                 'title' => 'Success',
-                'text' => 'Re-entry processed successfully.'
+                'text' => 'Product return processed successfully.'
             ]);
         } catch (\Throwable $e) {
             DB::rollBack();
-            $this->addError('submit', 'Failed to process re-entry: ' . $e->getMessage());
+            $this->addError('submit', 'Failed to process return: ' . $e->getMessage());
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Error',
-                'text' => 'Failed to process re-entry: ' . $e->getMessage()
+                'text' => 'Failed to process return: ' . $e->getMessage()
             ]);
         }
-    }
-
-    // Add this helper method to the class
-    private function recalculateSaleTotal($saleId)
-    {
-        $sale = Sale::find($saleId);
-        if (!$sale) return;
-
-        // Calculate total from all sales items
-        $itemsTotal = SalesItem::where('sale_id', $saleId)->sum(DB::raw('price * quantity'));
-
-        // Update sale total
-        $sale->total_amount = max(0, floatval($itemsTotal));
-        $sale->save();
     }
 
     public function render()

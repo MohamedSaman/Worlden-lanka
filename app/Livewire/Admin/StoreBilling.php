@@ -48,6 +48,7 @@ class StoreBilling extends Component
     public $newCustomerNotes = '';
 
     public $saleNotes = '';
+    public $deliveryNote = '';
     public $paymentType = 'full';
     public $paymentMethod = '';
     public $paymentReceiptImage;
@@ -458,6 +459,7 @@ class StoreBilling extends Component
                 'payment_type'     => $this->paymentType,
                 'payment_status'   => $this->paymentType === 'full' ? 'paid' : 'partial',
                 'notes'            => $this->saleNotes,
+                'delivery_note'    => $this->deliveryNote,
                 'due_amount'       => $this->balanceAmount,
             ]);
 
@@ -635,6 +637,7 @@ class StoreBilling extends Component
         $this->balancePaymentReceiptImagePreview = null;
         $this->balanceBankName = '';
         $this->saleNotes= '';
+        $this->deliveryNote= '';
         $this->customerId = null;
     }
 

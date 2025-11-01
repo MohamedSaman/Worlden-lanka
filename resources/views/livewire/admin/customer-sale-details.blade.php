@@ -281,13 +281,20 @@
                                         $amt = floatval($row['amount'] ?? 0);
                                         if (($row['type'] ?? '') === 'paid') {
                                         $grandTotal -= $amt; // subtract paid amounts
+                                        } elseif (($row['type'] ?? '') === 'return') {
+                                        $grandTotal -= $amt; // subtract return amounts
                                         } else {
                                         $grandTotal += $amt; // add back-forward and invoice amounts
                                         }
                                         @endphp
                                         <tr class="border-bottom transition-all hover:bg-[#f1f5f9] {{ $loop->iteration % 2 == 0 ? 'bg-[#f9fafb]' : '' }}">
                                             <td class="ps-4 text-center text-sm text-gray-800">{{ $loop->iteration }}</td>
-                                            <td class="text-sm text-gray-600">{{ $row['description'] }}</td>
+                                            <td class="text-sm text-gray-600">
+                                                @if(($row['type'] ?? '') === 'return')
+                                                <span class="badge bg-danger">Return</span>
+                                                @endif
+                                                {{ $row['description'] }}
+                                            </td>
                                             <td class="text-sm text-gray-600">
                                                 @if(!empty($row['date']))
                                                 {{ \Carbon\Carbon::parse($row['date'])->format('d M Y') }}
@@ -298,6 +305,8 @@
                                             <td class="text-end fw-bold text-sm text-gray-800">
                                                 @if(($row['type'] ?? '') === 'paid')
                                                 <span style="color: #ef4444;">({{ number_format($row['amount'] ?? 0, 2) }})</span>
+                                                @elseif(($row['type'] ?? '') === 'return')
+                                                <span style="color: #dc3545;">({{ number_format($row['amount'] ?? 0, 2) }})</span>
                                                 @else
                                                 {{ number_format($row['amount'] ?? 0, 2) }}
                                                 @endif
@@ -308,10 +317,14 @@
                                             <td colspan="4" class="text-center py-6"> Not found Payment Records </td>
                                         </tr>
                                         @endforelse
-                                        @php $accountTotalDue = $modalData['accountTotals']['total_due'] ?? 0; @endphp
+                                        @php
+                                        $accountTotalDue = $modalData['accountTotals']['total_due'] ?? 0;
+                                        $totalReturnAmount = $modalData['totalReturnAmount'] ?? 0;
+                                        $adjustedBalance = max(0, $accountTotalDue - $totalReturnAmount);
+                                        @endphp
                                         <tr class="bg-[#f1f5f9] fw-bold">
                                             <td colspan="3" class="text-end text-gray-800">Balance Total Due Amount</td>
-                                            <td class="text-end text-gray-800">{{ number_format($accountTotalDue, 2) }}</td>
+                                            <td class="text-end text-gray-800">{{ number_format($adjustedBalance, 2) }}</td>
                                         </tr>
                                     </tbody>
                                 </table>

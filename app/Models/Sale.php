@@ -20,6 +20,7 @@ class Sale extends Model
         'payment_type',
         'payment_status',
         'notes',
+        'delivery_note',
         'due_amount',
         'user_id',
     ];

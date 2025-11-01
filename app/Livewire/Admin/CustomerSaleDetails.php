@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Sale;
 use App\Models\Customer;
 use App\Models\Payment;
+use App\Models\ReturnProduct;
 
 #[Layout('components.layouts.admin')]
 #[Title('Customer Sales Details')]
@@ -38,36 +39,36 @@ class CustomerSaleDetails extends Component
 
         // Payment sums by logical status for this customer's sales and Brought-forward payments
         $paymentsBase = Payment::where(function ($query) use ($customerId) {
-            $query->whereHas('sale', function($q) use ($customerId) {
+            $query->whereHas('sale', function ($q) use ($customerId) {
                 $q->where('customer_id', $customerId);
             })
-            ->orWhere('customer_id', $customerId);
+                ->orWhere('customer_id', $customerId);
         });
 
         $paidSum = (clone $paymentsBase)
-            ->where(function($q){
+            ->where(function ($q) {
                 $q->where('is_completed', true)
-                  ->orWhereIn('status', ['Paid','paid']);
+                    ->orWhereIn('status', ['Paid', 'paid']);
             })
             ->sum('amount');
         $paidForwardSum = (clone $paymentsBase)
-            ->where(function($q){
+            ->where(function ($q) {
                 $q->where('applied_to', 'back_forward')
-                  ->orWhere('status', 'forward');
+                    ->orWhere('status', 'forward');
             })
             ->sum('amount');
 
         $currentSum = (clone $paymentsBase)
-            ->where(function($q){
+            ->where(function ($q) {
                 $q->where('applied_to', 'current')
-                  ->orWhere('status', 'current');
+                    ->orWhere('status', 'current');
             })
             ->sum('amount');
 
         $forwardSum = (clone $paymentsBase)
-            ->where(function($q){
+            ->where(function ($q) {
                 $q->where('applied_to', 'back_forward')
-                  ->orWhere('status', 'forward');
+                    ->orWhere('status', 'forward');
             })
             ->sum('amount');
 
@@ -145,7 +146,7 @@ class CustomerSaleDetails extends Component
             ->leftJoin('customers', 'payments.customer_id', '=', 'customers.id')
             ->where(function ($query) use ($customerId) {
                 $query->where('sales.customer_id', $customerId)
-                      ->orWhere('payments.customer_id', $customerId);
+                    ->orWhere('payments.customer_id', $customerId);
             })
             ->select(
                 'payments.id',
@@ -164,21 +165,53 @@ class CustomerSaleDetails extends Component
             ->orderBy('payments.created_at', 'desc')
             ->get();
 
-        // Build unified invoice summary rows timeline: Brought-Forward first, then Invoices and Paid ordered by date
+        // Get return products for this customer
+        $returns = DB::table('return_products')
+            ->join('sales', 'return_products.sale_id', '=', 'sales.id')
+            ->join('product_details', 'return_products.product_id', '=', 'product_details.id')
+            ->where('sales.customer_id', $customerId)
+            ->select(
+                'return_products.id',
+                'return_products.return_quantity',
+                'return_products.selling_price',
+                'return_products.total_amount',
+                'return_products.notes',
+                'return_products.created_at',
+                'sales.invoice_number',
+                'product_details.product_name'
+            )
+            ->orderBy('return_products.created_at', 'desc')
+            ->get();
+
+        // Calculate total return amount
+        $totalReturnAmount = $returns->sum('total_amount');
+
+        // Build unified invoice summary rows timeline: Brought-Forward first, then Invoices, Returns and Paid ordered by date
         $invoiceSummaryRows = [];
 
-        $bfAmount = ($accountTotals->back_forward_due + $paidForwardSum ) ?? 0;
+        $bfAmount = ($accountTotals->back_forward_due + $paidForwardSum) ?? 0;
 
         // Collect invoice and payment events with comparable dates
         $events = [];
         foreach ($invoiceSales as $inv) {
             $events[] = [
                 'type' => 'invoice',
-                'description' => 'Invoice ' . $inv->invoice_number.'(' . ($inv->notes ? $inv->notes : 'No notes.') . ')',
+                'description' => 'Invoice ' . $inv->invoice_number . '(' . ($inv->notes ? $inv->notes : 'No notes.') . ')',
                 'date' => $inv->sale_date,
                 'amount' => floatval($inv->total_invoice_amount ?? 0),
             ];
         }
+
+        // Add return events
+        foreach ($returns as $return) {
+            $events[] = [
+                'type' => 'return',
+                'description' => 'Return - Invoice ' . $return->invoice_number . ' (' . $return->product_name . ($return->notes ? ' - ' . $return->notes : '') . ')',
+                'date' => $return->created_at,
+                'amount' => floatval($return->total_amount ?? 0),
+            ];
+        }
+
         foreach ($payments as $p) {
             $isPaid = ($p->is_completed === 1) || (strtolower((string)$p->status) === 'paid');
             if (!$isPaid) continue;
@@ -193,7 +226,7 @@ class CustomerSaleDetails extends Component
             }
 
             if (!empty($p->due_payment_method)) {
-                $label .= ' - ' . ucfirst(str_replace('_',' ', $p->due_payment_method));
+                $label .= ' - ' . ucfirst(str_replace('_', ' ', $p->due_payment_method));
             }
             if (!empty($p->payment_reference)) {
                 $label .= ' (' . $p->payment_reference . ')';
@@ -246,6 +279,8 @@ class CustomerSaleDetails extends Component
             'invoices' => $invoices,
             'productSales' => $productSales,
             'invoiceSales' => $invoiceSales,
+            'returns' => $returns,
+            'totalReturnAmount' => $totalReturnAmount,
             'accountTotals' => [
                 'total_due' => $accountTotals->total_due ?? 0,
                 'current_due' => $accountTotals->current_due ?? 0,
@@ -340,7 +375,7 @@ class CustomerSaleDetails extends Component
             }
 
             fclose($file);
-        };  
+        };
     }
 
     // For modal CSV export

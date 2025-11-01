@@ -27,6 +27,7 @@ use App\Livewire\Admin\DuePayments as AdminDuePayments;
 use App\Http\Controllers\StaffSaleExportController;
 use App\Http\Controllers\WatchesExportController;
 use App\Livewire\Admin\BackForward;
+use App\Livewire\Admin\Bill;
 use App\Livewire\Admin\Category;
 use App\Livewire\Admin\DueCheques;
 use App\Livewire\Admin\Products;
@@ -79,6 +80,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('/product-stocks', \App\Livewire\Admin\ProductStocks::class)->name('product-stocks');
         Route::get('/product-re-entry',ProductReEntry::class )->name('product-reentry');
         Route::get('/back-forward',BackForward::class )->name('back-forward');
+        Route::get('/bill', Bill::class)->name('bill');
 
     });
 

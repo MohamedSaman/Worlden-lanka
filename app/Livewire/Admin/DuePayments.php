@@ -14,6 +14,7 @@ use App\Models\CustomerAccount;
 use App\Models\Sale;
 use App\Models\Payment;
 use App\Models\Cheque;
+use App\Models\ReturnProduct;
 use Exception;
 use Illuminate\Support\Collection;
 
@@ -102,22 +103,41 @@ class DuePayments extends Component
     public function getPaymentDetails($customerId)
     {
         $this->paymentId = $customerId;
-        $customer = Customer::withSum(['customerAccounts' => function($query) {
+        $customer = Customer::withSum(['customerAccounts' => function ($query) {
             $query->where('total_due', '>', 0);
         }], 'total_due')
-        ->withSum('customerAccounts', 'current_due_amount')
-        ->withSum('customerAccounts', 'back_forward_amount')
-        ->with(['customerAccounts' => function($query) {
-            $query->where('total_due', '>', 0)->latest()->limit(1);
-        }, 'sales' => function($query) {
-            $query->latest()->limit(1);
-        }])
-        ->find($customerId);
+            ->withSum('customerAccounts', 'current_due_amount')
+            ->withSum('customerAccounts', 'back_forward_amount')
+            ->with(['customerAccounts' => function ($query) {
+                $query->where('total_due', '>', 0)->latest()->limit(1);
+            }, 'sales' => function ($query) {
+                $query->latest()->limit(1);
+            }])
+            ->find($customerId);
+
+        // Calculate total return amount for this customer
+        $totalReturnAmount = ReturnProduct::whereHas('sale', function ($query) use ($customerId) {
+            $query->where('customer_id', $customerId);
+        })->sum('total_amount');
 
         $this->paymentDetail = $customer;
-        $this->totalDueAmount = $customer->customer_accounts_sum_total_due ?? 0;
-        $this->currentDueAmount = $customer->customer_accounts_sum_current_due_amount ?? 0;
-        $this->backForwardAmount = $customer->customer_accounts_sum_back_forward_amount ?? 0;
+        $rawCurrentDue = $customer->customer_accounts_sum_current_due_amount ?? 0;
+        $rawTotalDue = $customer->customer_accounts_sum_total_due ?? 0;
+
+        // Calculate actual current due after subtracting returns
+        $actualCurrentDue = max(0, $rawCurrentDue - $totalReturnAmount);
+
+        // If actual current due is 0 or negative, set all dues to 0
+        if ($actualCurrentDue <= 0) {
+            $this->currentDueAmount = 0;
+            $this->totalDueAmount = 0;
+            $this->backForwardAmount = $customer->customer_accounts_sum_back_forward_amount ?? 0;
+        } else {
+            $this->currentDueAmount = $actualCurrentDue;
+            $this->totalDueAmount = max(0, $rawTotalDue - $totalReturnAmount);
+            $this->backForwardAmount = $customer->customer_accounts_sum_back_forward_amount ?? 0;
+        }
+
         $this->duePaymentMethod = '';
         $this->paymentNote = '';
         $this->duePaymentAttachment = null;
@@ -296,7 +316,7 @@ class DuePayments extends Component
                 'amount' => $totalPaid,
                 'due_date' => now(),
                 'status' => $paymentStatus,
-                'payment_reference' =>$this->paymentNote,
+                'payment_reference' => $this->paymentNote,
                 'is_completed' => true,
                 'payment_date' => now(),
                 'due_payment_method' => $paymentMethod,
@@ -489,50 +509,86 @@ class DuePayments extends Component
 
     public function render()
     {
-        $query = Customer::withSum(['customerAccounts' => function($subQuery) {
+        $query = Customer::withSum(['customerAccounts' => function ($subQuery) {
             $subQuery->where('total_due', '>', 0);
         }], 'total_due')
-        ->withSum('customerAccounts', 'current_due_amount')
-        ->withSum('customerAccounts', 'back_forward_amount')
-        ->withMin('customerAccounts', 'created_at')
-        ->when($this->search, function ($query) {
-            $query->where(function ($q) {
-                $q->where('name', 'like', '%' . $this->search . '%')
-                    ->orWhere('phone', 'like', '%' . $this->search . '%');
-            })->orWhereHas('sales', function ($s) {
-                $s->where('invoice_number', 'like', '%' . $this->search . '%');
-            });
-        })
-        ->when($this->filters['status'] !== '', function ($query) {
-            if ($this->filters['status'] === 'pending') {
-                $query->whereRelation('customerAccounts', 'total_due', '>', 0);
-            } elseif ($this->filters['status'] === 'paid') {
-                $query->whereDoesntHave('customerAccounts', function ($q) {
-                    $q->where('total_due', '>', 0);
+            ->withSum('customerAccounts', 'current_due_amount')
+            ->withSum('customerAccounts', 'back_forward_amount')
+            ->withMin('customerAccounts', 'created_at')
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('name', 'like', '%' . $this->search . '%')
+                        ->orWhere('phone', 'like', '%' . $this->search . '%');
+                })->orWhereHas('sales', function ($s) {
+                    $s->where('invoice_number', 'like', '%' . $this->search . '%');
                 });
-            }
-        })
-        ->when($this->filters['dateFrom'], function ($query) {
-            $query->whereHas('customerAccounts', function ($q) {
-                $q->whereDate('created_at', '>=', $this->filters['dateFrom']);
+            })
+            ->when($this->filters['status'] !== '', function ($query) {
+                if ($this->filters['status'] === 'pending') {
+                    $query->whereRelation('customerAccounts', 'total_due', '>', 0);
+                } elseif ($this->filters['status'] === 'paid') {
+                    $query->whereDoesntHave('customerAccounts', function ($q) {
+                        $q->where('total_due', '>', 0);
+                    });
+                }
+            })
+            ->when($this->filters['dateFrom'], function ($query) {
+                $query->whereHas('customerAccounts', function ($q) {
+                    $q->whereDate('created_at', '>=', $this->filters['dateFrom']);
+                });
+            })
+            ->when($this->filters['dateTo'], function ($query) {
+                $query->whereHas('customerAccounts', function ($q) {
+                    $q->whereDate('created_at', '<=', $this->filters['dateTo']);
+                });
+            })
+            ->whereHas('customerAccounts', function ($q) {
+                $q->where('total_due', '>', 0);
             });
-        })
-        ->when($this->filters['dateTo'], function ($query) {
-            $query->whereHas('customerAccounts', function ($q) {
-                $q->whereDate('created_at', '<=', $this->filters['dateTo']);
-            });
-        })
-        ->whereHas('customerAccounts', function ($q) {
-            $q->where('total_due', '>', 0);
-        });
 
         $duePayments = $query->orderBy('id')->paginate(10);
+
+        // Calculate adjusted due amounts after returns
+        foreach ($duePayments as $customer) {
+            // Calculate total return amount for this customer
+            $totalReturnAmount = ReturnProduct::whereHas('sale', function ($query) use ($customer) {
+                $query->where('customer_id', $customer->id);
+            })->sum('total_amount');
+
+            // Store original values
+            $customer->original_current_due = $customer->customer_accounts_sum_current_due_amount ?? 0;
+            $customer->original_total_due = $customer->customer_accounts_sum_total_due ?? 0;
+            $customer->total_return_amount = $totalReturnAmount;
+
+            // Calculate adjusted current due (current due - returns)
+            $adjustedCurrentDue = max(0, $customer->original_current_due - $totalReturnAmount);
+
+            // If adjusted current due is 0 or negative, set all current dues to 0
+            if ($adjustedCurrentDue <= 0) {
+                $customer->adjusted_current_due = 0;
+                $customer->adjusted_total_due = $customer->customer_accounts_sum_back_forward_amount ?? 0;
+            } else {
+                $customer->adjusted_current_due = $adjustedCurrentDue;
+                $customer->adjusted_total_due = max(0, $customer->original_total_due - $totalReturnAmount);
+            }
+        }
+
+        // Filter out customers with 0 adjusted current due if they have no brought forward
+        $duePayments->getCollection()->transform(function ($customer) {
+            $hasRealDue = $customer->adjusted_current_due > 0 ||
+                ($customer->customer_accounts_sum_back_forward_amount ?? 0) > 0;
+            return $hasRealDue ? $customer : null;
+        })->filter();
 
         $duePaymentsCount = Customer::whereHas('customerAccounts', function ($q) {
             $q->where('total_due', '>', 0);
         })->count();
 
         $totalDue = CustomerAccount::where('total_due', '>', 0)->sum('total_due');
+
+        // Subtract total returns from total due
+        $totalReturns = ReturnProduct::sum('total_amount');
+        $adjustedTotalDue = max(0, $totalDue - $totalReturns);
 
         $todayDuePayments = CustomerAccount::where('total_due', '>', 0)->whereDate('created_at', today())->sum('total_due');
 
@@ -545,7 +601,7 @@ class DuePayments extends Component
             'duePaymentsCount' => $duePaymentsCount,
             'todayDuePayments' => $todayDuePayments,
             'todayDuePaymentsCount' => $todayDuePaymentsCount,
-            'totalDue' => $totalDue,
+            'totalDue' => $adjustedTotalDue,
             'cheques' => $this->cheques,
             'chequeNumber' => $this->chequeNumber,
             'bankName' => $this->bankName,
