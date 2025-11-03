@@ -1,92 +1,58 @@
-<div class="container-fluid py-6 bg-gray-50 min-vh-100">
+<div class="container-fluid py-4">
     <!-- Page Header with Stats -->
-    <div class="row mb-4">
+    <div class="row g-4 mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
-                <!-- Header Content -->
-                <div class="card-header text-white p-2 rounded-t-4 d-flex align-items-center"
-                    style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%);">
-                    <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
-                        <i class="bi bi-receipt-cutoff text-white fs-4" aria-hidden="true"></i>
+            <div class="card card-header-modern mb-4">
+                <div class="d-flex align-items-center">
+                    <div class="icon-wrapper me-3">
+                        <i class="bi bi-receipt-cutoff"></i>
                     </div>
                     <div>
-                        <h3 class="mb-1 fw-bold tracking-tight text-white">Bills & Invoices</h3>
-                        <p class="text-white opacity-80 mb-0 text-sm">View and manage all sales invoices</p>
+                        <h3 class="mb-1">Bills & Invoices</h3>
+                        <p class="mb-0">View and manage all sales invoices</p>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Stats Cards -->
-                <div class="card-body p-5">
-                    <div class="row g-4">
-                        <!-- Total Sales Card -->
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
-                                <div class="card-body p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md bg-primary bg-opacity-10 rounded-circle me-3">
-                                            <i class="bi bi-receipt text-primary fs-5"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-600 mb-1">Total Sales</p>
-                                            <h4 class="fw-bold mb-0" style="color: #9d1c20;">{{ $totalSales }}</h4>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Today Sales Card -->
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
-                                <div class="card-body p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md bg-success bg-opacity-10 rounded-circle me-3">
-                                            <i class="bi bi-calendar-check text-success fs-5"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-600 mb-1">Today's Sales</p>
-                                            <h4 class="fw-bold mb-0 text-success">{{ $todaySales }}</h4>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Total Revenue Card -->
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
-                                <div class="card-body p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md bg-warning bg-opacity-10 rounded-circle me-3">
-                                            <i class="bi bi-currency-dollar text-warning fs-5"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-600 mb-1">Total Revenue</p>
-                                            <h4 class="fw-bold mb-0 text-warning">Rs.{{ number_format($totalRevenue, 2) }}</h4>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Today Revenue Card -->
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
-                                <div class="card-body p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md bg-info bg-opacity-10 rounded-circle me-3">
-                                            <i class="bi bi-cash-coin text-info fs-5"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm text-gray-600 mb-1">Today's Revenue</p>
-                                            <h4 class="fw-bold mb-0 text-info">Rs.{{ number_format($todayRevenue, 2) }}</h4>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+        <!-- Stats Cards -->
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card primary animate-fade-in">
+                <div class="stat-icon">
+                    <i class="bi bi-receipt"></i>
                 </div>
+                <div class="stat-label">Total Sales</div>
+                <div class="stat-value">{{ number_format($totalSales) }}</div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card success animate-fade-in" style="animation-delay: 0.1s;">
+                <div class="stat-icon">
+                    <i class="bi bi-calendar-check"></i>
+                </div>
+                <div class="stat-label">Today's Sales</div>
+                <div class="stat-value">{{ number_format($todaySales) }}</div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card warning animate-fade-in" style="animation-delay: 0.2s;">
+                <div class="stat-icon">
+                    <i class="bi bi-currency-dollar"></i>
+                </div>
+                <div class="stat-label">Total Revenue</div>
+                <div class="stat-value text-warning">Rs.{{ number_format($totalRevenue, 2) }}</div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card info animate-fade-in" style="animation-delay: 0.3s;">
+                <div class="stat-icon">
+                    <i class="bi bi-cash-coin"></i>
+                </div>
+                <div class="stat-label">Today's Revenue</div>
+                <div class="stat-value text-info">Rs.{{ number_format($todayRevenue, 2) }}</div>
             </div>
         </div>
     </div>
@@ -94,58 +60,59 @@
     <!-- Sales Table -->
     <div class="row">
         <div class="col-12">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
+            <div class="card animate-slide-in">
                 <!-- Search & Filter Bar -->
-                <div class="card-header p-4" style="background-color: #eff6ff;">
-                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                        <div class="flex-grow-1">
-                            <div class="input-group" style="max-width: 600px;">
-                                <span class="input-group-text bg-gray-100 border-0 px-3">
-                                    <i class="bi bi-search text-danger"></i>
-                                </span>
-                                <input type="text"
-                                    class="form-control"
-                                    placeholder="Search by invoice number or customer..."
-                                    wire:model.live.debounce.300ms="search"
-                                    autocomplete="off">
+                <div class="card-body border-bottom" style="background-color: #f8f9fa;">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-lg-7">
+                            <div class="search-box-modern">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search text-primary-custom"></i>
+                                    </span>
+                                    <input type="text"
+                                        class="form-control"
+                                        placeholder="Search by invoice number or customer..."
+                                        wire:model.live.debounce.300ms="search"
+                                        autocomplete="off">
+                                </div>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="dropdown">
-                                <button class="btn btn-light rounded-pill shadow-sm px-4 py-2" type="button"
-                                    id="filterDropdown" data-bs-toggle="dropdown"
-                                    style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;">
-                                    <i class="bi bi-funnel me-1"></i> Filters
+                        <div class="col-lg-5 text-lg-end">
+                            <div class="dropdown d-inline-block">
+                                <button class="btn-modern btn-secondary-modern" type="button"
+                                    id="filterDropdown" data-bs-toggle="dropdown">
+                                    <i class="bi bi-funnel"></i> Filters
                                 </button>
-                                <div class="dropdown-menu p-4 shadow-lg border-0 rounded-4" style="width: 300px;">
-                                    <h6 class="dropdown-header bg-light rounded py-2 mb-3 text-center">Filter Options</h6>
+                                <div class="dropdown-menu dropdown-menu-end p-4 shadow-modern-lg rounded-modern" style="width: 320px;">
+                                    <h6 class="dropdown-header bg-light rounded-modern py-2 mb-3 text-center fw-bold text-primary-custom">Filter Options</h6>
                                     <div class="mb-3">
-                                        <label class="form-label text-sm">Date From</label>
-                                        <input type="date" class="form-control" wire:model.live="filters.dateFrom">
+                                        <label class="form-label-modern">Date From</label>
+                                        <input type="date" class="form-control-modern" wire:model.live="filters.dateFrom">
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label text-sm">Date To</label>
-                                        <input type="date" class="form-control" wire:model.live="filters.dateTo">
+                                        <label class="form-label-modern">Date To</label>
+                                        <input type="date" class="form-control-modern" wire:model.live="filters.dateTo">
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label text-sm">Payment Type</label>
-                                        <select class="form-select" wire:model.live="filters.paymentType">
+                                        <label class="form-label-modern">Payment Type</label>
+                                        <select class="form-select-modern" wire:model.live="filters.paymentType">
                                             <option value="">All</option>
                                             <option value="full">Full Payment</option>
                                             <option value="partial">Partial Payment</option>
                                         </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label text-sm">Customer Type</label>
-                                        <select class="form-select" wire:model.live="filters.customerType">
+                                        <label class="form-label-modern">Customer Type</label>
+                                        <select class="form-select-modern" wire:model.live="filters.customerType">
                                             <option value="">All</option>
                                             <option value="retail">Retail</option>
                                             <option value="wholesale">Wholesale</option>
                                         </select>
                                     </div>
                                     <div class="d-grid">
-                                        <button class="btn btn-secondary btn-sm" wire:click="resetFilters">
-                                            Reset Filters
+                                        <button class="btn-modern btn-secondary-modern" wire:click="resetFilters">
+                                            <i class="bi bi-arrow-counterclockwise"></i> Reset Filters
                                         </button>
                                     </div>
                                 </div>
@@ -155,86 +122,95 @@
                 </div>
 
                 <!-- Table Content -->
-                <div class="card-body p-5">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead style="background-color: #eff6ff;">
-                                <tr>
-                                    <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Invoice #</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Customer</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Date</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Items</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-end" style="color: #9d1c20;">Total Amount</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Payment Type</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Status</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($sales as $sale)
-                                <tr class="border-bottom">
-                                    <td>
-                                        <span class="fw-bold text-primary">#{{ $sale->invoice_number }}</span>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <div class="fw-semibold">{{ $sale->customer->name ?? 'N/A' }}</div>
-                                            <div class="text-sm text-muted">{{ $sale->customer->phone ?? '' }}</div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="text-sm">{{ $sale->created_at->format('d M Y') }}</div>
-                                        <div class="text-xs text-muted">{{ $sale->created_at->format('h:i A') }}</div>
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge bg-info">{{ $sale->items->count() }} items</span>
-                                    </td>
-                                    <td class="text-end">
-                                        <span class="fw-bold">Rs.{{ number_format($sale->total_amount, 2) }}</span>
-                                    </td>
-                                    <td class="text-center">
-                                        @if($sale->payment_type === 'full')
-                                        <span class="badge bg-success">Full</span>
-                                        @else
-                                        <span class="badge bg-warning">Partial</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        @if($sale->payment_status === 'paid')
-                                        <span class="badge bg-success">Paid</span>
-                                        @elseif($sale->payment_status === 'partial')
-                                        <span class="badge bg-warning">Partial</span>
-                                        @else
-                                        <span class="badge bg-danger">Unpaid</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        <button wire:click="viewInvoice({{ $sale->id }})"
-                                            class="btn btn-sm btn-primary rounded-pill">
-                                            <i class="bi bi-eye me-1"></i> View
-                                        </button>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="8" class="text-center py-5">
-                                        <i class="bi bi-inbox fs-1 text-muted"></i>
-                                        <p class="text-muted mt-2">No sales found</p>
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-
-                    @if($sales->hasPages())
-                    <div class="card-footer p-4 bg-white border-top rounded-b-4">
-                        <div class="mt-3">
-                            {{ $sales->links('livewire.custom-pagination') }}
-                        </div>
-                    </div>
-                    @endif
+                <div class="table-modern">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Invoice #</th>
+                                <th>Customer</th>
+                                <th>Date</th>
+                                <th class="text-center">Items</th>
+                                <th class="text-end">Total Amount</th>
+                                <th class="text-center">Payment</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($sales as $sale)
+                            <tr>
+                                <td>
+                                    <span class="fw-bold text-primary-custom">#{{ $sale->invoice_number }}</span>
+                                </td>
+                                <td>
+                                    <div>
+                                        <div class="fw-semibold">{{ $sale->customer->name ?? 'N/A' }}</div>
+                                        <div class="small text-secondary">{{ $sale->customer->phone ?? '' }}</div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="small">{{ $sale->created_at->format('d M Y') }}</div>
+                                    <div class="small text-secondary">{{ $sale->created_at->format('h:i A') }}</div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge-modern badge-info-modern">
+                                        <i class="bi bi-box-seam"></i> {{ $sale->items->count() }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="fw-bold">Rs.{{ number_format($sale->total_amount, 2) }}</span>
+                                </td>
+                                <td class="text-center">
+                                    @if($sale->payment_type === 'full')
+                                    <span class="badge-modern badge-success-modern">Full</span>
+                                    @else
+                                    <span class="badge-modern badge-warning-modern">Partial</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    @if($sale->payment_status === 'paid')
+                                    <span class="badge-modern badge-success-modern">
+                                        <i class="bi bi-check-circle-fill"></i> Paid
+                                    </span>
+                                    @elseif($sale->payment_status === 'partial')
+                                    <span class="badge-modern badge-warning-modern">
+                                        <i class="bi bi-clock-fill"></i> Partial
+                                    </span>
+                                    @else
+                                    <span class="badge-modern badge-danger-modern">
+                                        <i class="bi bi-exclamation-circle-fill"></i> Unpaid
+                                    </span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <button wire:click="viewInvoice({{ $sale->id }})"
+                                        class="btn-action btn-view"
+                                        title="View Invoice">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-center">
+                                        <i class="bi bi-inbox fs-1 text"></i>
+                                        <p class="text mt-3 mb-0">No sales found</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
+
+                @if($sales->hasPages())
+                <div class="card-footer bg-white border-top p-4">
+                    <div class="pagination-modern">
+                        {{ $sales->links('livewire.custom-pagination') }}
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -257,11 +233,11 @@
                             <h6 class="fw-bold mb-3" style="color: #9d1c20;">Customer Information</h6>
                             <table class="table table-sm table-borderless">
                                 <tr>
-                                    <td class="text-muted">Name:</td>
+                                    <td class="text">Name:</td>
                                     <td class="fw-semibold">{{ $saleDetails['sale']->customer->name ?? 'N/A' }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-muted">Phone:</td>
+                                    <td class="text">Phone:</td>
                                     <td>{{ $saleDetails['sale']->customer->phone ?? 'N/A' }}</td>
                                 </tr>
                             </table>
@@ -272,15 +248,15 @@
                             <h6 class="fw-bold mb-3" style="color: #9d1c20;">Invoice Information</h6>
                             <table class="table table-sm table-borderless">
                                 <tr>
-                                    <td class="text-muted">Invoice Number:</td>
+                                    <td class="text">Invoice Number:</td>
                                     <td class="fw-semibold">#{{ $saleDetails['sale']->invoice_number }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-muted">Date:</td>
+                                    <td class="text">Date:</td>
                                     <td>{{ $saleDetails['sale']->created_at->format('d M Y, h:i A') }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-muted">Cashier:</td>
+                                    <td class="text">Cashier:</td>
                                     <td>{{ $saleDetails['sale']->user->name ?? 'N/A' }}</td>
                                 </tr>
                             </table>
@@ -307,7 +283,8 @@
                                     <td class="text-center">{{ $item->quantity }}</td>
                                     <td class="text-end">Rs.{{ number_format($item->price, 2) }}</td>
                                     <td class="text-end">Rs.{{ number_format($item->discount, 2) }}</td>
-                                    <td class="text-end fw-bold">Rs.{{ number_format($item->total, 2) }}</td>
+                                    <td class="text-end fw-bold">Rs.{{ ($item->quantity * $item->price) - $item->discount }}</td>
+
                                 </tr>
                                 @endforeach
                             </tbody>
@@ -360,16 +337,16 @@
                                     <h6 class="fw-bold mb-3" style="color: #9d1c20;">Payment Summary</h6>
                                     <table class="table table-sm table-borderless mb-0">
                                         <tr>
-                                            <td class="text-muted">Subtotal:</td>
+                                            <td class="text">Subtotal:</td>
                                             <td class="text-end">Rs.{{ number_format($saleDetails['sale']->subtotal, 2) }}</td>
                                         </tr>
                                         <tr>
-                                            <td class="text-muted">Discount:</td>
+                                            <td class="text">Discount:</td>
                                             <td class="text-end text-danger">-Rs.{{ number_format($saleDetails['sale']->discount_amount, 2) }}</td>
                                         </tr>
                                         @if($saleDetails['totalReturnAmount'] > 0)
                                         <tr>
-                                            <td class="text-muted">Returns:</td>
+                                            <td class="text">Returns:</td>
                                             <td class="text-end text-danger">-Rs.{{ number_format($saleDetails['totalReturnAmount'], 2) }}</td>
                                         </tr>
                                         @endif
@@ -398,51 +375,7 @@
 </div>
 
 @push('styles')
-<style>
-    body {
-        font-family: 'Inter', sans-serif;
-    }
-
-    .tracking-tight {
-        letter-spacing: -0.025em;
-    }
-
-    .transition-all {
-        transition: all 0.3s ease;
-    }
-
-    .hover\:scale-105:hover {
-        transform: scale(1.05);
-    }
-
-    .icon-shape {
-        width: 2rem;
-        height: 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .icon-shape.icon-lg {
-        width: 3rem;
-        height: 3rem;
-    }
-
-    .icon-shape.icon-md {
-        width: 2.5rem;
-        height: 2.5rem;
-    }
-
-    .rounded-4 {
-        border-radius: 1rem;
-    }
-
-    .shadow-lg {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    }
-</style>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+@include('components.admin-styles')
 @endpush
 
 @push('scripts')
@@ -525,11 +458,10 @@
                 <style>
                     @page { size: A4; margin: 1cm; }
                     body {
-                        font-family: Arial, sans-serif;
-                        padding: 20px;
-                        font-size: 13px;
-                        color: #333;
-                    }
+                            font-family: "Consolas", "Lucida Console", monospace;
+                            font-size: 14px;
+                        }
+
                     .company-header {
                         text-align: center;
                         margin-bottom: 20px;
@@ -544,7 +476,7 @@
                     }
                     .company-address {
                         font-size: 11px;
-                        color: #666;
+                        color: #000;
                         margin: 5px 0;
                     }
                     .receipt-title {
@@ -626,7 +558,7 @@
                         padding-top: 20px;
                         border-top: 1px solid #ddd;
                         font-size: 11px;
-                        color: #666;
+                        color: #000;
                         clear: both;
                     }
                     @media print {

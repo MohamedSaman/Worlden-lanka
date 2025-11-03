@@ -1,254 +1,224 @@
-<div class="container-fluid py-6 bg-gray-50 min-vh-100 transition-colors duration-300">
-    <!-- Page Header with Stats -->
-    <div class="row mb-4">
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="row g-4 mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
-                <!-- Header Content -->
-                <div class="card-header text-white p-2 rounded-t-4 d-flex align-items-center"
-                    style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%);">
-                    <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
-                        <i class="bi bi-cash-stack text-white fs-4" aria-hidden="true"></i>
+            <div class="card card-header-modern mb-4">
+                <div class="d-flex align-items-center">
+                    <div class="icon-wrapper me-3">
+                        <i class="bi bi-cash-stack"></i>
                     </div>
                     <div>
-                        <h3 class="mb-1 fw-bold tracking-tight text-white">Customer Due Payments</h3>
-                        <p class="text-white opacity-80 mb-0 text-sm">Manage and collect pending payments from customers</p>
-                    </div>
-                </div>
-
-                <!-- Stats Cards -->
-                <div class="card-body p-5">
-                    <div class="row g-4">
-                        <!-- Pending Payments Card -->
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
-                                <div class="card-body p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-hourglass text-danger"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Total Due Payments</p>
-                                            <div class="d-flex align-items-baseline mt-1">
-                                                <h3 class="mb-0 fw-bold text-gray-800">{{ $duePaymentsCount }}</h3>
-                                                <span class="badge bg-danger bg-opacity-10 text-danger ms-2 rounded-full" style="padding: 6px 12px;">To Collect</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Total Due Amount Card -->
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
-                                <div class="card-body p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-currency-dollar text-danger"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Total Due Amount</p>
-                                            <div class="d-flex align-items-baseline mt-1">
-                                                <h4 class="mb-0 fw-bold text-gray-800">
-                                                    Rs.{{ number_format($totalDue, 2) }}
-                                                </h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
-                                <div class="card-body p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-hourglass text-danger"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Today Due Payment</p>
-                                            <div class="d-flex align-items-baseline mt-1">
-                                                <h4 class="mb-0 fw-bold text-gray-800">
-                                                    {{ $todayDuePaymentsCount }}
-                                                </h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
-                                <div class="card-body p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-currency-dollar text-danger"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Total Due Amount</p>
-                                            <div class="d-flex align-items-baseline mt-1">
-                                                <h4 class="mb-0 fw-bold text-gray-800">
-                                                    Rs.{{ number_format($todayDuePayments, 2) }}
-                                                </h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <h3 class="mb-1">Customer Due Payments</h3>
+                        <p class="mb-0">Manage and collect pending payments from customers</p>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Stats Cards -->
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card primary animate-fade-in">
+
+                <div class="stat-label">Total Due Payments</div>
+                <div class="stat-value">{{ number_format($duePaymentsCount) }}</div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card warning animate-fade-in" style="animation-delay: 0.1s;">
+
+                <div class="stat-label">Total Due Amount</div>
+                <div class="stat-value text-warning">Rs.{{ number_format($totalDue, 2) }}</div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card success animate-fade-in" style="animation-delay: 0.2s;">
+
+                <div class="stat-label">Today's Due Payments</div>
+                <div class="stat-value">{{ number_format($todayDuePaymentsCount) }}</div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card info animate-fade-in" style="animation-delay: 0.3s;">
+
+                <div class="stat-label">Today's Due Amount</div>
+                <div class="stat-value text-info">Rs.{{ number_format($todayDuePayments, 2) }}</div>
+            </div>
+        </div>
     </div>
+
 
     <div class="row">
         <div class="col-12">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
+            <div class="card animate-slide-in">
                 <!-- Search & Filter Bar -->
-                <div class="card-header p-4" style="background-color: #eff6ff;">
-                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                        <div class="flex-grow-1 d-flex justify-content-lg">
-                            <div class="input-group " style="max-width: 600px;">
-                                <span class="input-group-text bg-gray-100 border-0 px-3">
-                                    <i class="bi bi-search text-danger"></i>
-                                </span>
-                                <input type="text"
-                                    class="form-control "
-                                    placeholder="Search customers..."
-                                    wire:model.live.debounce.300ms="search"
-                                    autocomplete="off">
+                <div class="card-body border-bottom" style="background-color: #f8f9fa;">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-lg-7">
+                            <div class="search-box-modern">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search text-primary-custom"></i>
+                                    </span>
+                                    <input type="text"
+
+                                        class="form-control"
+                                        placeholder="Search customers..."
+                                        wire:model.live.debounce.300ms="search"
+                                        autocomplete="off">
+                                </div>
                             </div>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <div class="dropdown">
-                                <button class="btn btn-light rounded-pill shadow-sm px-4 py-2 transition-all hover:shadow" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
-                                    <i class="bi bi-funnel me-1"></i> Filters
+                        <div class="col-lg-5 text-lg-end">
+                            <div class="dropdown d-inline-block me-2">
+                                <button class="btn-modern btn-secondary-modern" type="button"
+                                    id="filterDropdown" data-bs-toggle="dropdown">
+                                    <i class="bi bi-funnel"></i> Filters
                                     @if ($filters['status'] || $filters['dateFrom'] || $filters['dateTo'])
-                                    <span class="badge bg-primary ms-1 rounded-pill" style="background-color: #9d1c20; color: #ffffff;">!</span>
+                                    <span class="badge bg-primary ms-1">!</span>
                                     @endif
                                 </button>
-                                <div class="dropdown-menu p-4 shadow-lg border-0 rounded-4" style="width: 300px;" aria-labelledby="filterDropdown">
-                                    <h6 class="dropdown-header bg-light rounded py-2 mb-3 text-center text-sm fw-semibold" style="color: #9d1c20;">Filter Options</h6>
+                                <div class="dropdown-menu dropdown-menu-end p-4 shadow-modern-lg rounded-modern" style="width: 320px;">
+                                    <h6 class="dropdown-header bg-light rounded-modern py-2 mb-3 text-center fw-bold text-primary-custom">Filter Options</h6>
                                     <div class="mb-3">
-                                        <label class="form-label text-sm fw-semibold" style="color: #9d1c20;">Payment Status</label>
-                                        <select class="form-select form-select-sm rounded-pill shadow-sm border-2" wire:model.live="filters.status" style="border-color: #9d1c20; color: #9d1c20;">
+                                        <label class="form-label-modern">Payment Status</label>
+                                        <select class="form-select-modern" wire:model.live="filters.status">
                                             <option value="">All Statuses</option>
                                             <option value="pending">Pending</option>
                                             <option value="paid">Paid</option>
                                         </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label text-sm fw-semibold" style="color: #9d1c20;">Due Date From</label>
-                                        <input type="date" class="form-control form-control-sm rounded-pill shadow-sm border-2" wire:model.live="filters.dateFrom" style="border-color: #9d1c20; color: #9d1c20;">
+                                        <label class="form-label-modern">Due Date From</label>
+                                        <input type="date" class="form-control-modern" wire:model.live="filters.dateFrom">
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label text-sm fw-semibold" style="color: #9d1c20;">Due Date To</label>
-                                        <input type="date" class="form-control form-control-sm rounded-pill shadow-sm border-2" wire:model.live="filters.dateTo" style="border-color: #9d1c20; color: #9d1c20;">
+                                        <label class="form-label-modern">Due Date To</label>
+                                        <input type="date" class="form-control-modern" wire:model.live="filters.dateTo">
                                     </div>
                                     <div class="d-grid">
-                                        <button class="btn btn-secondary rounded-pill shadow-sm px-4 py-2 transition-all hover:shadow" wire:click="resetFilters" style="background-color: #6B7280; border-color: #6B7280; color: white;">
-                                            <i class="bi bi-x-circle me-1"></i>Reset Filters
+                                        <button class="btn-modern btn-secondary-modern" wire:click="resetFilters">
+                                            <i class="bi bi-arrow-counterclockwise"></i> Reset Filters
                                         </button>
                                     </div>
                                 </div>
                             </div>
                             <button wire:click="printDuePayments"
-                                class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                                style="color: #fff; background-color: #9d1c20; border: 1px solid #9d1c20;"
+                                class="btn-modern btn-primary-modern"
                                 aria-label="Print due payments">
-                                <i class="bi bi-printer me-1" aria-hidden="true"></i> Print
+                                <i class="bi bi-printer"></i> Print
                             </button>
                         </div>
                     </div>
                 </div>
 
                 <!-- Table Content -->
-                <div class="card-body p-5">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead style="background-color: #eff6ff;">
-                                <tr>
-                                    <th class="text-uppercase text-xs fw-semibold py-3" style="color: #9d1c20;">Customer</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Current Due</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Brought-Forward Due</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Total Due</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($duePayments as $customer)
-                                <tr class="border-bottom transition-all hover:bg-[#f1f5f9] {{ $loop->iteration % 2 == 0 ? 'bg-[#f9fafb]' : '' }} {{ now()->gt($customer->customerAccounts->last()->created_at->addDays(30) ?? now()) && $customer->customer_accounts_sum_current_due_amount > 0 ? 'bg-danger bg-opacity-10' : '' }}">
-                                    <td data-label="Customer">
-                                        <div class="d-flex align-items-center">
-                                            <div class="icon-shape icon-md rounded-circle bg-primary bg-opacity-10 me-2 d-flex align-items-center justify-content-center">
-                                                <span class="text-primary fw-bold">{{ substr($customer->name, 0, 1) }}</span>
-                                            </div>
-                                            <div>
-                                                <p class="text-sm fw-semibold text-gray-800 mb-0">{{ $customer->name }}</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td class="text-center" data-label="Current Due">
-                                        <div class="d-flex align-items-center justify-content-center">
-                                            <span class="text-sm fw-semibold text-gray-800">Rs.{{ number_format($customer->adjusted_current_due ?? 0, 2) }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="text-center" data-label="Back-Forward Due">
-                                        <div class="d-flex align-items-center justify-content-center">
-                                            <span class="text-sm fw-semibold text-gray-800">Rs.{{ number_format($customer->customer_accounts_sum_back_forward_amount ?? 0, 2) }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="text-center" data-label="Total Due">
-                                        <div class="d-flex align-items-center justify-content-center">
-                                            <span class="text-sm fw-semibold text-gray-800">Rs.{{ number_format($customer->adjusted_total_due ?? 0, 2) }}</span>
-                                        </div>
-                                    </td>
-                                    <td class="text-center" data-label="Actions">
-                                        @if (($customer->adjusted_current_due ?? 0) > 0 || ($customer->customer_accounts_sum_back_forward_amount ?? 0) > 0)
-                                        <button class="btn btn-primary text-white rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                                            wire:click="getPaymentDetails({{ $customer->id }})">
-                                            <i class="bi bi-currency-dollar me-1"></i> Receive
-                                        </button>
-                                        @else
-                                        <button class="btn btn-success text-white rounded-full shadow-sm px-4 py-2 pe-none">
-                                            <i class="bi bi-check-circle-fill me-1"></i> Paid
-                                        </button>
+                <div class="table-modern">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Customer</th>
+                                <th class="text-end">Current Due</th>
+                                <th class="text-end">Brought-Forward</th>
+                                <th class="text-end">Total Due</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($duePayments as $customer)
+                            @php
+                            $overdue = false;
+                            if ($customer && $customer->customerAccounts && $customer->customerAccounts->count() > 0) {
+                            $lastAccount = $customer->customerAccounts->last();
+                            if ($lastAccount && $lastAccount->created_at) {
+                            try {
+                            $overdue = now()->gt($lastAccount->created_at->addDays(30)) && ($customer->customer_accounts_sum_current_due_amount ?? 0) > 0;
+                            } catch (\Throwable $e) {
+                            $overdue = false;
+                            }
+                            }
+                            }
+                            @endphp
+                            <tr @if($overdue) class="table-danger-subtle" @endif>
+                                <td>
+                                    <div>
+                                        <div class="fw-semibold">{{ $customer->name ?? 'N/A' }}</div>
+                                        @if($customer->phone ?? false)
+                                        <div class="small text-secondary">{{ $customer->phone }}</div>
                                         @endif
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="6" class="text-center py-6">
-                                        <div style="width:72px;height:72px;background-color:#f3f4f6;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;margin-bottom:12px;">
-                                            <i class="bi bi-cash-coin text-gray-600 fs-3"></i>
-                                        </div>
-                                        <h5 class="text-gray-600 fw-normal">No Due Payments Found</h5>
-                                        <p class="text-sm text-gray-500 mb-0">All customer payments are completed or no matching results found.</p>
-                                    </td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                    @if ($duePayments->hasPages())
-                    <div class="card-footer p-4 bg-white border-top rounded-b-4">
-                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-                            <div class="text-sm text-gray-600">
-                                Showing <span class="fw-semibold text-gray-800">{{ $duePayments->firstItem() }}</span> to <span class="fw-semibold text-gray-800">{{ $duePayments->lastItem() }}</span> of <span class="fw-semibold text-gray-800">{{ $duePayments->total() }}</span> results
-                            </div>
-                            <div class="pagination-container">
-                                {{ $duePayments->links('livewire::bootstrap') }}
-                            </div>
+                                    </div>
+                                </td>
+                                <td class="text-end">
+                                    <span class="fw-bold">Rs.{{ number_format($customer->adjusted_current_due ?? 0, 2) }}</span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="fw-bold">Rs.{{ number_format($customer->customer_accounts_sum_back_forward_amount ?? 0, 2) }}</span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="fw-bold text-primary-custom">Rs.{{ number_format($customer->adjusted_total_due ?? 0, 2) }}</span>
+                                </td>
+                                <td class="text-center">
+                                    @if($overdue)
+                                    <span class="badge-modern badge-danger-modern">
+                                        <i class="bi bi-exclamation-circle-fill"></i> Overdue
+                                    </span>
+                                    @elseif(($customer->adjusted_current_due ?? 0) > 0 || ($customer->customer_accounts_sum_back_forward_amount ?? 0) > 0)
+                                    <span class="badge-modern badge-warning-modern">
+                                        <i class="bi bi-clock-fill"></i> Pending
+                                    </span>
+                                    @else
+                                    <span class="badge-modern badge-success-modern">
+                                        <i class="bi bi-check-circle-fill"></i> Paid
+                                    </span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    @if (($customer->adjusted_current_due ?? 0) > 0 || ($customer->customer_accounts_sum_back_forward_amount ?? 0) > 0)
+                                    <button wire:click="getPaymentDetails({{ $customer->id }})"
+                                        class="btn-modern btn-view"
+                                        title="Receive Payment">
+                                        <i class="bi bi-currency-dollar"></i> Receive
+                                    </button>
+                                    @else
+                                    <button class="btn-action btn-view" disabled title="Paid">
+                                        <i class="bi bi-check-circle"></i>
+                                    </button>
+                                    @endif
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-5">
+                                    <div class="text-center">
+                                        <i class="bi bi-inbox fs-1 text-muted"></i>
+                                        <p class="text-muted mt-3 mb-0">No due payments found</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                @if ($duePayments->hasPages())
+                <div class="card-footer bg-white border-top">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="text-sm text-muted">
+                            Showing {{ $duePayments->firstItem() }} to {{ $duePayments->lastItem() }} of {{ $duePayments->total() }} results
+                        </div>
+                        <div>
+                            {{ $duePayments->links('livewire::bootstrap') }}
                         </div>
                     </div>
-                    @endif
                 </div>
+                @endif
             </div>
         </div>
     </div>
+
 
     <!-- Payment Detail Modal -->
     <div wire:ignore.self class="modal fade" id="payment-detail-modal" tabindex="-1" aria-labelledby="payment-detail-modal-label" aria-hidden="true">
@@ -471,233 +441,91 @@
             @endif
         </div>
     </div>
-</div>
-</div>
 
-<!-- Extend Due Date Modal -->
-<div wire:ignore.self class="modal fade" id="extend-due-modal" tabindex="-1" aria-labelledby="extend-due-modal-label" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg rounded-4">
-            <div class="modal-header text-white p-4"
-                style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%);">
-                <h5 class="modal-title fw-bold tracking-tight" id="extend-due-modal-label">
-                    <i class="bi bi-calendar-plus me-2"></i> Extend Due Date
-                </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body p-5">
-                <form wire:submit.prevent="extendDueDate">
-                    <div class="text-center mb-4">
-                        <div class="icon-shape icon-xl bg-warning bg-opacity-10 rounded-circle mx-auto mb-3">
-                            <i class="bi bi-calendar-week text-warning fs-2"></i>
+    <!-- Extend Due Date Modal -->
+    <div wire:ignore.self class="modal fade" id="extend-due-modal" tabindex="-1" aria-labelledby="extend-due-modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header text-white p-4"
+                    style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%);">
+                    <h5 class="modal-title fw-bold tracking-tight" id="extend-due-modal-label">
+                        <i class="bi bi-calendar-plus me-2"></i> Extend Due Date
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-5">
+                    <form wire:submit.prevent="extendDueDate">
+                        <div class="text-center mb-4">
+                            <div class="icon-shape icon-xl bg-warning bg-opacity-10 rounded-circle mx-auto mb-3">
+                                <i class="bi bi-calendar-week text-warning fs-2"></i>
+                            </div>
+                            <h5 class="fw-bold text-gray-800" style="color: #9d1c20;">Extend Payment Due Date</h5>
+                            <p class="text-sm text-gray-600">Provide a new due date and reason for extension</p>
                         </div>
-                        <h5 class="fw-bold text-gray-800" style="color: #9d1c20;">Extend Payment Due Date</h5>
-                        <p class="text-sm text-gray-600">Provide a new due date and reason for extension</p>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">New Due Date <span class="text-danger">*</span></label>
-                        <div class="input-group shadow-sm rounded-4">
-                            <span class="input-group-text bg-white border-end-0">
-                                <i class="bi bi-calendar-date text-primary"></i>
-                            </span>
-                            <input type="date"
-                                class="form-control border-start-0 ps-0 rounded-end-4 @error('newDueDate') is-invalid @enderror"
-                                wire:model="newDueDate"
-                                min="{{ date('Y-m-d') }}">
-                            @error('newDueDate')
+                        <div class="mb-4">
+                            <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">New Due Date <span class="text-danger">*</span></label>
+                            <div class="input-group shadow-sm rounded-4">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi bi-calendar-date text-primary"></i>
+                                </span>
+                                <input type="date"
+                                    class="form-control border-start-0 ps-0 rounded-end-4 @error('newDueDate') is-invalid @enderror"
+                                    wire:model="newDueDate"
+                                    min="{{ date('Y-m-d') }}">
+                                @error('newDueDate')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">Reason for Extension <span class="text-danger">*</span></label>
+                            <textarea class="form-control rounded-4 shadow-sm @error('extensionReason') is-invalid @enderror"
+                                wire:model="extensionReason"
+                                rows="3"
+                                placeholder="Explain why the due date needs to be extended..."></textarea>
+                            @error('extensionReason')
                             <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
+                            <div class="form-text text-sm text-gray-600">This information will be added to the sale notes.</div>
                         </div>
-                    </div>
-                    <div class="mb-4">
-                        <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">Reason for Extension <span class="text-danger">*</span></label>
-                        <textarea class="form-control rounded-4 shadow-sm @error('extensionReason') is-invalid @enderror"
-                            wire:model="extensionReason"
-                            rows="3"
-                            placeholder="Explain why the due date needs to be extended..."></textarea>
-                        @error('extensionReason')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                        <div class="form-text text-sm text-gray-600">This information will be added to the sale notes.</div>
-                    </div>
-                    <div class="d-flex justify-content-end gap-2 mt-4">
-                        <button type="button"
-                            class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
-                            data-bs-dismiss="modal">
-                            <i class="bi bi-x me-1"></i> Cancel
-                        </button>
-                        <button type="submit"
-                            class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105">
-                            <i class="bi bi-check2-circle me-1"></i> Confirm Extension
-                        </button>
-                    </div>
-                </form>
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <button type="button"
+                                class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105"
+                                data-bs-dismiss="modal">
+                                <i class="bi bi-x me-1"></i> Cancel
+                            </button>
+                            <button type="submit"
+                                class="btn btn-light rounded-full shadow-sm px-4 py-2 transition-transform hover:scale-105">
+                                <i class="bi bi-check2-circle me-1"></i> Confirm Extension
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
-</div>
 
 @push('styles')
-<style>
-    body {
-        font-family: 'Inter', sans-serif;
-        font-size: 15px;
-        color: #1f2937;
-    }
-
-    .tracking-tight {
-        letter-spacing: -0.025em;
-    }
-
-    .transition-all {
-        transition: all 0.3s ease;
-    }
-
-    .transition-transform {
-        transition: transform 0.2s ease;
-    }
-
-    .hover\:scale-105:hover {
-        transform: scale(1.05);
-    }
-
-    .hover\:scale-110:hover {
-        transform: scale(1.1);
-    }
-
-    .icon-shape {
-        width: 2rem;
-        height: 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .icon-shape.icon-lg {
-        width: 3rem;
-        height: 3rem;
-    }
-
-    .icon-shape.icon-xl {
-        width: 4.5rem;
-        height: 4.5rem;
-    }
-
-    .icon-shape.icon-md {
-        width: 2.5rem;
-        height: 2.5rem;
-    }
-
-    .icon-shape.icon-xs {
-        width: 1.5rem;
-        height: 1.5rem;
-    }
-
-    .table {
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-    .table th,
-    .table td {
-        border: 1px solid #e5e7eb;
-        vertical-align: middle;
-    }
-
-    .table tbody tr:nth-child(even) {
-        background-color: #f9fafb;
-    }
-
-    .table tbody tr:hover {
-        background-color: #f1f5f9;
-    }
-
-    .rounded-full {
-        border-radius: 9999px;
-    }
-
-    .rounded-4 {
-        border-radius: 1rem;
-    }
-
-    .shadow-lg {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    }
-
-    .shadow-sm {
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    }
-
-    .btn-light {
-        background-color: #ffffff;
-        border-color: #ffffff;
-        color: #1e3a8a;
-    }
-
-    .btn-light:hover {
-        background-color: #f1f5f9;
-        border-color: #f1f5f9;
-        color: #1e3a8a;
-    }
-
-    .bg-primary {
-        background-color: #1e40af;
-    }
-
-    .bg-info {
-        background-color: #0ea5e9;
-    }
-
-    .bg-success {
-        background-color: #22c55e;
-    }
-
-    .bg-danger {
-        background-color: #ef4444;
-    }
-
-    .bg-warning {
-        background-color: #f59e0b;
-    }
-
-    .alert-info,
-    .alert-warning {
-        background-color: rgba(0, 0, 0, 0.05);
-    }
-
-    .form-control,
-    .form-select {
-        border-radius: 1rem;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #1e40af;
-        box-shadow: 0 0 0 0.2rem rgba(30, 64, 175, 0.25);
-    }
-</style>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+@include('components.admin-styles')
 @endpush
 
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('livewire:initialized', () => {
-        @this.on('openModal', (modalId) => {
+        Livewire.on('openModal', (modalId) => {
             let modal = new bootstrap.Modal(document.getElementById(modalId));
             modal.show();
         });
 
-        @this.on('closeModal', (modalId) => {
+        Livewire.on('closeModal', (modalId) => {
             let modalElement = document.getElementById(modalId);
             let modal = bootstrap.Modal.getInstance(modalElement);
             modal.hide();
         });
 
-        @this.on('showToast', ({
+        Livewire.on('showToast', ({
             type,
             message
         }) => {
@@ -733,7 +561,7 @@
             }
 
             const clonedTable = tableElement.cloneNode(true);
-            const actionColumnIndex = 4; // Corrected index for Actions column
+            const actionColumnIndex = 5; // Actions column (0-indexed: Customer, Current, Brought-Forward, Total, Status, Actions)
             const headerRow = clonedTable.querySelector('thead tr');
             const headerCells = headerRow.querySelectorAll('th');
             if (headerCells.length > actionColumnIndex) {
@@ -916,6 +744,15 @@
             printWindow.document.write(htmlContent);
             printWindow.document.close();
             printWindow.onload = function() {
+                // Overwrite print styles for font and color
+                const style = printWindow.document.createElement('style');
+                style.innerHTML = `
+                    body { font-family: "Courier New", monospace !important; font-size: 14px !important; color: #000 !important; }
+                    * { color: #000 !important; }
+                    .table-bordered th, .table-bordered td { border: 1px solid #000 !important; padding: 2px 6px !important; font-size: 12px !important; }
+                    @media print { * { color: #000 !important; font-weight: bold !important; } }
+                `;
+                printWindow.document.head.appendChild(style);
                 printWindow.focus();
             };
         });

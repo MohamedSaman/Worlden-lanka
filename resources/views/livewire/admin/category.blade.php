@@ -1,8 +1,7 @@
-<div class="container-fluid py-2">
-
+<div class="container-fluid py-4">
     <!-- Success Message -->
     @if (session()->has('message'))
-    <div class="alert alert-success alert-dismissible fade show mb-5 rounded-3 shadow-sm" role="alert" style="border-left: 5px solid #28a745; color: #233D7F; background: #e6f4ea;">
+    <div class="alert alert-success alert-dismissible fade show mb-4 rounded-3 shadow-sm" role="alert" style="border-left: 5px solid #28a745; color: #155724; background: #d4edda;">
         <div class="d-flex align-items-center">
             <i class="bi bi-check-circle-fill me-2 text-success"></i>
             {{ session('message') }}
@@ -11,95 +10,113 @@
     </div>
     @endif
 
-
-    <!-- Header Section -->
-     <div class="card-header text-white p-2  d-flex align-items-center"
-            style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%); border-radius: 20px 20px 0 0;">
-            <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
-                <i class="bi bi-collection fs-4 text-white" aria-hidden="true"></i>
+    <!-- Page Header -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card card-header-modern mb-4">
+                <div class="d-flex align-items-center">
+                    <div class="icon-wrapper me-3">
+                        <i class="bi bi-collection"></i>
+                    </div>
+                    <div>
+                        <h3 class="mb-1">Product Category Details</h3>
+                        <p class="mb-0">Monitor and manage your Product Category Details</p>
+                    </div>
+                </div>
             </div>
-            <div>
-                <h3 class="mb-1 fw-bold tracking-tight text-white">Product Category Details</h3>
-                <p class="text-white opacity-80 mb-0 text-sm">Monitor and manage your Product Category Details</p>
-            </div>
-        </div>
-    <div class="card-header bg-transparent pb-4 mt-4 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 border-bottom" style="border-color: #233D7F;">
-
-        <!-- Middle: Search Bar -->
-        <div class="flex-grow-1 d-flex justify-content-lg">
-            <div class="input-group" style="max-width: 600px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
-                <span class="input-group-text bg-gray-100 border-0 px-3">
-                    <i class="bi bi-search text-danger"></i>
-                </span>
-                <input type="text"
-                    class="form-control"
-                    placeholder="Search category..."
-                    wire:model.live.debounce.300ms="search"
-                    autocomplete="off">
-            </div>
-        </div>
-
-        <!-- Right: Buttons -->
-        <div class="d-flex gap-2 flex-shrink-0 justify-content-lg-end">
-            <button
-                class="btn btn-primary rounded-full px-4 fw-medium transition-all hover:shadow w-100"
-                wire:click="toggleAddModal"
-                style="background-color: #9d1c20; border-color: #9d1c20; color: white;transition: all 0.3s ease; hover: transform: scale(1.05)">
-                <i class="bi bi-plus-circle me-2"></i>Add Category
-            </button>
-
         </div>
     </div>
 
-    <!-- Categories Table -->
-    <div class="card-body p-1  pt-5 bg-transparent">
-        <div class="table-responsive shadow-sm rounded-2 overflow-auto">
-            <table class="table table-sm">
-                <thead>
-                    <tr>
-                        <th class="text-center py-3 ps-4">ID</th>
-                        <th class="text-center py-3">Name</th>
-                        <th class="text-center py-3">Description</th>
-                        <th class="text-center py-3">Created At</th>
-                        <th class="text-center py-3">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($categories as $category)
-                    <tr class="transition-all hover:bg-gray-50">
-                        <td class="text-sm text-center ps-4 py-3">{{ $category->id }}</td>
-                        <td class="text-sm text-center py-3">{{ $category->name }}</td>
-                        <td class="text-sm text-center py-3">{{ $category->description }}</td>
-                        <td class="text-sm text-center py-3">{{ $category->created_at->format('d/m/Y') }}</td>
-                        <td class="text-center py-3">
-                            <div class="d-flex justify-content-center gap-2">
-                                <button
-                                    class="btn btn-sm"
-                                    wire:click="toggleEditModal({{ $category->id }})"
-                                    style="color: #00C8FF;"
-                                    title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button
-                                    class="btn btn-sm text-danger"
-                                    wire:click="toggleDeleteModal({{ $category->id }})"
-                                    title="Delete">
-                                    <i class="bi bi-trash"></i>
-                                </button>
+    <!-- Main Content -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card animate-slide-in">
+                <!-- Search & Actions Bar -->
+                <div class="card-body border-bottom" style="background-color: #f8f9fa;">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-lg-7">
+                            <div class="search-box-modern">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search text-primary-custom"></i>
+                                    </span>
+                                    <input type="text"
+                                        class="form-control"
+                                        placeholder="Search category..."
+                                        wire:model.live.debounce.300ms="search"
+                                        autocomplete="off">
+                                </div>
                             </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="5" class="text-center py-4" style="color: #9d1c20;">
-                            <i class="bi bi-exclamation-circle me-2"></i>No categories found.
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-            <div class="mt-3 mx-2">
-                {{ $categories->links('livewire::bootstrap') }}
+                        </div>
+                        <div class="col-lg-5 text-lg-end">
+                            <button class="btn-modern btn-primary-modern" wire:click="toggleAddModal">
+                                <i class="bi bi-plus-circle me-2"></i>Add Category
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Content -->
+                <div class="table-modern">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Created At</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($categories as $category)
+                            <tr>
+                                <td>
+                                    <span class="fw-bold text-primary-custom">#{{ $category->id }}</span>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">{{ $category->name }}</div>
+                                </td>
+                                <td>
+                                    <div class="small text-secondary">{{ $category->description }}</div>
+                                </td>
+                                <td>
+                                    <div class="small">{{ $category->created_at->format('d M Y') }}</div>
+                                </td>
+                                <td class="text-center">
+                                    <button wire:click="toggleEditModal({{ $category->id }})"
+                                        class="btn-action btn-edit me-1"
+                                        title="Edit">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button wire:click="toggleDeleteModal({{ $category->id }})"
+                                        class="btn-action btn-delete"
+                                        title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-inbox display-6"></i>
+                                        <p class="mt-2 mb-0">No categories found</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                @if($categories->hasPages())
+                <div class="card-footer bg-white border-top p-4">
+                    <div class="pagination-modern">
+                        {{ $categories->links('livewire::bootstrap') }}
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -191,23 +208,7 @@
 </div>
 
 @push('styles')
-<style>
-    .tracking-tight {
-        letter-spacing: -0.025em;
-    }
-
-    .transition-all {
-        transition: all 0.3s ease;
-    }
-
-    .hover\:bg-gray-50:hover {
-        background-color: #f8f9fa;
-    }
-
-    .hover\:shadow:hover {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-</style>
+@include('components.admin-styles')
 @endpush
 
 @push('script')

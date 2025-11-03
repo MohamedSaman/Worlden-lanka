@@ -1,362 +1,368 @@
-<div class="container-fluid py-1">
-
-    <!-- Header Section -->
-    <div class="card-header text-white p-3 d-flex flex-column flex-md-row align-items-start align-items-md-center"
-        style="background: linear-gradient(90deg, #b5171a 0%, #d34d51ff 100%); border-radius: 20px 20px 0 0;">
-        <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-2 d-flex align-items-center justify-content-center me-md-3 mb-2 mb-md-0">
-            <i class="bi bi-box-seam fs-5 fs-md-4 text-white" aria-hidden="true"></i>
-        </div>
-        <div class="text-center text-md-start">
-            <h3 class="mb-1 fw-bold tracking-tight text-white fs-5 fs-md-4">Product Details</h3>
-            <p class="text-white opacity-80 mb-0 text-sm">Monitor and manage your Product Details</p>
-        </div>
-    </div>
-    <div class="card-header bg-transparent pb-4 mt-4 d-flex flex-column justify-content-between gap-3 border-bottom" style="border-color: #233D7F;">
-        <!-- Search Bar -->
-        <div class="w-100 d-flex justify-content-center justify-content-lg-start">
-            <div class="input-group" style="max-width: 600px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);">
-                <span class="input-group-text bg-gray-100 border-0 px-3" >
-                    <i class="bi bi-search text-danger" ></i>
-                </span>
-                <input type="text"
-                    class="form-control"
-                    placeholder="Search products..."
-                    wire:model.live.debounce.300ms="search"
-                    autocomplete="off">
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card card-header-modern mb-4">
+                <div class="d-flex align-items-center">
+                    <div class="icon-wrapper me-3">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <div>
+                        <h3 class="mb-1">Product Details</h3>
+                        <p class="mb-0">Monitor and manage your Product Details</p>
+                    </div>
+                </div>
             </div>
         </div>
-
-        <!-- Buttons -->
-        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center justify-content-lg-end">
-            <button class="btn btn-light rounded-pill shadow-sm px-3 py-2 transition-transform hover:scale-105 btn-create"
-                wire:click="toggleAddModal"
-                style="color: #fff; background-color: #b5171a; border: 1px solid #b5171a; font-size: 0.875rem;">
-                <i class="bi bi-plus-circle me-1"></i> 
-                <span class="d-none d-sm-inline">Add </span>Product
-            </button>
-            <button wire:click="exportToCSV"
-                class="btn btn-light rounded-pill shadow-sm px-3 py-2 transition-transform hover:scale-105"
-                aria-label="Export stock details to CSV"
-                style="color: #fff; background-color: #b5171a; border: 1px solid #b5171a; font-size: 0.875rem;">
-                <i class="bi bi-download me-1" aria-hidden="true"></i> 
-                <span class="d-none d-sm-inline">Export </span>CSV
-            </button>
-        </div>
-    </div>
-    <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3 px-3">
-        <p class="mb-2 mb-md-0 text-center text-md-start">
-            You can create custom field here 
-            <i class="bi bi-arrow-right ms-2 d-none d-md-inline"></i>
-        </p>
-        <button
-            class="btn btn-primary rounded-pill px-3 py-2 fw-medium transition-all hover:shadow align-self-center"
-            wire:click="$set('showAddFieldModal', true)"
-            style="background-color: #b5171a; border: 1px solid #b5171a; color: white; font-size: 0.875rem;">
-            <i class="bi bi-plus-circle me-2"></i>Add Field
-        </button>
     </div>
 
-    <!-- Products Table -->
-    <div class="card-body py-0 px-1  bg-transparent">
-        <div class="table-responsive shadow-sm rounded-2 overflow-auto">
-            <table class="table table-sm">
-                <thead>
-                    <tr>
-                        <th class="ps-4 py-3">ID</th>
-                        <th class="py-3">Product Code</th>
-                        <th class="py-3">Product Name</th>
-                        <th class="py-3">Category</th>
-                        <th class="py-3">Supplier Price</th>
-                        <th class="py-3">Selling Price</th>
-
-                        <th class="py-3">Quantity Inhand</th>
-                        <th class="py-3">Sold</th>
-                        <th class="py-3 text-center">Stock</th>
-
-                        @foreach ($fieldKeys as $key)
-                        <th class="text-center py-3 ">{{ $key }}</th>
-                        @endforeach
-                        <th class="text-center py-3">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($products as $product)
-                    <tr class="transition-all hover:bg-gray-50">
-                        <td class="ps-4 py-3">{{ $product->id }}</td>
-                        <td class="py-3">{{ $product->product_code }}</td>
-                        <td class="py-3">{{ $product->product_name }}</td>
-                        <td class="py-3">{{ $product->category->name ?? 'N/A' }}</td>
-                        <td class="py-3">Rs. {{ number_format($product->supplier_price, 2) }}</td>
-                        <td class="py-3">Rs. {{ number_format($product->selling_price, 2) }}</td>
-                        <td class="py-3 text-center">{{ $product->stock_quantity + $product->damage_quantity }}</td>
-                        <td class="py-3 text-center">{{ $product->sold }}</td>
-                        <td class="py-3 text-center">
-                            @if($product->stock_quantity > 0)
-                            <span class="badge bg-success text-white px-3 py-2 rounded-pill">In Stock</span>
-                            @else
-                            <span class="badge bg-danger text-white px-3 py-2 rounded-pill">Out of Stock</span>
-                            @endif
-                        </td>
-
-                        @foreach ($fieldKeys as $key)
-                        <td class="text-center py-3">{{ $product->customer_field[$key] ?? '-' }}</td>
-                        @endforeach
-                        <td class="text-center py-3">
-                            <div class="d-flex justify-content-center gap-2">
-                                <button
-                                    class="btn btn-sm "
-                                    wire:click="viewProduct({{ $product->id }})"
-                                    style="color: #233D7F;"
-                                    title="View">
-                                    <i class="bi bi-eye"></i>
-                                </button>
-                                <button
-                                    class="btn btn-sm "
-                                    wire:click="editProduct({{ $product->id }})"
-                                    style="color: #00C8FF;"
-                                    title="Edit">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button
-                                    class="btn btn-sm "
-                                    wire:click="confirmDelete({{ $product->id }})"
-                                    style=" color: #EF4444;"
-                                    title="Delete">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="{{ 9 + count($fieldKeys) }}" class="text-center py-4" style="color: #d34d51ff;">
-                            <i class="bi bi-exclamation-circle me-2"></i>No products found.
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <div class="mt-4">
-        {{ $products->links('livewire::bootstrap') }}
-    </div>
-
-    <!-- Add Product Modal -->
-    @if ($showAddModal)
-    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
-        <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 900px;">
-            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
-                <div class="modal-header py-3 px-4" style="background-color: #9d1c20; color: white;">
-                    <h5 class="modal-title fw-bold tracking-tight">Add New Product</h5>
-                    <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" wire:click="toggleAddModal" aria-label="Close"></button>
-                </div>
-                <form wire:submit.prevent="save">
-                    <div class="modal-body p-5">
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <label for="category_id" class="form-label fw-medium" style="color: #9d1c20;">Category</label>
-                                <select
-                                    id="category_id"
-                                    wire:model="category_id"
-                                    class="form-select border-2 shadow-sm"
-                                    style=" color: #9d1c20;">
-                                    <option value="">Select a category</option>
-                                    @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label for="product_name" class="form-label fw-medium" style="color: #9d1c20;">Product Name</label>
-                                <input
-                                    type="text"
-                                    id="product_name"
-                                    wire:model="product_name"
-                                    class="form-control border-2 shadow-sm"
-                                    style=" color: #9d1c20;">
-                                @error('product_name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                            </div>
-
-                            <div class="col-md-6">
-                                <label for="supplier_price" class="form-label fw-medium" style="color: #9d1c20;">Supplier Price</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white border-2 border-end-0">Rs.</span>
-                                    <input
-                                        type="number"
-                                        id="supplier_price"
-                                        wire:model="supplier_price"
-                                        class="form-control border-2 shadow-sm"
-                                        style=" color: #9d1c20;"
-                                        step="0.01">
-                                </div>
-                                @error('supplier_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label for="selling_price" class="form-label fw-medium" style="color: #9d1c20;">Selling Price</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-white border-2 border-end-0">Rs.</span>
-                                    <input
-                                        type="number"
-                                        id="selling_price"
-                                        wire:model="selling_price"
-                                        class="form-control border-2 shadow-sm"
-                                        style=" color: #9d1c20;"
-                                        step="0.01">
-                                </div>
-                                @error('selling_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label for="stock_quantity" class="form-label fw-medium" style="color: #9d1c20;">Total Quantity</label>
-                                <input
-                                    type="number"
-                                    id="stock_quantity"
-                                    wire:model="stock_quantity"
-                                    class="form-control border-2 shadow-sm"
-                                    style=" color: #9d1c20;"
-                                    min="0" step="1">
-                                @error('stock_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label for="damage_quantity" class="form-label fw-medium" style="color: #9d1c20;">Damage Quantity</label>
-                                <input
-                                    type="number"
-                                    id="damage_quantity"
-                                    wire:model="damage_quantity"
-                                    class="form-control border-2 shadow-sm"
-                                    style=" color: #9d1c20;"
-                                    min="0" step="1">
-                                @error('damage_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+    <!-- Main Content -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card animate-slide-in">
+                <!-- Search & Actions -->
+                <div class="card-body border-bottom" style="background-color: #f8f9fa;">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-lg-6">
+                            <div class="search-box-modern">
+                                <i class="bi bi-search"></i>
+                                <input type="text"
+                                    class="form-control"
+                                    placeholder="Search products..."
+                                    wire:model.live.debounce.300ms="search"
+                                    autocomplete="off">
                             </div>
                         </div>
+                        <div class="col-lg-6">
+                            <div class="d-flex gap-2 justify-content-lg-end">
+                                <button class="btn btn-modern btn-primary-modern"
+                                    wire:click="toggleAddModal">
+                                    <i class="bi bi-plus-circle me-1"></i>
+                                    <span class="d-none d-sm-inline">Add </span>Product
+                                </button>
+                                <button wire:click="exportToCSV"
+                                    class="btn btn-modern btn-secondary-modern">
+                                    <i class="bi bi-download me-1"></i>
+                                    <span class="d-none d-sm-inline">Export </span>CSV
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                        <div class="mt-2">
-                            <h6 class="fw-bold text-uppercase text-muted">Customer Fields</h6>
-                            <div class="row g-4">
+                <!-- Custom Field Section -->
+                <div class="card-body border-bottom d-flex justify-content-between align-items-center" style="background-color: #fafbfc;">
+                    <p class="mb-0 text-muted">
+                        You can create custom field here
+                        <i class="bi bi-arrow-right ms-2"></i>
+                    </p>
+                    <button
+                        class="btn btn-modern btn-outline-modern"
+                        wire:click="$set('showAddFieldModal', true)">
+                        <i class="bi bi-plus-circle me-1"></i>Add Field
+                    </button>
+                </div>
+
+                <!-- Table -->
+                <div class="table-modern">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th class="ps-4 py-3">ID</th>
+                                <th class="py-3">Product Code</th>
+                                <th class="py-3">Product Name</th>
+                                <th class="py-3">Category</th>
+                              
+                                <th class="py-3">Selling Price</th>
+
+                                <th class="py-3">Quantity Inhand</th>
+                                <th class="py-3">Sold</th>
+                                <th class="py-3 text-center">Stock</th>
+
                                 @foreach ($fieldKeys as $key)
-                                <div class="col-md-6 mb-3">
-                                    <label for="customer_field_{{ $key }}" class="form-label fw-medium" style="color: #9d1c20;">{{ $key }}</label>
-                                    <input
-                                        type="text"
-                                        id="customer_field_{{ $key }}"
-                                        wire:model="customer_fields.{{ $loop->index }}.value"
-                                        class="form-control border-2 shadow-sm"
-                                        style="color: #9d1c20;"
-                                        placeholder="Enter {{ $key }}">
-                                    @error('customer_fields.' . $loop->index . '.value') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                                </div>
+                                <th class="text-center py-3 ">{{ $key }}</th>
                                 @endforeach
-                            </div>
-                        </div>
+                                <th class="text-center py-3">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($products as $product)
+                            <tr class="transition-all hover:bg-gray-50">
+                                <td class="ps-4 py-3">{{ $product->id }}</td>
+                                <td class="py-3">{{ $product->product_code }}</td>
+                                <td class="py-3">{{ $product->product_name }}</td>
+                                <td class="py-3">{{ $product->category->name ?? 'N/A' }}</td>
+                                
+                                <td class="py-3">Rs. {{ number_format($product->selling_price, 2) }}</td>
+                                <td class="py-3 text-center">{{ $product->stock_quantity + $product->damage_quantity }}</td>
+                                <td class="py-3 text-center">{{ $product->sold }}</td>
+                                <td class="py-3 text-center">
+                                    @if($product->stock_quantity > 0)
+                                    <span class="badge bg-success text-white px-3 py-2 rounded-pill">In Stock</span>
+                                    @else
+                                    <span class="badge bg-danger text-white px-3 py-2 rounded-pill">Out of Stock</span>
+                                    @endif
+                                </td>
 
-                    </div>
-                    <div class="modal-footer py-3 px-4 d-flex justify-content-end gap-3" style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
-                        <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="toggleAddModal" style="background-color: #6B7280; border-color: #6B7280; color: white;">Cancel</button>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">Save Product</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-    @endif
-
-    <!-- Edit Product Modal -->
-    @if ($showEditModal)
-    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
-                <div class="modal-header py-3 px-4" style="background-color: #9d1c20; color: white;">
-                    <h5 class="modal-title fw-bold tracking-tight">Edit Product</h5>
-                    <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" wire:click="toggleEditModal" aria-label="Close"></button>
+                                @foreach ($fieldKeys as $key)
+                                <td class="text-center py-3">{{ $product->customer_field[$key] ?? '-' }}</td>
+                                @endforeach
+                                <td class="text-center py-3">
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button
+                                            class="btn btn-sm "
+                                            wire:click="viewProduct({{ $product->id }})"
+                                            style="color: #233D7F;"
+                                            title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        <button
+                                            class="btn btn-sm "
+                                            wire:click="editProduct({{ $product->id }})"
+                                            style="color: #00C8FF;"
+                                            title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button
+                                            class="btn btn-sm "
+                                            wire:click="confirmDelete({{ $product->id }})"
+                                            style=" color: #EF4444;"
+                                            title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="{{ 9 + count($fieldKeys) }}" class="text-center py-4" style="color: #d34d51ff;">
+                                    <i class="bi bi-exclamation-circle me-2"></i>No products found.
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
-                <form wire:submit.prevent="update">
-                    <div class="modal-body p-5">
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <label for="edit_category_id" class="form-label fw-medium" style="color: #9d1c20;">Category</label>
-                                <select
-                                    id="edit_category_id"
-                                    wire:model="category_id"
-                                    class="form-select border-2 shadow-sm"
-                                    style=" color: #9d1c20;">
-                                    <option value="">Select a category</option>
-                                    @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                    @endforeach
-                                </select>
-                                @error('category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <label for="edit_product_name" class="form-label fw-medium" style="color: #9d1c20;">Product Name</label>
-                                <input
-                                    type="text"
-                                    id="edit_product_name"
-                                    wire:model="product_name"
-                                    class="form-control border-2 shadow-sm"
-                                    style=" color: #9d1c20;">
-                                @error('product_name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <label for="edit_supplier_price" class="form-label fw-medium" style="color: #9d1c20;">Supplier Price</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white border-2 border-end-0" style="">Rs.</span>
+            </div>
+
+            <div class="mt-4">
+                {{ $products->links('livewire::bootstrap') }}
+            </div>
+
+            <!-- Add Product Modal -->
+            @if ($showAddModal)
+            <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
+                <div class="modal-dialog modal-xl modal-dialog-centered" style="max-width: 900px;">
+                    <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                        <div class="modal-header py-3 px-4" style="background-color: #9d1c20; color: white;">
+                            <h5 class="modal-title fw-bold tracking-tight">Add New Product</h5>
+                            <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" wire:click="toggleAddModal" aria-label="Close"></button>
+                        </div>
+                        <form wire:submit.prevent="save">
+                            <div class="modal-body p-5">
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <label for="category_id" class="form-label fw-medium" style="color: #9d1c20;">Category</label>
+                                        <select
+                                            id="category_id"
+                                            wire:model="category_id"
+                                            class="form-select border-2 shadow-sm"
+                                            style=" color: #9d1c20;">
+                                            <option value="">Select a category</option>
+                                            @foreach ($categories as $category)
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="product_name" class="form-label fw-medium" style="color: #9d1c20;">Product Name</label>
+                                        <input
+                                            type="text"
+                                            id="product_name"
+                                            wire:model="product_name"
+                                            class="form-control border-2 shadow-sm"
+                                            style=" color: #9d1c20;">
+                                        @error('product_name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <label for="supplier_price" class="form-label fw-medium" style="color: #9d1c20;">Supplier Price</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-2 border-end-0">Rs.</span>
+                                            <input
+                                                type="number"
+                                                id="supplier_price"
+                                                wire:model="supplier_price"
+                                                class="form-control border-2 shadow-sm"
+                                                style=" color: #9d1c20;"
+                                                step="0.01">
+                                        </div>
+                                        @error('supplier_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="selling_price" class="form-label fw-medium" style="color: #9d1c20;">Selling Price</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white border-2 border-end-0">Rs.</span>
+                                            <input
+                                                type="number"
+                                                id="selling_price"
+                                                wire:model="selling_price"
+                                                class="form-control border-2 shadow-sm"
+                                                style=" color: #9d1c20;"
+                                                step="0.01">
+                                        </div>
+                                        @error('selling_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="stock_quantity" class="form-label fw-medium" style="color: #9d1c20;">Total Quantity</label>
                                         <input
                                             type="number"
-                                            id="edit_supplier_price"
-                                            wire:model="supplier_price"
+                                            id="stock_quantity"
+                                            wire:model="stock_quantity"
                                             class="form-control border-2 shadow-sm"
                                             style=" color: #9d1c20;"
-                                            step="0.01">
+                                            min="0" step="1">
+                                        @error('stock_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                                     </div>
-                                    @error('supplier_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <label for="edit_selling_price" class="form-label fw-medium" style="color: #9d1c20;">Selling Price</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-white border-2 border-end-0" style="">Rs.</span>
+                                    <div class="col-md-6">
+                                        <label for="damage_quantity" class="form-label fw-medium" style="color: #9d1c20;">Damage Quantity</label>
                                         <input
                                             type="number"
-                                            id="edit_selling_price"
-                                            wire:model="selling_price"
+                                            id="damage_quantity"
+                                            wire:model="damage_quantity"
                                             class="form-control border-2 shadow-sm"
                                             style=" color: #9d1c20;"
-                                            step="0.01">
+                                            min="0" step="1">
+                                        @error('damage_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                                     </div>
-                                    @error('selling_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <label for="edit_stock_quantity" class="form-label fw-medium" style="color: #9d1c20;">Stock Quantity</label>
-                                    <input
-                                        type="number"
-                                        id="edit_stock_quantity"
-                                        wire:model="stock_quantity"
-                                        class="form-control border-2 shadow-sm"
-                                        style=" color: #9d1c20;"
-                                        min="0" step="1">
-                                    @error('stock_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+
+                                <div class="mt-2">
+                                    <h6 class="fw-bold text-uppercase text-muted">Customer Fields</h6>
+                                    <div class="row g-4">
+                                        @foreach ($fieldKeys as $key)
+                                        <div class="col-md-6 mb-3">
+                                            <label for="customer_field_{{ $key }}" class="form-label fw-medium" style="color: #9d1c20;">{{ $key }}</label>
+                                            <input
+                                                type="text"
+                                                id="customer_field_{{ $key }}"
+                                                wire:model="customer_fields.{{ $loop->index }}.value"
+                                                class="form-control border-2 shadow-sm"
+                                                style="color: #9d1c20;"
+                                                placeholder="Enter {{ $key }}">
+                                            @error('customer_fields.' . $loop->index . '.value') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                        </div>
+                                        @endforeach
+                                    </div>
                                 </div>
+
                             </div>
-                            <div class="col-md-6">
-                                <div class="mb-4">
-                                    <label for="edit_damage_quantity" class="form-label fw-medium" style="color: #9d1c20;">Damage Quantity</label>
-                                    <input
-                                        type="number"
-                                        id="edit_damage_quantity"
-                                        wire:model="damage_quantity"
-                                        class="form-control border-2 shadow-sm"
-                                        style=" color: #9d1c20;"
-                                        min="0" step="1">
-                                    @error('damage_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                                </div>
+                            <div class="modal-footer py-3 px-4 d-flex justify-content-end gap-3" style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
+                                <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="toggleAddModal" style="background-color: #6B7280; border-color: #6B7280; color: white;">Cancel</button>
+                                <button type="submit" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">Save Product</button>
                             </div>
-                            {{-- <div class="col-md-6">
+                        </form>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            <!-- Edit Product Modal -->
+            @if ($showEditModal)
+            <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
+                <div class="modal-dialog modal-lg modal-dialog-centered">
+                    <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                        <div class="modal-header py-3 px-4" style="background-color: #9d1c20; color: white;">
+                            <h5 class="modal-title fw-bold tracking-tight">Edit Product</h5>
+                            <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" wire:click="toggleEditModal" aria-label="Close"></button>
+                        </div>
+                        <form wire:submit.prevent="update">
+                            <div class="modal-body p-5">
+                                <div class="row g-4">
+                                    <div class="col-md-6">
+                                        <label for="edit_category_id" class="form-label fw-medium" style="color: #9d1c20;">Category</label>
+                                        <select
+                                            id="edit_category_id"
+                                            wire:model="category_id"
+                                            class="form-select border-2 shadow-sm"
+                                            style=" color: #9d1c20;">
+                                            <option value="">Select a category</option>
+                                            @foreach ($categories as $category)
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        @error('category_id') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="edit_product_name" class="form-label fw-medium" style="color: #9d1c20;">Product Name</label>
+                                        <input
+                                            type="text"
+                                            id="edit_product_name"
+                                            wire:model="product_name"
+                                            class="form-control border-2 shadow-sm"
+                                            style=" color: #9d1c20;">
+                                        @error('product_name') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-4">
+                                            <label for="edit_supplier_price" class="form-label fw-medium" style="color: #9d1c20;">Supplier Price</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white border-2 border-end-0" style="">Rs.</span>
+                                                <input
+                                                    type="number"
+                                                    id="edit_supplier_price"
+                                                    wire:model="supplier_price"
+                                                    class="form-control border-2 shadow-sm"
+                                                    style=" color: #9d1c20;"
+                                                    step="0.01">
+                                            </div>
+                                            @error('supplier_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-4">
+                                            <label for="edit_selling_price" class="form-label fw-medium" style="color: #9d1c20;">Selling Price</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text bg-white border-2 border-end-0" style="">Rs.</span>
+                                                <input
+                                                    type="number"
+                                                    id="edit_selling_price"
+                                                    wire:model="selling_price"
+                                                    class="form-control border-2 shadow-sm"
+                                                    style=" color: #9d1c20;"
+                                                    step="0.01">
+                                            </div>
+                                            @error('selling_price') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-4">
+                                            <label for="edit_stock_quantity" class="form-label fw-medium" style="color: #9d1c20;">Stock Quantity</label>
+                                            <input
+                                                type="number"
+                                                id="edit_stock_quantity"
+                                                wire:model="stock_quantity"
+                                                class="form-control border-2 shadow-sm"
+                                                style=" color: #9d1c20;"
+                                                min="0" step="1">
+                                            @error('stock_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-4">
+                                            <label for="edit_damage_quantity" class="form-label fw-medium" style="color: #9d1c20;">Damage Quantity</label>
+                                            <input
+                                                type="number"
+                                                id="edit_damage_quantity"
+                                                wire:model="damage_quantity"
+                                                class="form-control border-2 shadow-sm"
+                                                style=" color: #9d1c20;"
+                                                min="0" step="1">
+                                            @error('damage_quantity') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                        </div>
+                                    </div>
+                                    {{-- <div class="col-md-6">
                                 <label class="form-label fw-medium" style="color: #9d1c20;">Sold Quantity</label>
                                 <input
                                     type="number"
@@ -365,7 +371,8 @@
                                     class="form-control border-2 shadow-sm"
                                     style=" color: #9d1c20;"
                                     min="0" step="1" readonly>
-                                @error('sold') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                                @error('sold') <div class="text-danger small mt-1">{{ $message }}
+                                </div> @enderror
                             </div> --}}
                             <div class="col-md-6">
                                 <label for="status" class="form-label fw-medium" style="color: #233D7F;">Status</label>
@@ -380,36 +387,36 @@
                                 </select>
                                 @error('status') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
-                        </div>
+                    </div>
 
 
-                        <!-- customer Fields -->
-                        <div class="mb-4">
-                            <label class="form-label fw-medium" style="color: #9d1c20;">Customer Fields</label>
-                            <div class="row g-3">
-                                @foreach ($customer_fields as $index => $field)
-                                @php
-                                $labelKey = ucwords(strtolower($field['key']));
-                                @endphp
-                                <div class="col-md-6">
-                                    <label class="form-label fw-medium" style="color: #9d1c20;">{{ $labelKey }}</label>
-                                    <input
-                                        type="text"
-                                        placeholder="Enter {{ $labelKey }}"
-                                        wire:model="customer_fields.{{ $index }}.value"
-                                        class="form-control border-2 shadow-sm"
-                                        style=" color: #9d1c20;">
-                                    @error('customer_fields.' . $index . '.value') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
-                                </div>
-                                @endforeach
+                    <!-- customer Fields -->
+                    <div class="mb-4">
+                        <label class="form-label fw-medium" style="color: #9d1c20;">Customer Fields</label>
+                        <div class="row g-3">
+                            @foreach ($customer_fields as $index => $field)
+                            @php
+                            $labelKey = ucwords(strtolower($field['key']));
+                            @endphp
+                            <div class="col-md-6">
+                                <label class="form-label fw-medium" style="color: #9d1c20;">{{ $labelKey }}</label>
+                                <input
+                                    type="text"
+                                    placeholder="Enter {{ $labelKey }}"
+                                    wire:model="customer_fields.{{ $index }}.value"
+                                    class="form-control border-2 shadow-sm"
+                                    style=" color: #9d1c20;">
+                                @error('customer_fields.' . $index . '.value') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
                             </div>
+                            @endforeach
                         </div>
+                    </div>
 
-                    </div>
-                    <div class="modal-footer py-3 px-4" style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
-                        <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="toggleEditModal" style="background-color: #6B7280; border-color: #6B7280; color: white;">Cancel</button>
-                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">Update Product</button>
-                    </div>
+                </div>
+                <div class="modal-footer py-3 px-4" style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" wire:click="toggleEditModal" style="background-color: #6B7280; border-color: #6B7280; color: white;">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-medium transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#233D7F'; this.style.borderColor='#233D7F';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">Update Product</button>
+                </div>
                 </form>
             </div>
         </div>
@@ -714,68 +721,9 @@
     </div>
     @endif
 
-@push('styles')
-<style>
-    .input-group {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    .btn {
-        transition: all 0.3s ease;
-    }
-
-    .btn:hover {
-        transform: scale(1.05);
-    }
-
-    .tracking-tight {
-        letter-spacing: -0.025em;
-    }
-
-    .transition-all {
-        transition: all 0.3s ease;
-    }
-
-    .hover\:bg-gray-50:hover {
-        background-color: #f8f9fa;
-    }
-
-    .hover\:shadow:hover {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    @media (max-width: 767.98px) {
-        .table {
-            font-size: 0.875rem;
-        }
-
-        .btn-group-sm>.btn,
-        .btn-sm {
-            padding: 0.25rem 0.4rem;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 0.25rem;
-        }
-
-        .table td:nth-child(5),
-        .table th:nth-child(5),
-        /* Email */
-        .table td:nth-child(7),
-        .table th:nth-child(7) {
-            /* Address */
-            display: none;
-        }
-    }
-
-    @media (max-width: 575.98px) {
-        .modal-footer {
-            justify-content: center;
-        }
-    }
-</style>
-@endpush
+    @push('styles')
+    @include('components.admin-styles')
+    @endpush
 
 
 

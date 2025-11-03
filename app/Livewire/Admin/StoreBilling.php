@@ -72,6 +72,10 @@ class StoreBilling extends Component
     public $showReceipt = false;
     public $receipt = null;
 
+    public $invoiceNumber = '';
+    public $isInvoiceGenerated = false;
+    public $invoiceDate = '';
+
     public $cashAmount = 0;
     public $cheques = [];
     public $newCheque = [
@@ -96,6 +100,8 @@ class StoreBilling extends Component
         $this->loadQuantityTypes();
         $this->updateTotals();
         $this->balanceDueDate = date('Y-m-d', strtotime('+7 days'));
+        $this->invoiceDate = date('Y-m-d'); // Set default to today
+        $this->generateInvoiceNumber();
     }
     public function loadBanks()
     {
@@ -133,6 +139,62 @@ class StoreBilling extends Component
             'doz' => 'Dozen',
             'roll' => 'Roll',
         ];
+    }
+
+    public function generateInvoiceNumber($useDate = null)
+    {
+        $prefix = 'INV-';
+        $dateToUse = $useDate ?? $this->invoiceDate ?? now()->format('Y-m-d');
+        $formattedDate = date('Ymd', strtotime($dateToUse));
+
+        $lastInvoice = Sale::where('invoice_number', 'like', "{$prefix}{$formattedDate}%")
+            ->orderBy('invoice_number', 'desc')
+            ->first();
+
+        $nextNumber = 1;
+
+        if ($lastInvoice) {
+            $parts = explode('-', $lastInvoice->invoice_number);
+            $lastNumber = intval(end($parts));
+            $nextNumber = $lastNumber + 1;
+        }
+
+        $this->invoiceNumber = $prefix . $formattedDate . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        $this->isInvoiceGenerated = true;
+    }
+
+    public function updatedInvoiceDate($value)
+    {
+        // When date changes, regenerate invoice number for that date
+        if (!empty($value)) {
+            $this->generateInvoiceNumber($value);
+        }
+    }
+
+    public function validateInvoiceNumber()
+    {
+        if (empty($this->invoiceNumber)) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Error',
+                'text' => 'Invoice number cannot be empty'
+            ]);
+            $this->generateInvoiceNumber();
+            return false;
+        }
+
+        $existingInvoice = Sale::where('invoice_number', $this->invoiceNumber)->first();
+
+        if ($existingInvoice) {
+            $this->dispatch('swal', [
+                'icon' => 'error',
+                'title' => 'Invoice Already Exists',
+                'text' => 'This invoice number already exists in the database. Please use a different number.'
+            ]);
+            return false;
+        }
+
+        return true;
     }
 
     public function loadCustomers()
@@ -423,6 +485,11 @@ class StoreBilling extends Component
             return;
         }
 
+        // Validate invoice number before proceeding
+        if (!$this->validateInvoiceNumber()) {
+            return;
+        }
+
         $this->validate([
             'customerId' => 'required',
             'paymentType' => 'required|in:full,partial',
@@ -449,7 +516,7 @@ class StoreBilling extends Component
             DB::beginTransaction();
 
             $sale = Sale::create([
-                'invoice_number'   => Sale::generateInvoiceNumber(),
+                'invoice_number'   => $this->invoiceNumber,
                 'customer_id'      => $this->customerId,
                 'user_id'          => auth()->id(),
                 'customer_type'    => Customer::find($this->customerId)->type ?? 'N/A',
@@ -461,6 +528,8 @@ class StoreBilling extends Component
                 'notes'            => $this->saleNotes,
                 'delivery_note'    => $this->deliveryNote,
                 'due_amount'       => $this->balanceAmount,
+                'created_at'       => $this->invoiceDate . ' ' . date('H:i:s'), // Set custom date with current time
+                'updated_at'       => now(),
             ]);
 
             $adminSale = AdminSale::create([
@@ -563,7 +632,7 @@ class StoreBilling extends Component
                     'status'          => null,
                     'due_date'        => $this->balanceDueDate ?? now()->addDays(7),
                 ]);
-                
+
                 // Maintain a single CustomerAccount row per customer.
                 // If an account exists, update it; otherwise, create a new one.
                 // Business rule: carry forward old current due + add new due.
@@ -599,6 +668,8 @@ class StoreBilling extends Component
             $this->js('swal.fire("Success", "Sale completed successfully! Invoice #' . $sale->invoice_number . '", "success")');
             $this->clearCart();
             $this->resetPaymentInfo();
+            $this->invoiceDate = date('Y-m-d'); // Reset to today's date for next sale
+            $this->generateInvoiceNumber(); // Generate new invoice for next sale
             $this->js('$("#receiptModal").modal("show")');
         } catch (Exception $e) {
             DB::rollBack();
@@ -636,8 +707,8 @@ class StoreBilling extends Component
         $this->balancePaymentReceiptImage = null;
         $this->balancePaymentReceiptImagePreview = null;
         $this->balanceBankName = '';
-        $this->saleNotes= '';
-        $this->deliveryNote= '';
+        $this->saleNotes = '';
+        $this->deliveryNote = '';
         $this->customerId = null;
     }
 

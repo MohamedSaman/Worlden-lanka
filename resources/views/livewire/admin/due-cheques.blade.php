@@ -1,99 +1,89 @@
-<div class="container-fluid py-6 bg-gray-50 min-vh-100 transition-colors duration-300">
-    <!-- Page Header with Stats (unchanged) -->
-    <div class="row mb-4">
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="row g-4 mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
-                <!-- Header Content (unchanged) -->
-                <div class="card-header text-white p-2 rounded-t-4 d-flex align-items-center"
-                    style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%);border-radius: 20px 20px 0 0;">
-                    <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
-                        <i class="bi bi-cash-stack text-white fs-4" aria-hidden="true"></i>
+            <div class="card card-header-modern mb-4">
+                <div class="d-flex align-items-center">
+                    <div class="icon-wrapper me-3">
+                        <i class="bi bi-cash-stack"></i>
                     </div>
                     <div>
-                        <h3 class="mb-1 fw-bold tracking-tight text-white">Cheque Payments Details</h3>
-                        <p class="text-white opacity-80 mb-0 text-sm">Manage and collect pending cheque payments from customers</p>
+                        <h3 class="mb-1">Cheque Payments Details</h3>
+                        <p class="mb-0">Manage and collect pending cheque payments from customers</p>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Stats Cards (unchanged) -->
-                <div class="card-body p-5">
-                    <div class="row g-4">
-                        <!-- Pending Cheques Card -->
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
-                                <div class="card-body p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-hourglass text-danger"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Pending Cheques</p>
-                                            <div class="d-flex align-items-baseline mt-1">
-                                                <h3 class="mb-0 fw-bold text-gray-800">{{ $pendingChequeCount }}</h3>
-                                                <span class="badge bg-danger bg-opacity-10 text-danger ms-2 rounded-full" style="padding: 6px 12px;">To Collect</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+        <!-- Stats Cards -->
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card primary animate-fade-in">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
+                            <i class="bi bi-hourglass text-danger"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Pending Cheques</p>
+                            <div class="d-flex align-items-baseline mt-1">
+                                <h3 class="mb-0 fw-bold text-gray-800">{{ $pendingChequeCount }}</h3>
+                                <span class="badge bg-danger bg-opacity-10 text-danger ms-2 rounded-full" style="padding: 6px 12px;">To Collect</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <!-- Complete Cheque Card -->
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
-                                <div class="card-body p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-clock-history text-danger"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Complete Cheque</p>
-                                            <div class="d-flex align-items-baseline mt-1">
-                                                <h3 class="mb-0 fw-bold text-gray-800">{{ $completeChequeCount }}</h3>
-                                                <span class="badge bg-danger bg-opacity-10 text-danger ms-2 rounded-full" style="padding: 6px 12px;">Complete</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card success animate-fade-in" style="animation-delay: 0.1s;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
+                            <i class="bi bi-clock-history text-danger"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Complete Cheque</p>
+                            <div class="d-flex align-items-baseline mt-1">
+                                <h3 class="mb-0 fw-bold text-gray-800">{{ $completeChequeCount }}</h3>
+                                <span class="badge bg-danger bg-opacity-10 text-danger ms-2 rounded-full" style="padding: 6px 12px;">Complete</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <!-- Return Cheques Card -->
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
-                                <div class="card-body p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-exclamation-circle text-danger"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Return Cheques</p>
-                                            <div class="d-flex align-items-baseline mt-1">
-                                                <h3 class="mb-0 fw-bold text-gray-800">{{ $returnChequeCount }}</h3>
-                                                <span class="badge bg-danger bg-opacity-10 text-danger ms-2 rounded-full" style="padding: 6px 12px;">Attention</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card warning animate-fade-in" style="animation-delay: 0.2s;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
+                            <i class="bi bi-exclamation-circle text-danger"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Return Cheques</p>
+                            <div class="d-flex align-items-baseline mt-1">
+                                <h3 class="mb-0 fw-bold text-gray-800">{{ $returnChequeCount }}</h3>
+                                <span class="badge bg-danger bg-opacity-10 text-danger ms-2 rounded-full" style="padding: 6px 12px;">Attention</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-                        <!-- Total Due Amount Card -->
-                        <div class="col-xl-3 col-md-6">
-                            <div class="card border-0 shadow-lg rounded-4 h-100 transition-all hover:scale-105">
-                                <div class="card-body p-4">
-                                    <div class="d-flex align-items-center">
-                                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
-                                            <i class="bi bi-currency-dollar text-danger"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Total Cheque Due</p>
-                                            <div class="d-flex align-items-baseline mt-1">
-                                                <h4 class="mb-0 fw-bold text-gray-800">Rs.{{ number_format($totalDueAmount, 2) }}</h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="stat-card info animate-fade-in" style="animation-delay: 0.3s;">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center">
+                        <div class="icon-shape icon-md rounded-circle bg-danger bg-opacity-10 me-3 text-center">
+                            <i class="bi bi-currency-dollar text-danger"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600 mb-0 text-uppercase fw-semibold">Total Cheque Due</p>
+                            <div class="d-flex align-items-baseline mt-1">
+                                <h4 class="mb-0 fw-bold text-gray-800">Rs.{{ number_format($totalDueAmount, 2) }}</h4>
                             </div>
                         </div>
                     </div>
@@ -102,11 +92,12 @@
         </div>
     </div>
 
+    <!-- Main Content -->
     <div class="row">
         <div class="col-12">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
-                <!-- Search & Filter Bar (unchanged, but added print button wire:click if needed) -->
-                <div class="card-header p-4" style="background-color: #eff6ff;">
+            <div class="card animate-slide-in">
+                <!-- Search & Filter Bar -->
+                <div class="card-body border-bottom" style="background-color: #f8f9fa;">
                     <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
                         <div class="flex-grow-1 d-flex justify-content-lg">
                             <div class="input-group " style="max-width: 600px;">
@@ -169,70 +160,74 @@
                 </div>
 
                 <!-- Table Content -->
-                <div class="card-body p-5">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead style="background-color: #eff6ff;">
-                                <tr>
-                                    <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Invoice</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Customer</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Cheque Number</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Amount</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Cheque Date</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Status</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Actions</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">View</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($duePayments as $cheque)
-                                <tr>
-                                    <td class="text-center fw-bold">{{ $cheque->payment->sale->invoice_number ?? 'N/A' }}</td>
-                                    <td class="text-center">{{ $cheque->customer->name ?? 'N/A' }}</td>
-                                    <td class="text-center">{{ $cheque->cheque_number ?? 'N/A' }}</td>
-                                    <td class="text-center">Rs. {{ number_format($cheque->cheque_amount ?? 0, 2) }}</td>
-                                    <td class="text-center">{{ $cheque->cheque_date?->format('d/m/Y') ?? 'N/A' }}</td>
-                                    <td class="text-center">
-                                        <span class="px-3 py-1 fw-semibold {{ $cheque->status === 'pending' ? 'text-warning' : ($cheque->status === 'complete' ? 'text-success' : 'text-danger ') }}">
-                                            {{ ucfirst($cheque->status ?? 'Pending') }}
-                                        </span>
-                                    </td>
+                <div class="table-modern">
+                    <table class="table table-hover mb-0">
+                        <thead style="background-color: #eff6ff;">
+                            <tr>
+                                <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Invoice</th>
+                                <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Customer</th>
+                                <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Cheque Number</th>
+                                <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Amount</th>
+                                <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Cheque Date</th>
+                                <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Status</th>
+                                <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Actions</th>
+                                <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">View</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($duePayments as $cheque)
+                            <tr>
+                                <td class="text-center fw-bold">{{ $cheque->payment->sale->invoice_number ?? 'N/A' }}</td>
+                                <td class="text-center">{{ $cheque->customer->name ?? 'N/A' }}</td>
+                                <td class="text-center">{{ $cheque->cheque_number ?? 'N/A' }}</td>
+                                <td class="text-center">Rs. {{ number_format($cheque->cheque_amount ?? 0, 2) }}</td>
+                                <td class="text-center">{{ $cheque->cheque_date?->format('d/m/Y') ?? 'N/A' }}</td>
+                                <td class="text-center">
+                                    <span class="px-3 py-1 fw-semibold {{ $cheque->status === 'pending' ? 'text-warning' : ($cheque->status === 'complete' ? 'text-success' : 'text-danger ') }}">
+                                        {{ ucfirst($cheque->status ?? 'Pending') }}
+                                    </span>
+                                </td>
 
-                                    <td class="text-center">
-                                        @if($cheque->status == 'pending')
-                                        <div class="d-flex justify-content-center gap-2">
-                                            <button wire:click="completePaymentDetails({{ $cheque->id }})" class="btn btn-sm btn-success rounded-pill">Complete</button>
-                                            <button wire:click="returnCheque({{ $cheque->id }})" class="btn btn-sm btn-danger rounded-pill">Return</button>
-                                        </div>
-                                        @elseif($cheque->status == 'return')
-                                        <div class="d-flex justify-content-center gap-2">
-                                            <button wire:click="refundCheque({{ $cheque->id }})" class="btn btn-sm btn-warning rounded-pill">Refund</button>
-                                        </div>
-                                        @else
-                                        <span class="text-success">completed</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        <button class="btn btn-sm rounded-pill view-cheque-btn" data-cheque-id="{{ $cheque->id }}">
-                                            <i class="bi bi-eye"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="7" class="text-center py-4 text-gray-600">No due cheque payments found.</td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="px-4 py-3 border-top">
+                                <td class="text-center">
+                                    @if($cheque->status == 'pending')
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button wire:click="completePaymentDetails({{ $cheque->id }})" class="btn btn-sm btn-success rounded-pill">Complete</button>
+                                        <button wire:click="returnCheque({{ $cheque->id }})" class="btn btn-sm btn-danger rounded-pill">Return</button>
+                                    </div>
+                                    @elseif($cheque->status == 'return')
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button wire:click="refundCheque({{ $cheque->id }})" class="btn btn-sm btn-warning rounded-pill">Refund</button>
+                                    </div>
+                                    @else
+                                    <span class="text-success">completed</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm rounded-pill view-cheque-btn" data-cheque-id="{{ $cheque->id }}">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="7" class="text-center py-4 text-gray-600">No due cheque payments found.</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                @if($duePayments->hasPages())
+                <div class="card-footer bg-white border-top p-4">
+                    <div class="pagination-modern">
                         {{ $duePayments->links('livewire::bootstrap') }}
                     </div>
                 </div>
+                @endif
             </div>
         </div>
     </div>
+
 
     <!-- Payment Detail Modal -->
     <div wire:ignore.self class="modal fade" id="payment-detail-modal" tabindex="-1" aria-labelledby="payment-detail-modal-label" aria-hidden="true">
@@ -253,17 +248,17 @@
                             <div class="text-center mb-4">
                                 <div class="icon-shape icon-xl rounded-circle bg-primary bg-opacity-10 mx-auto d-flex align-items-center justify-content-center">
                                     @if($paymentDetail->sale && $paymentDetail->sale->customer)
-                                        <span class="text-primary fw-bold" style="font-size: 2rem;">{{ substr($paymentDetail->sale->customer->name, 0, 1) }}</span>
+                                    <span class="text-primary fw-bold" style="font-size: 2rem;">{{ substr($paymentDetail->sale->customer->name, 0, 1) }}</span>
                                     @else
-                                        <i class="bi bi-person text-primary"></i>
+                                    <i class="bi bi-person text-primary"></i>
                                     @endif
                                 </div>
                                 @if($paymentDetail->sale && $paymentDetail->sale->customer)
-                                    <h6 class="mt-3 mb-0 fw-bold text-gray-800">{{ $paymentDetail->sale->customer->name }}</h6>
-                                    <p class="text-sm text-gray-600 mb-0">{{ $paymentDetail->sale->customer->phone }}</p>
+                                <h6 class="mt-3 mb-0 fw-bold text-gray-800">{{ $paymentDetail->sale->customer->name }}</h6>
+                                <p class="text-sm text-gray-600 mb-0">{{ $paymentDetail->sale->customer->phone }}</p>
                                 @else
-                                    <h6 class="mt-3 mb-0 fw-bold text-gray-800">No Sale Record</h6>
-                                    <p class="text-sm text-gray-600 mb-0">Direct Cheque Payment</p>
+                                <h6 class="mt-3 mb-0 fw-bold text-gray-800">No Sale Record</h6>
+                                <p class="text-sm text-gray-600 mb-0">Direct Cheque Payment</p>
                                 @endif
                             </div>
                             <h6 class="text-uppercase text-sm fw-semibold mb-3 border-bottom pb-2" style="color: #1e3a8a;">Payment Details</h6>
@@ -273,18 +268,18 @@
                                     <span class="fw-bold text-gray-800">{{ $paymentDetail->sale->invoice_number ?? 'No Invoice' }}</span>
                                 </p>
                                 @if($paymentDetail->sale)
-                                    <p class="mb-2 d-flex justify-content-between text-sm">
-                                        <span class="text-gray-600">Sale Date:</span>
-                                        <span class="text-gray-800">{{ $paymentDetail->sale->created_at->format('d/m/Y') }}</span>
-                                    </p>
+                                <p class="mb-2 d-flex justify-content-between text-sm">
+                                    <span class="text-gray-600">Sale Date:</span>
+                                    <span class="text-gray-800">{{ $paymentDetail->sale->created_at->format('d/m/Y') }}</span>
+                                </p>
                                 @endif
                                 @if($paymentDetail->due_date)
-                                    <p class="mb-2 d-flex justify-content-between text-sm">
-                                        <span class="text-gray-600">Due Date:</span>
-                                        <span class="{{ now()->gt($paymentDetail->due_date) ? 'text-danger fw-bold' : 'text-gray-800' }}">
-                                            {{ $paymentDetail->due_date->format('d/m/Y') }}
-                                        </span>
-                                    </p>
+                                <p class="mb-2 d-flex justify-content-between text-sm">
+                                    <span class="text-gray-600">Due Date:</span>
+                                    <span class="{{ now()->gt($paymentDetail->due_date) ? 'text-danger fw-bold' : 'text-gray-800' }}">
+                                        {{ $paymentDetail->due_date->format('d/m/Y') }}
+                                    </span>
+                                </p>
                                 @endif
                                 <div class="card border-0 shadow-sm rounded-4 p-3 mt-3">
                                     <div class="d-flex justify-content-between align-items-center">
@@ -607,147 +602,7 @@
 </div>
 
 @push('styles')
-<style>
-    body {
-        font-family: 'Inter', sans-serif;
-        font-size: 15px;
-        color: #1f2937;
-    }
-
-    .tracking-tight {
-        letter-spacing: -0.025em;
-    }
-
-    .transition-all {
-        transition: all 0.3s ease;
-    }
-
-    .transition-transform {
-        transition: transform 0.2s ease;
-    }
-
-    .hover\:scale-105:hover {
-        transform: scale(1.05);
-    }
-
-    .hover\:scale-110:hover {
-        transform: scale(1.1);
-    }
-
-    .icon-shape {
-        width: 2rem;
-        height: 2rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .icon-shape.icon-lg {
-        width: 3rem;
-        height: 3rem;
-    }
-
-    .icon-shape.icon-xl {
-        width: 4.5rem;
-        height: 4.5rem;
-    }
-
-    .icon-shape.icon-md {
-        width: 2.5rem;
-        height: 2.5rem;
-    }
-
-    .icon-shape.icon-xs {
-        width: 1.5rem;
-        height: 1.5rem;
-    }
-
-    .table {
-        border-collapse: separate;
-        border-spacing: 0;
-    }
-
-    .table th,
-    .table td {
-        border: 1px solid #e5e7eb;
-        vertical-align: middle;
-    }
-
-    .table tbody tr:nth-child(even) {
-        background-color: #f9fafb;
-    }
-
-    .table tbody tr:hover {
-        background-color: #f1f5f9;
-    }
-
-    .rounded-full {
-        border-radius: 9999px;
-    }
-
-    .rounded-4 {
-        border-radius: 1rem;
-    }
-
-    .shadow-lg {
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    }
-
-    .shadow-sm {
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    }
-
-    .btn-light {
-        background-color: #ffffff;
-        border-color: #ffffff;
-        color: #1e3a8a;
-    }
-
-    .btn-light:hover {
-        background-color: #f1f5f9;
-        border-color: #f1f5f9;
-        color: #1e3a8a;
-    }
-
-    .bg-primary {
-        background-color: #1e40af;
-    }
-
-    .bg-info {
-        background-color: #0ea5e9;
-    }
-
-    .bg-success {
-        background-color: #22c55e;
-    }
-
-    .bg-danger {
-        background-color: #ef4444;
-    }
-
-    .bg-warning {
-        background-color: #f59e0b;
-    }
-
-    .alert-info,
-    .alert-warning {
-        background-color: rgba(0, 0, 0, 0.05);
-    }
-
-    .form-control,
-    .form-select {
-        border-radius: 1rem;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-        border-color: #1e40af;
-        box-shadow: 0 0 0 0.2rem rgba(30, 64, 175, 0.25);
-    }
-</style>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+@include('components.admin-styles')
 @endpush
 
 @push('scripts')
@@ -872,17 +727,17 @@
         });
     });
 
-     // JavaScript to handle modal data population
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.view-cheque-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    // Assuming you pass cheque data via data attributes or fetch via Livewire
-                    const chequeId = this.getAttribute('data-cheque-id');
-                    // Trigger Livewire or fetch cheque details and populate modal
-                    // Example: Livewire.emit('loadChequeDetails', chequeId);
-                    new bootstrap.Modal(document.getElementById('chequeDetailsModal')).show();
-                });
+    // JavaScript to handle modal data population
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.view-cheque-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                // Assuming you pass cheque data via data attributes or fetch via Livewire
+                const chequeId = this.getAttribute('data-cheque-id');
+                // Trigger Livewire or fetch cheque details and populate modal
+                // Example: Livewire.emit('loadChequeDetails', chequeId);
+                new bootstrap.Modal(document.getElementById('chequeDetailsModal')).show();
             });
         });
+    });
 </script>
 @endpush

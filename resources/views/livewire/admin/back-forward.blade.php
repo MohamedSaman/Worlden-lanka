@@ -1,117 +1,136 @@
 <!-- File: resources/views/livewire/admin/Brought-forward.blade.php -->
-<div class="container-fluid py-2">
-    <div class="card border-0">
-        <!-- Header -->
-        <div class="card-header text-white p-2 d-flex align-items-center"
-            style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%); border-radius: 20px 20px 0 0;">
-            <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
-                <i class="bi bi-currency-exchange fs-4 text-white" aria-hidden="true"></i>
-            </div>
-            <div>
-                <h3 class="mb-1 fw-bold tracking-tight text-white">Brought-Forward Management</h3>
-                <p class="text-white opacity-80 mb-0 text-sm">Monitor and adjust customer Brought-forward amounts</p>
-            </div>
-        </div>
-        <div class="card-header bg-transparent pb-4 mt-2 d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-            <!-- Search Bar -->
-            <div class="flex-grow-1 d-flex justify-content-lg-center">
-                <div class="input-group" style="max-width: 600px;">
-                    <span class="input-group-text bg-gray-100 border-0 px-3">
-                        <i class="bi bi-search text-danger"></i>
-                    </span>
-                    <input type="text"
-                        class="form-control"
-                        placeholder="Search customers..."
-                        wire:model.live.debounce.300ms="search"
-                        autocomplete="off">
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card card-header-modern mb-4">
+                <div class="d-flex align-items-center">
+                    <div class="icon-wrapper me-3">
+                        <i class="bi bi-currency-exchange"></i>
+                    </div>
+                    <div>
+                        <h3 class="mb-1">Brought-Forward Management</h3>
+                        <p class="mb-0">Monitor and adjust customer Brought-forward amounts</p>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="card-body p-1 pt-5 bg-transparent">
-            <div class="table-responsive shadow-sm rounded-2 overflow-auto">
-                <table class="table table-sm align-middle">
-                    <thead class="d-none d-md-table-header-group">
-                        <tr>
-                            <th class="text-center ps-4 py-3">No</th>
-                            <th class="py-3">Customer Name</th>
-                            <th class="text-center py-3">Contact Number</th>
-                            <th class="text-center py-3">Total Brought-Forward Amount</th>
-                            <th class="text-center py-3">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @if ($customers->count() > 0)
+    <!-- Main Content -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card animate-slide-in">
+                <!-- Search Bar -->
+                <div class="card-body border-bottom" style="background-color: #f8f9fa;">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-lg-12">
+                            <div class="search-box-modern">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-search text-primary-custom"></i>
+                                    </span>
+                                    <input type="text"
+                                        class="form-control"
+                                        placeholder="Search customers..."
+                                        wire:model.live.debounce.300ms="search"
+                                        autocomplete="off">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Table Content -->
+                <div class="table-modern">
+                    <table class="table table-hover mb-0">
+                        <thead class="d-none d-md-table-header-group">
+                            <tr>
+                                <th class="text-center ps-4 py-3">No</th>
+                                <th class="py-3">Customer Name</th>
+                                <th class="text-center py-3">Contact Number</th>
+                                <th class="text-center py-3">Total Brought-Forward Amount</th>
+                                <th class="text-center py-3">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if ($customers->count() > 0)
                             @foreach ($customers as $customer)
-                                <tr class="transition-all hover:bg-gray-50 d-block d-md-table-row mb-3 mb-md-0" style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
-                                    <!-- Desktop/Table Layout -->
-                                    <td class="text-sm text-center ps-4 py-3 d-none d-md-table-cell">{{ $loop->iteration }}</td>
-                                    <td class="text-sm py-3 d-none d-md-table-cell">{{ $customer->name ?? '-' }}</td>
-                                    <td class="text-sm text-center py-3 d-none d-md-table-cell">{{ $customer->phone ?? 'N/A' }}</td>
-                                    <td class="text-sm text-center py-3 font-bold d-none d-md-table-cell {{ $customer->customer_accounts_sum_back_forward_amount >= 0 ? 'text-success' : 'text-danger' }}">
-                                        {{ number_format($customer->customer_accounts_sum_back_forward_amount ?? 0, 2) }}
-                                    </td>
-                                    <td class="text-sm text-center d-none d-md-table-cell">
-                                        <div class="btn-group btn-group-sm gap-2" role="group">
-                                            <button class="btn text-primary bg-outline-primary border border-1 border-primary rounded-pill px-3" wire:click="adjustBackForward({{ $customer->id }})" wire:loading.attr="disabled" title="Add Amount">
-                                                <i class="bi bi-plus" wire:loading.class="d-none" wire:target="adjustBackForward({{ $customer->id }})">Add</i>
-                                                <span wire:loading wire:target="adjustBackForward({{ $customer->id }})">
-                                                    <i class="spinner-border spinner-border-sm"></i>
-                                                </span>
-                                            </button>
-                                            <button class="btn text-warning bg-outline-warning border border-1 border-warning rounded-pill px-3" wire:click="editBackForward({{ $customer->id }})" wire:loading.attr="disabled" title="Edit Amount">
-                                                <i class="bi bi-pencil" wire:loading.class="d-none" wire:target="editBackForward({{ $customer->id }})">Edit</i>
-                                                <span wire:loading wire:target="editBackForward({{ $customer->id }})">
-                                                    <i class="spinner-border spinner-border-sm"></i>
-                                                </span>
-                                            </button>
-                                        </div>
-                                    </td>
-                                    <!-- Mobile/Card Layout -->
-                                    <td colspan="5" class="d-block d-md-none px-3 py-3">
-                                        <div class="d-flex flex-column gap-2">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <span class="fw-bold" style="color:#9d1c20;">{{ $loop->iteration }}. {{ $customer->name ?? '-' }}</span>
-                                                <div class="btn-group btn-group-sm gap-2" role="group">
-                                                    <button class="btn text-primary bg-outline-primary border border-1 border-primary rounded-pill px-3" wire:click="adjustBackForward({{ $customer->id }})" wire:loading.attr="disabled" title="Add Amount">
-                                                        <i class="bi bi-plus" wire:loading.class="d-none" wire:target="adjustBackForward({{ $customer->id }})"></i>
-                                                        <span wire:loading wire:target="adjustBackForward({{ $customer->id }})">
-                                                            <i class="spinner-border spinner-border-sm"></i>
-                                                        </span>
-                                                    </button>
-                                                    <button class="btn text-warning bg-outline-warning border border-1 border-warning rounded-pill px-3" wire:click="editBackForward({{ $customer->id }})" wire:loading.attr="disabled" title="Edit Amount">
-                                                        <i class="bi bi-pencil" wire:loading.class="d-none" wire:target="editBackForward({{ $customer->id }})"></i>
-                                                        <span wire:loading wire:target="editBackForward({{ $customer->id }})">
-                                                            <i class="spinner-border spinner-border-sm"></i>
-                                                        </span>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="text-muted small">
-                                                <span><i class="bi bi-telephone me-1"></i>{{ $customer->phone ?? 'N/A' }}</span>
-                                            </div>
-                                            <div>
-                                                <span class="fw-bold {{ $customer->customer_accounts_sum_back_forward_amount >= 0 ? 'text-success' : 'text-danger' }}">
-                                                    {{ number_format($customer->customer_accounts_sum_back_forward_amount ?? 0, 2) }}
-                                                </span>
-                                                <span class="text-muted ms-1">Brought-Forward</span>
+                            <tr class="transition-all hover:bg-gray-50 d-block d-md-table-row mb-3 mb-md-0" style="border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03);">
+                                <!-- Desktop/Table Layout -->
+                                <td class="text-sm text-center ps-4 py-3 d-none d-md-table-cell">{{ $loop->iteration }}</td>
+                                <td class="text-sm py-3 d-none d-md-table-cell">{{ $customer->name ?? '-' }}</td>
+                                <td class="text-sm text-center py-3 d-none d-md-table-cell">{{ $customer->phone ?? 'N/A' }}</td>
+                                <td class="text-sm text-center py-3 font-bold d-none d-md-table-cell {{ $customer->customer_accounts_sum_back_forward_amount >= 0 ? 'text-success' : 'text-danger' }}">
+                                    {{ number_format($customer->customer_accounts_sum_back_forward_amount ?? 0, 2) }}
+                                </td>
+                                <td class="text-sm text-center d-none d-md-table-cell">
+                                    <div class="btn-group btn-group-sm gap-2" role="group">
+                                        <button class="btn text-primary bg-outline-primary border border-1 border-primary rounded-pill px-3" wire:click="adjustBackForward({{ $customer->id }})" wire:loading.attr="disabled" title="Add Amount">
+                                            <i class="bi bi-plus" wire:loading.class="d-none" wire:target="adjustBackForward({{ $customer->id }})">Add</i>
+                                            <span wire:loading wire:target="adjustBackForward({{ $customer->id }})">
+                                                <i class="spinner-border spinner-border-sm"></i>
+                                            </span>
+                                        </button>
+                                        <button class="btn text-warning bg-outline-warning border border-1 border-warning rounded-pill px-3" wire:click="editBackForward({{ $customer->id }})" wire:loading.attr="disabled" title="Edit Amount">
+                                            <i class="bi bi-pencil" wire:loading.class="d-none" wire:target="editBackForward({{ $customer->id }})">Edit</i>
+                                            <span wire:loading wire:target="editBackForward({{ $customer->id }})">
+                                                <i class="spinner-border spinner-border-sm"></i>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </td>
+                                <!-- Mobile/Card Layout -->
+                                <td colspan="5" class="d-block d-md-none px-3 py-3">
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <span class="fw-bold" style="color:#9d1c20;">{{ $loop->iteration }}. {{ $customer->name ?? '-' }}</span>
+                                            <div class="btn-group btn-group-sm gap-2" role="group">
+                                                <button class="btn text-primary bg-outline-primary border border-1 border-primary rounded-pill px-3" wire:click="adjustBackForward({{ $customer->id }})" wire:loading.attr="disabled" title="Add Amount">
+                                                    <i class="bi bi-plus" wire:loading.class="d-none" wire:target="adjustBackForward({{ $customer->id }})"></i>
+                                                    <span wire:loading wire:target="adjustBackForward({{ $customer->id }})">
+                                                        <i class="spinner-border spinner-border-sm"></i>
+                                                    </span>
+                                                </button>
+                                                <button class="btn text-warning bg-outline-warning border border-1 border-warning rounded-pill px-3" wire:click="editBackForward({{ $customer->id }})" wire:loading.attr="disabled" title="Edit Amount">
+                                                    <i class="bi bi-pencil" wire:loading.class="d-none" wire:target="editBackForward({{ $customer->id }})"></i>
+                                                    <span wire:loading wire:target="editBackForward({{ $customer->id }})">
+                                                        <i class="spinner-border spinner-border-sm"></i>
+                                                    </span>
+                                                </button>
                                             </div>
                                         </div>
-                                    </td>
-                                </tr>
+                                        <div class="text-muted small">
+                                            <span><i class="bi bi-telephone me-1"></i>{{ $customer->phone ?? 'N/A' }}</span>
+                                        </div>
+                                        <div>
+                                            <span class="fw-bold {{ $customer->customer_accounts_sum_back_forward_amount >= 0 ? 'text-success' : 'text-danger' }}">
+                                                {{ number_format($customer->customer_accounts_sum_back_forward_amount ?? 0, 2) }}
+                                            </span>
+                                            <span class="text-muted ms-1">Brought-Forward</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
                             @endforeach
-                        @else
+                            @else
                             <tr>
                                 <td colspan="7" class="text-center py-4" style="color: #9d1c20;">
                                     <i class="bi bi-exclamation-circle me-2"></i>No customers found.
                                 </td>
                             </tr>
-                        @endif
-                    </tbody>
-                </table>
-            </div>
-            <div class="d-flex justify-content-end mt-4">
-                {{ $customers->links('livewire::bootstrap') }}
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+
+                @if($customers->hasPages())
+                <div class="card-footer bg-white border-top p-4">
+                    <div class="pagination-modern">
+                        {{ $customers->links('livewire::bootstrap') }}
+                    </div>
+                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -130,14 +149,14 @@
                             <label for="adjustmentAmount" class="form-label fw-medium" style="color: #9d1c20;">Adjustment Amount <span class="text-danger">*</span></label>
                             <input type="number" step="0.01" class="form-control border-2 shadow-sm" id="adjustmentAmount" wire:model="adjustmentAmount" style="color: #9d1c20;" placeholder="Enter positive for advance/forward, negative for back/due">
                             @error('adjustmentAmount')
-                                <span class="text-danger small mt-1">{{ $message }}</span>
+                            <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                         <div class="col-12">
                             <label for="adjustmentNotes" class="form-label fw-medium" style="color: #9d1c20;">Notes (Optional)</label>
                             <textarea class="form-control border-2 shadow-sm" id="adjustmentNotes" wire:model="adjustmentNotes" rows="3" style="color: #9d1c20;" placeholder="Add notes for this adjustment"></textarea>
                             @error('adjustmentNotes')
-                                <span class="text-danger small mt-1">{{ $message }}</span>
+                            <span class="text-danger small mt-1">{{ $message }}</span>
                             @enderror
                         </div>
                     </div>
@@ -152,35 +171,8 @@
 </div>
 
 @push('styles')
+@include('components.admin-styles')
 <style>
-    .input-group {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    }
-
-    .btn {
-        transition: all 0.3s ease;
-    }
-
-    .btn:hover {
-        transform: scale(1.05);
-    }
-
-    .tracking-tight {
-        letter-spacing: -0.025em;
-    }
-
-    .transition-all {
-        transition: all 0.3s ease;
-    }
-
-    .hover\:bg-gray-50:hover {
-        background-color: #f8f9fa;
-    }
-
-    .hover\:shadow:hover {
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
     @media (max-width: 767.98px) {
         .table {
             font-size: 0.875rem;
@@ -198,10 +190,8 @@
 
         .table td:nth-child(4),
         .table th:nth-child(4),
-        /* Contact Number */
         .table td:nth-child(5),
         .table th:nth-child(5) {
-            /* Email */
             display: none;
         }
     }

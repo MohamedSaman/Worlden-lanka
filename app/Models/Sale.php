@@ -23,6 +23,8 @@ class Sale extends Model
         'delivery_note',
         'due_amount',
         'user_id',
+        'created_at',
+        'updated_at',
     ];
 
     public function customer()

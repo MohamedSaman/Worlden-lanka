@@ -1,85 +1,96 @@
-<div class="container-fluid py-6 bg-gray-50 min-vh-100 transition-colors duration-300">
-    <div class="row mb-4">
+<div class="container-fluid py-4">
+    <!-- Page Header -->
+    <div class="row g-4 mb-4">
         <div class="col-12">
-            <div class="card border-0 shadow-lg overflow-hidden bg-white">
-                <div class="card-header text-white p-2 d-flex align-items-center" style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51ff 100%); border-radius: 20px 20px 0 0;">
-                    <div class="icon-shape icon-lg bg-white bg-opacity-25 rounded-circle p-3 d-flex align-items-center justify-content-center me-3">
-                        <i class="bi bi-arrow-counterclockwise text-white fs-4" aria-hidden="true"></i>
+            <div class="card card-header-modern mb-4">
+                <div class="d-flex align-items-center">
+                    <div class="icon-wrapper me-3">
+                        <i class="bi bi-arrow-counterclockwise"></i>
                     </div>
                     <div>
-                        <h3 class="mb-1 fw-bold tracking-tight text-white">Returned Cheque Management</h3>
-                        <p class="text-white opacity-80 mb-0 text-sm">Manage and re-process returned cheques</p>
+                        <h3 class="mb-1">Returned Cheque Management</h3>
+                        <p class="mb-0">Manage and re-process returned cheques</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Main Content -->
     <div class="row">
         <div class="col-12">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-white">
-                <div class="card-header p-4" style="background-color: #f8f9fa;">
-                    <h5 class="mb-0 fw-bold" style="color: #9d1c20;">Returned Cheque List</h5>
-                </div>
-
-                <div class="card-body p-5">
-                    <div class="table-responsive">
-                        <table class="table table-hover align-middle mb-0">
-                            <thead style="background-color: #f8f9fa;">
-                                <tr>
-                                    <th class="ps-4 text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Cheque No</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Bank</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Customer Name</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Amount</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Cheque Date</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Status</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">Action</th>
-                                    <th class="text-uppercase text-xs fw-semibold py-3 text-center" style="color: #9d1c20;">View</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($chequeDetails as $cheque)
-                                <tr>
-                                    <td class="text-center fw-bold">{{ $cheque->cheque_number }}</td>
-                                    <td class="text-center">{{ $cheque->bank_name }}</td>
-                                    <td class="text-center">{{ $cheque->customer ? $cheque->customer->name : 'N/A' }}</td>
-                                    <td class="text-center">Rs. {{ number_format($cheque->cheque_amount, 2) }}</td>
-                                    <td class="text-center">{{ $cheque->cheque_date ? \Carbon\Carbon::parse($cheque->cheque_date)->format('d/m/Y') : 'N/A' }}</td>
-                                    <td class="text-center">
-                                        <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger px-3 py-2">
-                                            {{ ucfirst($cheque->status) }}
-                                        </span>
-                                    </td>
-                                    <td class="text-center d-flex justify-content-center gap-2">
-                                        @if($cheque->status === 'return')
-                                        <button wire:click="openReentryModal({{ $cheque->id }})" class="btn btn-sm btn-primary rounded-pill px-3 transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
-                                            <i class="bi bi-redo me-1"></i>Re-entry
-                                        </button>
-                                        <button wire:click="openCompleteModal({{ $cheque->id }})" class="btn btn-sm btn-success rounded-pill px-3 transition-all hover:shadow" style="background-color: #28a745; border-color: #28a745; color: white;" onmouseover="this.style.backgroundColor='#1e7e34'; this.style.borderColor='#1e7e34';" onmouseout="this.style.backgroundColor='#28a745'; this.style.borderColor='#28a745';">
-                                            <i class="bi bi-check-circle me-1"></i>To Complete
-                                        </button>
-                                        @else
-                                        <span class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2">Processed</span>
-                                        @endif
-                                    </td>
-                                    <td class="text-center">
-                                        <button wire:click="openViewModal({{ $cheque->id }})" class="btn btn-sm btn-primary rounded-pill view-returned-cheque-btn" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
-                                            <i class="bi bi-eye me-1"></i>View
-                                        </button>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="8" class="text-center py-4 text-gray-600">No returned cheques found.</td>
-                                </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
+            <div class="card animate-slide-in">
+                <!-- Table Content -->
+                <div class="table-modern">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Cheque No</th>
+                                <th>Bank</th>
+                                <th>Customer Name</th>
+                                <th class="text-end">Amount</th>
+                                <th class="text-center">Cheque Date</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-center">Action</th>
+                                <th class="text-center">View</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($chequeDetails as $cheque)
+                            <tr>
+                                <td>
+                                    <span class="fw-bold text-primary-custom">#{{ $cheque->cheque_number }}</span>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">{{ $cheque->bank_name }}</div>
+                                </td>
+                                <td>
+                                    <div class="fw-semibold">{{ $cheque->customer ? $cheque->customer->name : 'N/A' }}</div>
+                                </td>
+                                <td class="text-end">
+                                    <span class="fw-bold">Rs. {{ number_format($cheque->cheque_amount, 2) }}</span>
+                                </td>
+                                <td class="text-center">{{ $cheque->cheque_date ? \Carbon\Carbon::parse($cheque->cheque_date)->format('d/m/Y') : 'N/A' }}</td>
+                                <td class="text-center">
+                                    <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger px-3 py-2">
+                                        {{ ucfirst($cheque->status) }}
+                                    </span>
+                                </td>
+                                <td class="text-center d-flex justify-content-center gap-2">
+                                    @if($cheque->status === 'return')
+                                    <button wire:click="openReentryModal({{ $cheque->id }})" class="btn btn-sm btn-primary rounded-pill px-3 transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
+                                        <i class="bi bi-redo me-1"></i>Re-entry
+                                    </button>
+                                    <button wire:click="openCompleteModal({{ $cheque->id }})" class="btn btn-sm btn-success rounded-pill px-3 transition-all hover:shadow" style="background-color: #28a745; border-color: #28a745; color: white;" onmouseover="this.style.backgroundColor='#1e7e34'; this.style.borderColor='#1e7e34';" onmouseout="this.style.backgroundColor='#28a745'; this.style.borderColor='#28a745';">
+                                        <i class="bi bi-check-circle me-1"></i>To Complete
+                                    </button>
+                                    @else
+                                    <span class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2">Processed</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <button wire:click="openViewModal({{ $cheque->id }})" class="btn btn-sm btn-primary rounded-pill view-returned-cheque-btn" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
+                                        <i class="bi bi-eye me-1"></i>View
+                                    </button>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted">
+                                        <i class="bi bi-inbox display-6"></i>
+                                        <p class="mt-2 mb-0">No returned cheques found</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
+
 
     <!-- View Cheque Modal -->
     <div wire:ignore.self class="modal fade" id="viewChequeModal" tabindex="-1" aria-labelledby="viewChequeModalLabel" aria-hidden="true" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
@@ -371,153 +382,56 @@
             </div>
         </div>
     </div>
+</div>
 
-    @push('styles')
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            color: #1f2937;
-        }
+@push('styles')
+@include('components.admin-styles')
+@endpush
 
-        .tracking-tight {
-            letter-spacing: -0.025em;
-        }
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    document.addEventListener('livewire:initialized', () => {
+        let reentryModal = new bootstrap.Modal(document.getElementById('reentry-modal'));
+        let completeModal = new bootstrap.Modal(document.getElementById('complete-modal'));
+        let viewModal = new bootstrap.Modal(document.getElementById('viewChequeModal'));
 
-        .transition-all {
-            transition: all 0.3s ease;
-        }
+        @this.on('open-reentry-modal', () => {
+            reentryModal.show();
+        });
 
-        .transition-transform {
-            transition: transform 0.2s ease;
-        }
+        @this.on('close-reentry-modal', () => {
+            reentryModal.hide();
+        });
 
-        .hover\:scale-105:hover {
-            transform: scale(1.05);
-        }
+        @this.on('open-complete-modal', () => {
+            completeModal.show();
+        });
 
-        .icon-shape {
-            width: 2rem;
-            height: 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        @this.on('close-complete-modal', () => {
+            completeModal.hide();
+        });
 
-        .icon-shape.icon-lg {
-            width: 3rem;
-            height: 3rem;
-        }
+        @this.on('open-view-modal', () => {
+            viewModal.show();
+        });
 
-        .table {
-            border-collapse: separate;
-            border-spacing: 0;
-        }
+        @this.on('close-view-modal', () => {
+            viewModal.hide();
+        });
 
-        .table th,
-        .table td {
-            border: 1px solid #e5e7eb;
-            vertical-align: middle;
-        }
-
-        .table tbody tr:nth-child(even) {
-            background-color: #f9fafb;
-        }
-
-        .table tbody tr:hover {
-            background-color: #f1f5f9;
-        }
-
-        .rounded-full {
-            border-radius: 9999px;
-        }
-
-        .rounded-4 {
-            border-radius: 1rem;
-        }
-
-        .shadow-lg {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-
-        .shadow-sm {
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-        }
-
-        .btn-light {
-            background-color: #ffffff;
-            border-color: #ffffff;
-            color: #233D7F;
-        }
-
-        .btn-light:hover {
-            background-color: #f1f5f9;
-            border-color: #f1f5f9;
-            color: #233D7F;
-        }
-
-        .form-control,
-        .form-select {
-            border-radius: 1rem;
-            border: 2px solid #e5e7eb;
-        }
-
-        .form-control:focus,
-        .form-select:focus {
-            border-color: #233D7F;
-            box-shadow: 0 0 0 0.2rem rgba(35, 61, 127, 0.25);
-        }
-    </style>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
-    @endpush
-
-    @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.addEventListener('livewire:initialized', () => {
-            let reentryModal = new bootstrap.Modal(document.getElementById('reentry-modal'));
-            let completeModal = new bootstrap.Modal(document.getElementById('complete-modal'));
-            let viewModal = new bootstrap.Modal(document.getElementById('viewChequeModal'));
-
-            @this.on('open-reentry-modal', () => {
-                reentryModal.show();
-            });
-
-            @this.on('close-reentry-modal', () => {
-                reentryModal.hide();
-            });
-
-            @this.on('open-complete-modal', () => {
-                completeModal.show();
-            });
-
-            @this.on('close-complete-modal', () => {
-                completeModal.hide();
-            });
-
-            @this.on('open-view-modal', () => {
-                viewModal.show();
-            });
-
-            @this.on('close-view-modal', () => {
-                viewModal.hide();
-            });
-
-            @this.on('notify', event => {
-                Swal.fire({
-                    icon: event.detail.type,
-                    title: event.detail.type === 'success' ? 'Success!' : 'Error!',
-                    text: event.detail.message,
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000,
-                    timerProgressBar: true,
-                });
+        @this.on('notify', event => {
+            Swal.fire({
+                icon: event.detail.type,
+                title: event.detail.type === 'success' ? 'Success!' : 'Error!',
+                text: event.detail.message,
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
             });
         });
-    </script>
-    @endpush
-</div>
+    });
+</script>
+@endpush
