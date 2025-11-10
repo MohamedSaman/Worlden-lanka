@@ -889,6 +889,7 @@
                                         <tr>
                                             <th scope="col" class="text-center py-2">No</th>
                                             <th scope="col" class="text-center py-2">Item</th>
+                                            <th scope="col" class="text-center py-2">Size</th>
                                             <th scope="col" class="text-center py-2">Price</th>
                                             <th scope="col" class="text-center py-2">Qty</th>
                                             <th scope="col" class="text-center py-2">Discount</th>
@@ -901,7 +902,13 @@
                                             <td class="text-center py-2">{{ $index + 1 }}</td>
                                             <td class="text-center py-2">{{ $item->product->product_name ?? 'N/A' }}
                                             </td>
-
+                                            <td class="text-center py-2">
+                                                @if($item->product && $item->product->customer_field)
+                                                {{ $item->product->customer_field['Size'] ?? '-' }}
+                                                @else
+                                                -
+                                                @endif
+                                            </td>
                                             <td class="text-center py-2">Rs.{{ number_format($item->price, 2) }}
                                             </td>
                                             <td class="text-center py-2">{{ $item->quantity }}</td>

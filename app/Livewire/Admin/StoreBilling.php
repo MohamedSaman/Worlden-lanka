@@ -144,31 +144,26 @@ class StoreBilling extends Component
     public function generateInvoiceNumber($useDate = null)
     {
         $prefix = 'INV-';
-        $dateToUse = $useDate ?? $this->invoiceDate ?? now()->format('Y-m-d');
-        $formattedDate = date('Ymd', strtotime($dateToUse));
-
-        $lastInvoice = Sale::where('invoice_number', 'like', "{$prefix}{$formattedDate}%")
+        $lastInvoice = Sale::where('invoice_number', 'like', "{$prefix}%")
             ->orderBy('invoice_number', 'desc')
             ->first();
 
         $nextNumber = 1;
-
         if ($lastInvoice) {
-            $parts = explode('-', $lastInvoice->invoice_number);
-            $lastNumber = intval(end($parts));
-            $nextNumber = $lastNumber + 1;
+            // Extract the number after the prefix
+            $lastNumber = intval(str_replace($prefix, '', $lastInvoice->invoice_number));
+            if ($lastNumber > 0) {
+                $nextNumber = $lastNumber + 1;
+            }
         }
-
-        $this->invoiceNumber = $prefix . $formattedDate . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        $this->invoiceNumber = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
         $this->isInvoiceGenerated = true;
     }
 
     public function updatedInvoiceDate($value)
     {
-        // When date changes, regenerate invoice number for that date
-        if (!empty($value)) {
-            $this->generateInvoiceNumber($value);
-        }
+        // Invoice number does not depend on date anymore
+        // No action needed on date change
     }
 
     public function validateInvoiceNumber()

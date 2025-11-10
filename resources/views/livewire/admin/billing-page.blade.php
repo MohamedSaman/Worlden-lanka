@@ -95,6 +95,7 @@
                                 <thead class="bg-light">
                                     <tr>
                                         <th class="text-uppercase text-secondary text-xs font-weight-bold">Product</th>
+                                        <th class="text-uppercase text-secondary text-xs font-weight-bold text-center">Size</th>
                                         <th class="text-uppercase text-secondary text-xs font-weight-bold text-center">Price</th>
                                         <th class="text-uppercase text-secondary text-xs font-weight-bold text-center">Qty</th>
                                         <th class="text-uppercase text-secondary text-xs font-weight-bold text-center">Discount</th>
@@ -111,6 +112,11 @@
                                             <small class="text-muted">
                                                 {{ $item['code'] ?? 'N/A' }} | {{ $item['brand'] ?? 'Unbranded' }}
                                             </small>
+                                        </td>
+
+                                        <!-- Size -->
+                                        <td class="text-center">
+                                            {{ $item['size'] ?? '-' }}
                                         </td>
 
                                         <!-- Price -->
@@ -166,7 +172,7 @@
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-5 text-muted">
+                                        <td colspan="7" class="text-center py-5 text-muted">
                                             <i class="fas fa-shopping-cart fa-3x mb-2"></i>
                                             <p>Your cart is empty. Search and add products to create a bill.</p>
                                         </td>

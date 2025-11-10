@@ -78,7 +78,9 @@ class BillingPage extends Component
             ->select(
                 'product_details.id',
                 'product_details.product_name',
+                'product_details.product_code',
                 'product_details.selling_price',
+                'product_details.customer_field',
                 DB::raw("CAST(JSON_UNQUOTE(JSON_EXTRACT(product_details.customer_field, '$.Stock')) AS UNSIGNED) as Stock")
             )
             ->first();
@@ -100,8 +102,10 @@ class BillingPage extends Component
             $this->cart[$productId] = [
                 'id' => $product->id,
                 'name' => $product->product_name,
+                'code' => $product->product_code ?? 'N/A',
+                'size' => $product->customer_field['Size'] ?? '-',
                 'price' => $product->selling_price ?? 0,
-                'discountPrice' => null, // <-- Add this line
+                'discountPrice' => null,
                 'inStock' => $product->Stock ?? 0,
             ];
 

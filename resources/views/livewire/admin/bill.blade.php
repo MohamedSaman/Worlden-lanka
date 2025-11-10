@@ -270,6 +270,7 @@
                             <thead style="background-color: #eff6ff;">
                                 <tr>
                                     <th>Product</th>
+                                    <th class="text-center">Size</th>
                                     <th class="text-center">Quantity</th>
                                     <th class="text-end">Price</th>
                                     <th class="text-end">Discount</th>
@@ -280,6 +281,13 @@
                                 @foreach($saleDetails['items'] as $item)
                                 <tr>
                                     <td>{{ $item->product->product_name ?? 'N/A' }}</td>
+                                    <td class="text-center">
+                                        @if($item->product && $item->product->customer_field)
+                                        {{ $item->product->customer_field['Size'] ?? '-' }}
+                                        @else
+                                        -
+                                        @endif
+                                    </td>
                                     <td class="text-center">{{ $item->quantity }}</td>
                                     <td class="text-end">Rs.{{ number_format($item->price, 2) }}</td>
                                     <td class="text-end">Rs.{{ number_format($item->discount, 2) }}</td>
