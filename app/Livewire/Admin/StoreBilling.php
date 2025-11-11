@@ -146,20 +146,26 @@ class StoreBilling extends Component
     {
         $prefix = 'INV-';
 
-        // Get the last invoice by extracting numeric value and ordering by it
-        $lastInvoice = Sale::where('invoice_number', 'like', "{$prefix}%")
-            ->orderByRaw('CAST(SUBSTRING(invoice_number, ' . (strlen($prefix) + 1) . ') AS UNSIGNED) DESC')
+        // Get the last sale by ID (most recent sale)
+        $lastSale = Sale::where('invoice_number', 'like', "{$prefix}%")
+            ->orderBy('id', 'DESC')
             ->first();
 
         $nextNumber = 1;
-        if ($lastInvoice) {
-            // Extract the number after the prefix
-            $lastNumber = intval(str_replace($prefix, '', $lastInvoice->invoice_number));
-            if ($lastNumber > 0) {
-                $nextNumber = $lastNumber + 1;
-            }
+        if ($lastSale) {
+            // Extract the number from the last invoice
+            $lastNumber = intval(str_replace($prefix, '', $lastSale->invoice_number));
+            $nextNumber = $lastNumber + 1;
         }
-        $this->invoiceNumber = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+
+        // Check if this number already exists (in case of manual changes), if so increment
+        $invoiceNumber = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        while (Sale::where('invoice_number', $invoiceNumber)->exists()) {
+            $nextNumber++;
+            $invoiceNumber = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        }
+
+        $this->invoiceNumber = $invoiceNumber;
         $this->isInvoiceGenerated = true;
     }
 
