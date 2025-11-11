@@ -138,14 +138,17 @@ class StoreBilling extends Component
             'set' => 'Set',
             'doz' => 'Dozen',
             'roll' => 'Roll',
+            'yards' => 'Yards'
         ];
     }
 
     public function generateInvoiceNumber($useDate = null)
     {
         $prefix = 'INV-';
+
+        // Get the last invoice by extracting numeric value and ordering by it
         $lastInvoice = Sale::where('invoice_number', 'like', "{$prefix}%")
-            ->orderBy('invoice_number', 'desc')
+            ->orderByRaw('CAST(SUBSTRING(invoice_number, ' . (strlen($prefix) + 1) . ') AS UNSIGNED) DESC')
             ->first();
 
         $nextNumber = 1;
@@ -424,6 +427,8 @@ class StoreBilling extends Component
     public function calculateBalanceAmount()
     {
         if ($this->paymentType == 'partial') {
+            // Ensure initial payment doesn't exceed grand total
+            $this->initialPaymentAmount = min(floatval($this->initialPaymentAmount), $this->grandTotal);
             $this->balanceAmount = $this->grandTotal - $this->initialPaymentAmount;
         } else {
             $this->balanceAmount = 0;
@@ -505,10 +510,33 @@ class StoreBilling extends Component
                     return;
                 }
             }
+        } else {
+            // Validate partial payment amounts
+            $initialPayment = floatval($this->initialPaymentAmount);
+
+            if ($initialPayment < 0) {
+                $this->js('swal.fire("Error", "Initial payment cannot be negative.", "error")');
+                return;
+            }
+
+            if ($initialPayment > $this->grandTotal) {
+                $this->js('swal.fire("Error", "Initial payment cannot exceed Grand Total.", "error")');
+                return;
+            }
+
+            // Recalculate balance amount to ensure accuracy
+            $this->calculateBalanceAmount();
         }
 
         try {
             DB::beginTransaction();
+
+            // Calculate actual due amount correctly
+            $actualDueAmount = 0;
+            if ($this->paymentType === 'partial') {
+                // For partial payment: due = total - initial payment (if any)
+                $actualDueAmount = $this->grandTotal - floatval($this->initialPaymentAmount);
+            }
 
             $sale = Sale::create([
                 'invoice_number'   => $this->invoiceNumber,
@@ -522,7 +550,7 @@ class StoreBilling extends Component
                 'payment_status'   => $this->paymentType === 'full' ? 'paid' : 'partial',
                 'notes'            => $this->saleNotes,
                 'delivery_note'    => $this->deliveryNote,
-                'due_amount'       => $this->balanceAmount,
+                'due_amount'       => $actualDueAmount,
                 'created_at'       => $this->invoiceDate . ' ' . date('H:i:s'), // Set custom date with current time
                 'updated_at'       => now(),
             ]);
@@ -621,7 +649,7 @@ class StoreBilling extends Component
                 Payment::create([
                     'sale_id'         => $sale->id,
                     'admin_sale_id'   => $adminSale->id,
-                    'amount'          => $this->grandTotal,
+                    'amount'          => $actualDueAmount,
                     'payment_method'  => 'credit',
                     'is_completed'    => false,
                     'status'          => null,
@@ -635,21 +663,20 @@ class StoreBilling extends Component
 
                 if ($account) {
                     $oldCurrentDue = floatval($account->current_due_amount ?? 0);
-                    $newCurrentDue = floatval($this->balanceAmount);
-                    // Keep back_forward_amount as-is; only add to current due
-                    $account->current_due_amount  = $oldCurrentDue + $newCurrentDue; // accumulate due
-                    // Do not modify paid_due here
-                    $account->total_due           = floatval($account->back_forward_amount ?? 0) + floatval($account->current_due_amount ?? 0);
-                    $account->sale_id             = $sale->id; // reference latest sale causing the due
+
+                    // Add the actual due amount (grand total for credit sales)
+                    $account->current_due_amount = $oldCurrentDue + $actualDueAmount;
+                    $account->total_due = floatval($account->back_forward_amount ?? 0) + $account->current_due_amount;
+                    $account->sale_id = $sale->id;
                     $account->save();
                 } else {
                     CustomerAccount::create([
                         'customer_id'         => $this->customerId,
                         'sale_id'             => $sale->id,
                         'back_forward_amount' => 0,
-                        'current_due_amount'  => $this->balanceAmount,
+                        'current_due_amount'  => $actualDueAmount,
                         'paid_due'            => 0,
-                        'total_due'           => $this->balanceAmount,
+                        'total_due'           => $actualDueAmount,
                     ]);
                 }
             }

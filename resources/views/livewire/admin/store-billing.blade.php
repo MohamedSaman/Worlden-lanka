@@ -206,8 +206,14 @@
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div class="text small mt-1">
+                                                <div class="text-muted small mt-1">
                                                     <span class="me-2">Code: {{ $result->product_code ?? '-' }}</span>
+                                                    @if($result->customer_field && isset($result->customer_field['Size']))
+                                                    <span class="me-2">| Size: <strong>{{ $result->customer_field['Size'] }}</strong></span>
+                                                    @endif
+                                                    @if($result->customer_field && isset($result->customer_field['Color']))
+                                                    <span>| Color: <strong>{{ $result->customer_field['Color'] }}</strong></span>
+                                                    @endif
                                                 </div>
                                             </div>
 

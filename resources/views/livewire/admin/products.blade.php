@@ -64,8 +64,8 @@
                 </div>
 
                 <!-- Table -->
-                <div class="table-modern">
-                    <table class="table table-hover mb-0">
+                <div class="table-modern overflow-auto">
+                    <table class="table table-hover mb-0 ">
                         <thead>
                             <tr>
                                 <th class="ps-4 py-3">ID</th>
