@@ -106,6 +106,12 @@ class StoreBilling extends Component
         $this->balanceDueDate = date('Y-m-d', strtotime('+7 days'));
         $this->invoiceDate = date('Y-m-d');
         $this->generateInvoiceNumber();
+
+        // Check if there's an edit parameter from URL
+        if (request()->has('edit')) {
+            $saleId = request()->get('edit');
+            $this->loadSaleForEditing($saleId);
+        }
     }
 
     public function loadBanks()
@@ -497,8 +503,18 @@ class StoreBilling extends Component
             return;
         }
 
+        $this->loadSaleForEditing($this->lastSaleId);
+
+        // Close receipt modal and scroll to top
+        $this->js('$("#receiptModal").modal("hide")');
+        $this->js('window.scrollTo({ top: 0, behavior: "smooth" })');
+    }
+
+    // NEW METHOD: Load Sale for Editing (can be called from receipt or from URL)
+    public function loadSaleForEditing($saleId)
+    {
         try {
-            $sale = Sale::with(['items.product', 'payments'])->find($this->lastSaleId);
+            $sale = Sale::with(['items.product', 'payments'])->find($saleId);
 
             if (!$sale) {
                 $this->js('swal.fire("Error", "Sale not found", "error")');
@@ -570,12 +586,7 @@ class StoreBilling extends Component
             }
 
             $this->updateTotals();
-
-            // Close receipt modal and scroll to top
-            $this->js('$("#receiptModal").modal("hide")');
-            $this->js('window.scrollTo({ top: 0, behavior: "smooth" })');
             $this->dispatch('show-toast', ['type' => 'info', 'message' => 'Sale loaded for editing. Make your changes and click "Update Sale".']);
-
         } catch (Exception $e) {
             Log::error('Edit sale error: ' . $e->getMessage());
             $this->js('swal.fire("Error", "Failed to load sale for editing: ' . $e->getMessage() . '", "error")');
@@ -592,6 +603,11 @@ class StoreBilling extends Component
         $this->invoiceDate = date('Y-m-d');
         $this->generateInvoiceNumber();
         $this->dispatch('show-toast', ['type' => 'info', 'message' => 'Edit cancelled']);
+
+        // Redirect to clear URL parameter if present
+        if (request()->has('edit')) {
+            return redirect()->route('admin.store-billing');
+        }
     }
 
     public function completeSale()
@@ -650,18 +666,18 @@ class StoreBilling extends Component
                 if ($oldSale) {
                     // Get payment IDs before deleting payments
                     $paymentIds = Payment::where('sale_id', $oldSale->id)->pluck('id')->toArray();
-                    
+
                     // Delete related cheques first
                     if (!empty($paymentIds)) {
                         Cheque::whereIn('payment_id', $paymentIds)->delete();
                     }
-                    
+
                     // Delete payments
                     Payment::where('sale_id', $oldSale->id)->delete();
-                    
+
                     // Delete sales items
                     SalesItem::where('sale_id', $oldSale->id)->delete();
-                    
+
                     // Delete admin sales - check if the record exists first
                     try {
                         // Try to find admin_sales by sale_id
@@ -674,10 +690,10 @@ class StoreBilling extends Component
                         // we'll skip this or handle differently
                         Log::warning('Could not delete admin_sale: ' . $e->getMessage());
                     }
-                    
+
                     // Delete customer accounts
                     CustomerAccount::where('sale_id', $oldSale->id)->delete();
-                    
+
                     // Finally delete the sale
                     $oldSale->delete();
                 }
@@ -833,11 +849,11 @@ class StoreBilling extends Component
 
             $message = $this->isEditMode ? 'Sale updated successfully!' : 'Sale completed successfully!';
             $this->js('swal.fire("Success", "' . $message . ' Invoice #' . $sale->invoice_number . '", "success")');
-            
+
             // Reset edit mode
             $this->isEditMode = false;
             $this->editingSaleId = null;
-            
+
             $this->clearCart();
             $this->resetPaymentInfo();
             $this->invoiceDate = date('Y-m-d');

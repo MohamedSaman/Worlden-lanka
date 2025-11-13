@@ -66,6 +66,12 @@ class Bill extends Component
         }
     }
 
+    public function editInvoice($saleId)
+    {
+        // Redirect to store billing page with the sale ID to edit
+        return redirect()->route('admin.store-billing', ['edit' => $saleId]);
+    }
+
     public function resetFilters()
     {
         $this->filters = [

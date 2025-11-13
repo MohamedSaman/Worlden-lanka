@@ -372,6 +372,9 @@
                 </div>
                 <div class="modal-footer p-4">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-warning" wire:click="editInvoice({{ $saleDetails['sale']->id }})" data-bs-dismiss="modal">
+                        <i class="bi bi-pencil-square me-2"></i>Edit Invoice
+                    </button>
                     <button type="button" class="btn btn-primary" onclick="printInvoice()">
                         <i class="bi bi-printer me-2"></i>Print Invoice
                     </button>
