@@ -91,6 +91,10 @@ class StoreBilling extends Component
     public $banks = [];
     public $availableQuantityTypes = [];
 
+    // New properties for edit mode
+    public $isEditMode = false;
+    public $editingSaleId = null;
+
     protected $listeners = ['quantityUpdated' => 'updateTotals'];
 
     public function mount()
@@ -100,9 +104,10 @@ class StoreBilling extends Component
         $this->loadQuantityTypes();
         $this->updateTotals();
         $this->balanceDueDate = date('Y-m-d', strtotime('+7 days'));
-        $this->invoiceDate = date('Y-m-d'); // Set default to today
+        $this->invoiceDate = date('Y-m-d');
         $this->generateInvoiceNumber();
     }
+
     public function loadBanks()
     {
         $this->banks = [
@@ -129,6 +134,7 @@ class StoreBilling extends Component
             'Standard Chartered Bank',
         ];
     }
+
     public function loadQuantityTypes()
     {
         $this->availableQuantityTypes = [
@@ -146,19 +152,16 @@ class StoreBilling extends Component
     {
         $prefix = 'INV-';
 
-        // Get the last sale by ID (most recent sale)
         $lastSale = Sale::where('invoice_number', 'like', "{$prefix}%")
             ->orderBy('id', 'DESC')
             ->first();
 
         $nextNumber = 1;
         if ($lastSale) {
-            // Extract the number from the last invoice
             $lastNumber = intval(str_replace($prefix, '', $lastSale->invoice_number));
             $nextNumber = $lastNumber + 1;
         }
 
-        // Check if this number already exists (in case of manual changes), if so increment
         $invoiceNumber = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
         while (Sale::where('invoice_number', $invoiceNumber)->exists()) {
             $nextNumber++;
@@ -172,7 +175,6 @@ class StoreBilling extends Component
     public function updatedInvoiceDate($value)
     {
         // Invoice number does not depend on date anymore
-        // No action needed on date change
     }
 
     public function validateInvoiceNumber()
@@ -185,6 +187,14 @@ class StoreBilling extends Component
             ]);
             $this->generateInvoiceNumber();
             return false;
+        }
+
+        // Skip validation if in edit mode and invoice number hasn't changed
+        if ($this->isEditMode && $this->editingSaleId) {
+            $currentSale = Sale::find($this->editingSaleId);
+            if ($currentSale && $currentSale->invoice_number === $this->invoiceNumber) {
+                return true;
+            }
         }
 
         $existingInvoice = Sale::where('invoice_number', $this->invoiceNumber)->first();
@@ -212,16 +222,13 @@ class StoreBilling extends Component
             $this->searchResults = ProductDetail::join('product_categories', 'product_categories.id', '=', 'product_details.category_id')
                 ->where('product_details.product_name', 'LIKE', '%' . $this->search . '%')
                 ->orWhere('product_details.product_code', 'LIKE', '%' . $this->search . '%')
-                ->select('product_details.*') // Select only product_details columns to avoid ambiguity
+                ->select('product_details.*')
                 ->get();
         } else {
             $this->searchResults = [];
         }
     }
 
-    /**
-     * MODIFIED: This method now adds new items to the top of the cart.
-     */
     public function addToCart($productId)
     {
         $product = ProductDetail::find($productId);
@@ -250,11 +257,11 @@ class StoreBilling extends Component
                 ]
             ];
 
-            $this->cart = $newItem + $this->cart; // Prepend new item
+            $this->cart = $newItem + $this->cart;
             $this->prices[$productId] = $product->selling_price ?? 0;
             $this->quantities[$productId] = 1;
             $this->discounts[$productId] = $product->discount_price ?? 0;
-            $this->quantityTypes[$productId] = ''; // Initialize quantity type
+            $this->quantityTypes[$productId] = '';
         }
 
         $this->search = '';
@@ -272,7 +279,6 @@ class StoreBilling extends Component
         $value = max(0, floatval($value));
         $this->prices[$key] = $value;
 
-        // Update max discount if needed
         if (isset($this->discounts[$key]) && $this->discounts[$key] > $value) {
             $this->discounts[$key] = $value;
         }
@@ -418,7 +424,7 @@ class StoreBilling extends Component
         ]);
 
         $this->loadCustomers();
-        $this->customerId = $customer->id; // Auto-select the newly created customer
+        $this->customerId = $customer->id;
 
         $this->newCustomerName = '';
         $this->newCustomerPhone = '';
@@ -433,7 +439,6 @@ class StoreBilling extends Component
     public function calculateBalanceAmount()
     {
         if ($this->paymentType == 'partial') {
-            // Ensure initial payment doesn't exceed grand total
             $this->initialPaymentAmount = min(floatval($this->initialPaymentAmount), $this->grandTotal);
             $this->balanceAmount = $this->grandTotal - $this->initialPaymentAmount;
         } else {
@@ -484,6 +489,111 @@ class StoreBilling extends Component
         }
     }
 
+    // NEW METHOD: Edit Sale
+    public function editSale()
+    {
+        if (!$this->receipt || !$this->lastSaleId) {
+            $this->js('swal.fire("Error", "No sale to edit", "error")');
+            return;
+        }
+
+        try {
+            $sale = Sale::with(['items.product', 'payments'])->find($this->lastSaleId);
+
+            if (!$sale) {
+                $this->js('swal.fire("Error", "Sale not found", "error")');
+                return;
+            }
+
+            // Set edit mode
+            $this->isEditMode = true;
+            $this->editingSaleId = $sale->id;
+
+            // Load sale data into form
+            $this->invoiceNumber = $sale->invoice_number;
+            $this->invoiceDate = $sale->created_at->format('Y-m-d');
+            $this->customerId = $sale->customer_id;
+            $this->saleNotes = $sale->notes;
+            $this->deliveryNote = $sale->delivery_note;
+            $this->paymentType = $sale->payment_type;
+
+            // Restore cart items - need to add back to stock first
+            $this->cart = [];
+            $this->quantities = [];
+            $this->prices = [];
+            $this->discounts = [];
+            $this->quantityTypes = [];
+
+            foreach ($sale->items as $item) {
+                $product = $item->product;
+                if ($product) {
+                    // Restore stock temporarily for editing
+                    $product->stock_quantity += $item->quantity;
+                    $product->sold -= $item->quantity;
+                    $product->save();
+
+                    $productId = $product->id;
+                    $this->cart[$productId] = [
+                        'id' => $product->id,
+                        'name' => $product->product_name,
+                        'code' => $product->product_code,
+                        'brand' => $product->brand->name ?? 'N/A',
+                        'image' => $product->image,
+                        'price' => $item->price,
+                        'stock_quantity' => $product->stock_quantity,
+                    ];
+                    $this->quantities[$productId] = $item->quantity;
+                    $this->prices[$productId] = $item->price;
+                    $this->discounts[$productId] = $item->discount;
+                    $this->quantityTypes[$productId] = $item->quantity_type ?? '';
+                }
+            }
+
+            // Restore payment info
+            $this->cashAmount = 0;
+            $this->cheques = [];
+
+            foreach ($sale->payments as $payment) {
+                if ($payment->payment_method === 'cash') {
+                    $this->cashAmount = $payment->amount;
+                } elseif ($payment->payment_method === 'cheque') {
+                    $cheque = Cheque::where('payment_id', $payment->id)->first();
+                    if ($cheque) {
+                        $this->cheques[] = [
+                            'number' => $cheque->cheque_number,
+                            'bank' => $cheque->bank_name,
+                            'date' => $cheque->cheque_date,
+                            'amount' => $cheque->cheque_amount,
+                        ];
+                    }
+                }
+            }
+
+            $this->updateTotals();
+
+            // Close receipt modal and scroll to top
+            $this->js('$("#receiptModal").modal("hide")');
+            $this->js('window.scrollTo({ top: 0, behavior: "smooth" })');
+            $this->dispatch('show-toast', ['type' => 'info', 'message' => 'Sale loaded for editing. Make your changes and click "Update Sale".']);
+
+        } catch (Exception $e) {
+            Log::error('Edit sale error: ' . $e->getMessage());
+            $this->js('swal.fire("Error", "Failed to load sale for editing: ' . $e->getMessage() . '", "error")');
+        }
+    }
+
+    // NEW METHOD: Cancel Edit
+    public function cancelEdit()
+    {
+        $this->isEditMode = false;
+        $this->editingSaleId = null;
+        $this->clearCart();
+        $this->resetPaymentInfo();
+        $this->invoiceDate = date('Y-m-d');
+        $this->generateInvoiceNumber();
+        $this->dispatch('show-toast', ['type' => 'info', 'message' => 'Edit cancelled']);
+    }
+
     public function completeSale()
     {
         if (empty($this->cart)) {
@@ -491,7 +601,6 @@ class StoreBilling extends Component
             return;
         }
 
-        // Validate invoice number before proceeding
         if (!$this->validateInvoiceNumber()) {
             return;
         }
@@ -517,7 +626,6 @@ class StoreBilling extends Component
                 }
             }
         } else {
-            // Validate partial payment amounts
             $initialPayment = floatval($this->initialPaymentAmount);
 
             if ($initialPayment < 0) {
@@ -530,17 +638,53 @@ class StoreBilling extends Component
                 return;
             }
 
-            // Recalculate balance amount to ensure accuracy
             $this->calculateBalanceAmount();
         }
 
         try {
             DB::beginTransaction();
 
-            // Calculate actual due amount correctly
+            // If in edit mode, delete old sale records first
+            if ($this->isEditMode && $this->editingSaleId) {
+                $oldSale = Sale::find($this->editingSaleId);
+                if ($oldSale) {
+                    // Get payment IDs before deleting payments
+                    $paymentIds = Payment::where('sale_id', $oldSale->id)->pluck('id')->toArray();
+                    
+                    // Delete related cheques first
+                    if (!empty($paymentIds)) {
+                        Cheque::whereIn('payment_id', $paymentIds)->delete();
+                    }
+                    
+                    // Delete payments
+                    Payment::where('sale_id', $oldSale->id)->delete();
+                    
+                    // Delete sales items
+                    SalesItem::where('sale_id', $oldSale->id)->delete();
+                    
+                    // Delete admin sales - check if the record exists first
+                    try {
+                        // Try to find admin_sales by sale_id
+                        $adminSale = AdminSale::where('sale_id', $oldSale->id)->first();
+                        if ($adminSale) {
+                            $adminSale->delete();
+                        }
+                    } catch (\Exception $e) {
+                        // If sale_id column doesn't exist in admin_sales table, 
+                        // we'll skip this or handle differently
+                        Log::warning('Could not delete admin_sale: ' . $e->getMessage());
+                    }
+                    
+                    // Delete customer accounts
+                    CustomerAccount::where('sale_id', $oldSale->id)->delete();
+                    
+                    // Finally delete the sale
+                    $oldSale->delete();
+                }
+            }
+
             $actualDueAmount = 0;
             if ($this->paymentType === 'partial') {
-                // For partial payment: due = total - initial payment (if any)
                 $actualDueAmount = $this->grandTotal - floatval($this->initialPaymentAmount);
             }
 
@@ -557,7 +701,7 @@ class StoreBilling extends Component
                 'notes'            => $this->saleNotes,
                 'delivery_note'    => $this->deliveryNote,
                 'due_amount'       => $actualDueAmount,
-                'created_at'       => $this->invoiceDate . ' ' . date('H:i:s'), // Set custom date with current time
+                'created_at'       => $this->invoiceDate . ' ' . date('H:i:s'),
                 'updated_at'       => now(),
             ]);
 
@@ -592,15 +736,14 @@ class StoreBilling extends Component
                 $qtyType = $this->quantityTypes[$id] ?? '';
                 $total = ($price * $quantityToSell) - ($itemDiscount * $quantityToSell);
 
-                // dd($qtyType);
                 SalesItem::create([
-                    'sale_id'    => $sale->id,
-                    'product_id' => $item['id'],
-                    'quantity'   => $quantityToSell,
+                    'sale_id'       => $sale->id,
+                    'product_id'    => $item['id'],
+                    'quantity'      => $quantityToSell,
                     'quantity_type' => $qtyType,
-                    'price'      => $price,
-                    'discount'   => $itemDiscount,
-                    'total'      => $total,
+                    'price'         => $price,
+                    'discount'      => $itemDiscount,
+                    'total'         => $total,
                 ]);
 
                 $productStock->stock_quantity -= $quantityToSell;
@@ -630,15 +773,15 @@ class StoreBilling extends Component
                 }
                 foreach ($this->cheques as $cheque) {
                     $payment = Payment::create([
-                        'sale_id'         => $sale->id,
-                        'admin_sale_id'   => $adminSale->id,
-                        'amount'          => floatval($cheque['amount']),
-                        'payment_method'  => 'cheque',
+                        'sale_id'           => $sale->id,
+                        'admin_sale_id'     => $adminSale->id,
+                        'amount'            => floatval($cheque['amount']),
+                        'payment_method'    => 'cheque',
                         'payment_reference' => $cheque['number'],
-                        'bank_name'       => $cheque['bank'],
-                        'is_completed'    => true,
-                        'payment_date'    => $cheque['date'],
-                        'status'          => 'Paid',
+                        'bank_name'         => $cheque['bank'],
+                        'is_completed'      => true,
+                        'payment_date'      => $cheque['date'],
+                        'status'            => 'Paid',
                     ]);
 
                     Cheque::create([
@@ -662,15 +805,10 @@ class StoreBilling extends Component
                     'due_date'        => $this->balanceDueDate ?? now()->addDays(7),
                 ]);
 
-                // Maintain a single CustomerAccount row per customer.
-                // If an account exists, update it; otherwise, create a new one.
-                // Business rule: carry forward old current due + add new due.
                 $account = CustomerAccount::where('customer_id', $this->customerId)->first();
 
                 if ($account) {
                     $oldCurrentDue = floatval($account->current_due_amount ?? 0);
-
-                    // Add the actual due amount (grand total for credit sales)
                     $account->current_due_amount = $oldCurrentDue + $actualDueAmount;
                     $account->total_due = floatval($account->back_forward_amount ?? 0) + $account->current_due_amount;
                     $account->sale_id = $sale->id;
@@ -690,14 +828,20 @@ class StoreBilling extends Component
             DB::commit();
 
             $this->receipt = Sale::with(['customer', 'items.product', 'payments'])->find($sale->id);
-
             $this->lastSaleId = $sale->id;
             $this->showReceipt = true;
-            $this->js('swal.fire("Success", "Sale completed successfully! Invoice #' . $sale->invoice_number . '", "success")');
+
+            $message = $this->isEditMode ? 'Sale updated successfully!' : 'Sale completed successfully!';
+            $this->js('swal.fire("Success", "' . $message . ' Invoice #' . $sale->invoice_number . '", "success")');
+            
+            // Reset edit mode
+            $this->isEditMode = false;
+            $this->editingSaleId = null;
+            
             $this->clearCart();
             $this->resetPaymentInfo();
-            $this->invoiceDate = date('Y-m-d'); // Reset to today's date for next sale
-            $this->generateInvoiceNumber(); // Generate new invoice for next sale
+            $this->invoiceDate = date('Y-m-d');
+            $this->generateInvoiceNumber();
             $this->js('$("#receiptModal").modal("show")');
         } catch (Exception $e) {
             DB::rollBack();

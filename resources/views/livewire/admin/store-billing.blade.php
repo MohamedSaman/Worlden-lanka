@@ -93,10 +93,34 @@
                 display: none;
             }
         }
+
+        /* Edit Mode Styles */
+        .edit-mode-banner {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.9; }
+        }
     </style>
     @endpush
 
     <div class="container-fluid py-4">
+        <!-- Edit Mode Banner -->
+        @if($isEditMode)
+        <div class="alert alert-warning edit-mode-banner d-flex justify-content-between align-items-center mb-4" role="alert">
+            <div>
+                <i class="bi bi-pencil-square me-2"></i>
+                <strong>EDIT MODE:</strong> You are editing Invoice #{{ $invoiceNumber }}. Make your changes and click "Update Sale" or "Cancel Edit".
+            </div>
+            <button class="btn btn-sm btn-dark" wire:click="cancelEdit">
+                <i class="bi bi-x-circle me-1"></i>Cancel Edit
+            </button>
+        </div>
+        @endif
+
         <!-- Professional Header Section -->
         <div class="row mb-4">
             <div class="col-12">
@@ -107,7 +131,13 @@
                                 <h2 class="text-white mb-1 fw-bold">
                                     <i class="bi bi-receipt-cutoff me-2"></i>Store Billing System
                                 </h2>
-                                <p class="text-white-50 mb-0">Create invoices and manage sales transactions</p>
+                                <p class="text-white-50 mb-0">
+                                    @if($isEditMode)
+                                        Update invoice and manage sale changes
+                                    @else
+                                        Create invoices and manage sales transactions
+                                    @endif
+                                </p>
                             </div>
                             <div class="col-md-6">
                                 <div class="card border-0 shadow-sm">
@@ -300,8 +330,6 @@
                                         </td>
                                         <td>
                                             <div style="width: 100px;">
-                                                {{-- FIXED: Removed wire:change and other attributes to simplify and
-                                                prevent conflicts --}}
                                                 <input type="number"
                                                     class="form-control form-control-sm text-center quantity-input"
                                                     value="{{ $quantities[$id] }}" min="1"
@@ -335,10 +363,6 @@
                                             </p>
                                         </td>
                                         <td>
-                                            <!-- <button class="btn btn-link btn-sm text-info rounded-circle "
-                                                wire:click="showDetail({{ $id }})">
-                                                <i class="bi bi-eye"></i>
-                                            </button> -->
                                             <button class="btn btn-link btn-sm text-danger rounded-circle "
                                                 wire:click="removeFromCart({{ $id }})">
                                                 <i class="bi bi-trash"></i>
@@ -347,7 +371,7 @@
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-5">
+                                        <td colspan="7" class="text-center py-5">
                                             <div class="text">
                                                 <i class="fas fa-shopping-cart fa-3x mb-3"></i>
                                                 <p>Your cart is empty. Search and add products to create a bill.</p>
@@ -575,13 +599,22 @@
                                         </div>
 
                                         <div class="d-flex mt-4">
-                                            <button class="btn btn-danger me-2" wire:click="clearCart"
-                                                style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
-                                                <i class="fas fa-times me-2"></i>Clear
-                                            </button>
-                                            <button class="btn btn-success flex-grow-1" wire:click="completeSale">
-                                                <i class="fas fa-check me-2"></i>Complete Sale
-                                            </button>
+                                            @if($isEditMode)
+                                                <button class="btn btn-warning me-2" wire:click="cancelEdit">
+                                                    <i class="bi bi-x-circle me-2"></i>Cancel
+                                                </button>
+                                                <button class="btn btn-primary flex-grow-1" wire:click="completeSale">
+                                                    <i class="fas fa-save me-2"></i>Update Sale
+                                                </button>
+                                            @else
+                                                <button class="btn btn-danger me-2" wire:click="clearCart"
+                                                    style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
+                                                    <i class="fas fa-times me-2"></i>Clear
+                                                </button>
+                                                <button class="btn btn-success flex-grow-1" wire:click="completeSale">
+                                                    <i class="fas fa-check me-2"></i>Complete Sale
+                                                </button>
+                                            @endif
                                         </div>
                                     </div>
                                 </div>
@@ -823,7 +856,8 @@
                 </div>
             </div>
         </div>
-        <!-- reciepte model -->
+        
+        <!-- Receipt modal -->
         <div wire:ignore.self class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel"
             aria-hidden="true">
             <div class="modal-dialog modal-lg">
@@ -835,6 +869,10 @@
                             <i class="bi bi-receipt me-2"></i>Sales Receipt
                         </h5>
                         <div class="ms-auto d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-warning rounded-full px-3 transition-all hover:shadow"
+                                wire:click="editSale">
+                                <i class="bi bi-pencil-square me-1"></i>Edit
+                            </button>
                             <button type="button" class="btn btn-sm rounded-full px-3 transition-all hover:shadow"
                                 id="printButton" style="background-color: #9d1c20;border-color:#fff; color: #fff;">
                                 <i class="bi bi-printer me-1"></i>Print
@@ -1026,7 +1064,6 @@
 </div>
 
 @push('scripts')
-{{-- FIXED: Simplified script section --}}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const printButton = document.getElementById('printButton');
@@ -1070,7 +1107,7 @@
                         * { color: #000 !important;
                         font:bold !important;  }
                     }
-                </style>
+                </style>
                 </head>
                 <body>
                     ${receiptContent}
@@ -1081,7 +1118,6 @@
         printWindow.document.close();
         printWindow.focus();
 
-        // Use a timeout to ensure content is loaded before printing
         setTimeout(() => {
             printWindow.print();
             printWindow.close();
@@ -1090,13 +1126,11 @@
 
     document.addEventListener('livewire:initialized', () => {
 
-        // Listener for showing modals from the backend
         window.addEventListener('showModal', event => {
             const modal = new bootstrap.Modal(document.getElementById(event.detail[0].modalId));
             modal.show();
         });
 
-        // Listener for closing modals from the backend
         window.addEventListener('closeModal', event => {
             const modal = bootstrap.Modal.getInstance(document.getElementById(event.detail[0].modalId));
             if (modal) {
@@ -1104,7 +1138,6 @@
             }
         });
 
-        // This is the single, working toast notification listener using SweetAlert2
         window.addEventListener('show-toast', event => {
             const data = event.detail[0];
             Swal.fire({
