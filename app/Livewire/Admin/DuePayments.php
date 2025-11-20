@@ -102,6 +102,9 @@ class DuePayments extends Component
 
     public function getPaymentDetails($customerId)
     {
+
+        $this->applyToCurrent = true;
+        $this->applyToBackForward = false;
         $this->paymentId = $customerId;
         $customer = Customer::withSum(['customerAccounts' => function ($query) {
             $query->where('total_due', '>', 0);
@@ -155,42 +158,7 @@ class DuePayments extends Component
         $this->dispatch('openModal', 'payment-detail-modal');
     }
 
-    public function updatedApplyToCurrent()
-    {
-        if ($this->applyToCurrent) {
-            $this->applyToBackForward = false;
-            $this->applyTarget = 'current';
-        }
-    }
-
-    public function updatedApplyToBackForward()
-    {
-        if ($this->applyToBackForward) {
-            $this->applyToCurrent = false;
-            $this->applyTarget = 'back_forward';
-        }
-    }
-
-    // Helper to explicitly set apply target from the UI (radio-like behavior)
-    public function setApplyTarget(string $target): void
-    {
-        if ($target === 'current') {
-            $this->applyToCurrent = true;
-            $this->applyToBackForward = false;
-            $this->applyTarget = 'current';
-        } elseif ($target === 'back_forward') {
-            $this->applyToCurrent = false;
-            $this->applyToBackForward = true;
-            $this->applyTarget = 'back_forward';
-        }
-    }
-
-    // Keep booleans in sync if applyTarget is changed via radio binding
-    public function updatedApplyTarget($value)
-    {
-        $this->applyToCurrent = ($value === 'current');
-        $this->applyToBackForward = ($value === 'back_forward');
-    }
+    // ...existing code...
 
     public function addCheque()
     {
@@ -234,20 +202,26 @@ class DuePayments extends Component
             return;
         }
 
-        // Ensure exactly one target is selected (using applyTarget)
-        if (!in_array($this->applyTarget, ['current', 'back_forward'], true)) {
-            $this->js("Swal.fire('Error', 'Please select exactly one target: Current Due or Brought-Forward.', 'error')");
+        // Validate that at least one target is selected
+        if (!$this->applyToCurrent && !$this->applyToBackForward) {
+            $this->js("Swal.fire('Error', 'Please select at least one payment target: Current Due or Brought-Forward.', 'error')");
             return;
         }
 
-        // Validate that the selected target has a due amount
-        if ($this->applyTarget === 'current' && $this->currentDueAmount <= 0) {
+        // Validate that selected targets have due amounts (only when single option selected)
+        if ($this->applyToCurrent && !$this->applyToBackForward && $this->currentDueAmount <= 0) {
             $this->js("Swal.fire('Error', 'Current due amount is zero. Cannot apply payment to current dues.', 'error')");
             return;
         }
 
-        if ($this->applyTarget === 'back_forward' && $this->backForwardAmount <= 0) {
+        if (!$this->applyToCurrent && $this->applyToBackForward && $this->backForwardAmount <= 0) {
             $this->js("Swal.fire('Error', 'Brought-forward amount is zero. Cannot apply payment to Brought-forward dues.', 'error')");
+            return;
+        }
+
+        // When both are selected, ensure at least one has due amount
+        if ($this->applyToCurrent && $this->applyToBackForward && $this->currentDueAmount <= 0 && $this->backForwardAmount <= 0) {
+            $this->js("Swal.fire('Error', 'No outstanding dues found to apply payment.', 'error')");
             return;
         }
 
@@ -274,20 +248,23 @@ class DuePayments extends Component
 
             $paymentMethod = $cashAmount > 0 && $chequeTotal > 0 ? 'cash+cheque' : ($chequeTotal > 0 ? 'cheque' : 'cash');
 
-            // Determine target amount based on selected target
-            $isCurrent = ($this->applyTarget === 'current');
-            $targetAmount = $isCurrent ? $this->currentDueAmount : max(0, $this->backForwardAmount);
+            // Calculate maximum allowed payment based on selections
+            $maxAllowedPayment = 0;
+            if ($this->applyToCurrent) {
+                $maxAllowedPayment += $this->currentDueAmount;
+            }
+            if ($this->applyToBackForward) {
+                $maxAllowedPayment += max(0, $this->backForwardAmount);
+            }
 
-            if ($totalPaid > $targetAmount) {
+            if ($totalPaid > $maxAllowedPayment) {
                 DB::rollBack();
-                $this->js("Swal.fire('Error', 'Total payment exceeds selected amount.', 'error')");
+                $this->js("Swal.fire('Error', 'Total payment (Rs." . number_format($totalPaid, 2) . ") exceeds selected due amount (Rs." . number_format($maxAllowedPayment, 2) . ").', 'error')");
                 return;
             }
 
-            // Get a valid sale_id - prioritize customer accounts with sales
+            // Get a valid sale_id
             $saleId = null;
-
-            // First try to get sale_id from customer accounts with dues
             $customerAccountWithSale = CustomerAccount::where('customer_id', $this->paymentId)
                 ->where('total_due', '>', 0)
                 ->whereNotNull('sale_id')
@@ -297,22 +274,28 @@ class DuePayments extends Component
             if ($customerAccountWithSale && $customerAccountWithSale->sale_id) {
                 $saleId = $customerAccountWithSale->sale_id;
             } else {
-                // Fallback: get any recent sale for this customer
-                $recentSale = Sale::where('customer_id', $this->paymentId)
-                    ->latest()
-                    ->first();
-
+                $recentSale = Sale::where('customer_id', $this->paymentId)->latest()->first();
                 if ($recentSale) {
                     $saleId = $recentSale->id;
                 }
-                // If no sale found, saleId remains null - this is allowed
             }
 
-            // Create Payment record (sale_id can be null)
-            $paymentStatus = $isCurrent ? 'current' : 'forward';
+            // Determine payment status based on selections
+            $paymentStatus = 'mixed'; // Default for both
+            $appliedTo = 'both';
+
+            if ($this->applyToCurrent && !$this->applyToBackForward) {
+                $paymentStatus = 'current';
+                $appliedTo = 'current';
+            } elseif (!$this->applyToCurrent && $this->applyToBackForward) {
+                $paymentStatus = 'forward';
+                $appliedTo = 'back_forward';
+            }
+
+            // Create Payment record
             $payment = Payment::create([
-                'sale_id' => $saleId,
-                'customer_id' => $this->paymentId, // Add customer_id for Brought-forward payments
+                'sale_id' => null,
+                'customer_id' => $this->paymentId,
                 'amount' => $totalPaid,
                 'due_date' => now(),
                 'status' => $paymentStatus,
@@ -321,7 +304,7 @@ class DuePayments extends Component
                 'payment_date' => now(),
                 'due_payment_method' => $paymentMethod,
                 'due_payment_attachment' => $attachmentPath,
-                'applied_to' => $isCurrent ? 'current' : 'back_forward',
+                'applied_to' => $appliedTo,
             ]);
 
             // Get all due accounts for the customer, ordered by creation date (oldest first)
@@ -334,7 +317,7 @@ class DuePayments extends Component
             if ($customerAccounts->isEmpty() && $this->backForwardAmount > 0) {
                 $customerAccount = CustomerAccount::create([
                     'customer_id' => $this->paymentId,
-                    'sale_id' => $saleId, // Can be null
+                    'sale_id' => null,
                     'current_due_amount' => 0,
                     'back_forward_amount' => $this->backForwardAmount,
                     'total_due' => $this->backForwardAmount,
@@ -343,11 +326,11 @@ class DuePayments extends Component
                 $customerAccounts = collect([$customerAccount]);
             }
 
-            // If still no accounts and no back forward amount, create a general account
+            // If still no accounts, create a general account
             if ($customerAccounts->isEmpty()) {
                 $customerAccount = CustomerAccount::create([
                     'customer_id' => $this->paymentId,
-                    'sale_id' => $saleId, // Can be null
+                    'sale_id' => null,
                     'current_due_amount' => $this->currentDueAmount,
                     'back_forward_amount' => $this->backForwardAmount,
                     'total_due' => $this->currentDueAmount + $this->backForwardAmount,
@@ -358,60 +341,81 @@ class DuePayments extends Component
 
             $remainingPayment = $totalPaid;
 
-            foreach ($customerAccounts as $acc) {
-                if ($remainingPayment <= 0) {
-                    break;
-                }
+            // PRIORITY LOGIC: When both are selected, always pay Current Due first, then Brought-Forward
+            // When only one is selected, pay that specific type
 
-                if ($isCurrent) {
-                    $dueForThis = $acc->current_due_amount;
-                    $payForThis = min($dueForThis, $remainingPayment);
-                    $newCurrentDue = $dueForThis - $payForThis;
-                    $newTotalDue = max(0, $newCurrentDue + $acc->back_forward_amount);
-                    $status = $newTotalDue == 0 ? 'Paid' : 'Partial';
+            // Step 1: Apply to Current Due (if selected or when both are selected)
+            if ($this->applyToCurrent || ($this->applyToCurrent && $this->applyToBackForward)) {
+                foreach ($customerAccounts as $acc) {
+                    if ($remainingPayment <= 0) {
+                        break;
+                    }
 
-                    $acc->update([
-                        'paid_due' => DB::raw("paid_due + {$payForThis}"),
-                        'current_due_amount' => $newCurrentDue,
-                        'total_due' => $newTotalDue,
-                        'due_payment_method' => $paymentMethod,
-                        'status' => $status,
-                        'payment_date' => now(),
-                    ]);
-                } else {
-                    // Paying against Brought-forward due: reduce Brought-forward amount     by the payment
-                    $dueForThis = max(0, floatval($acc->back_forward_amount));
-                    $payForThis = min($dueForThis, $remainingPayment);
-                    $newBackForward = max(0, $dueForThis - $payForThis);
-                    $newTotalDue = max(0, floatval($acc->current_due_amount) + $newBackForward);
-                    $status = $newTotalDue == 0 ? 'Paid' : 'Partial';
+                    $currentDue = $acc->current_due_amount;
+                    if ($currentDue > 0) {
+                        $payForCurrent = min($currentDue, $remainingPayment);
+                        $newCurrentDue = $currentDue - $payForCurrent;
+                        $newTotalDue = max(0, $newCurrentDue + $acc->back_forward_amount);
+                        $status = $newTotalDue == 0 ? 'Paid' : 'Partial';
 
-                    $acc->update([
-                        'paid_due' => DB::raw("paid_due + {$payForThis}"),
-                        'back_forward_amount' => $newBackForward,
-                        'total_due' => $newTotalDue,
-                        'due_payment_method' => $paymentMethod,
-                        'status' => $status,
-                        'payment_date' => now(),
-                    ]);
-                }
+                        $acc->update([
+                            'paid_due' => DB::raw("paid_due + {$payForCurrent}"),
+                            'current_due_amount' => $newCurrentDue,
+                            'total_due' => $newTotalDue,
+                            'due_payment_method' => $paymentMethod,
+                            'status' => $status,
+                            'payment_date' => now(),
+                        ]);
 
-                // Update associated sale if exists
-                if ($acc->sale_id) {
-                    $sale = Sale::find($acc->sale_id);
-                    if ($sale) {
-                        $sale->update(['due_amount' => $acc->current_due_amount]);
+                        // Update associated sale if exists
+                        if ($acc->sale_id) {
+                            $sale = Sale::find($acc->sale_id);
+                            if ($sale) {
+                                $sale->update(['due_amount' => $newCurrentDue]);
+                            }
+                        }
+
+                        $remainingPayment -= $payForCurrent;
                     }
                 }
-
-                $remainingPayment -= $payForThis;
             }
 
-            // Handle overpayment as advance (positive back_forward)
+            // Step 2: Apply to Brought-Forward (if selected and there's remaining payment)
+            // This runs when: only back-forward is selected, OR both are selected and there's remaining payment
+            if (($this->applyToBackForward && !$this->applyToCurrent) ||
+                ($this->applyToCurrent && $this->applyToBackForward && $remainingPayment > 0)
+            ) {
+                foreach ($customerAccounts as $acc) {
+                    if ($remainingPayment <= 0) {
+                        break;
+                    }
+
+                    $backForwardDue = max(0, floatval($acc->back_forward_amount));
+                    if ($backForwardDue > 0) {
+                        $payForBackForward = min($backForwardDue, $remainingPayment);
+                        $newBackForward = max(0, $backForwardDue - $payForBackForward);
+                        $newTotalDue = max(0, floatval($acc->current_due_amount) + $newBackForward);
+                        $status = $newTotalDue == 0 ? 'Paid' : 'Partial';
+
+                        $acc->update([
+                            'paid_due' => DB::raw("paid_due + {$payForBackForward}"),
+                            'back_forward_amount' => $newBackForward,
+                            'total_due' => $newTotalDue,
+                            'due_payment_method' => $paymentMethod,
+                            'status' => $status,
+                            'payment_date' => now(),
+                        ]);
+
+                        $remainingPayment -= $payForBackForward;
+                    }
+                }
+            }
+
+            // Handle overpayment as advance (should rarely happen with validation)
             if ($remainingPayment > 0) {
                 $lastAccount = CustomerAccount::where('customer_id', $this->paymentId)->latest()->first();
                 if ($lastAccount) {
-                    $newBackForward = $lastAccount->back_forward_amount - $remainingPayment; // Decrease Brought-forward
+                    $newBackForward = $lastAccount->back_forward_amount - $remainingPayment;
                     $newTotalDue = max(0, $lastAccount->current_due_amount + $newBackForward);
                     $lastAccount->update([
                         'back_forward_amount' => $newBackForward,
@@ -421,7 +425,7 @@ class DuePayments extends Component
                     CustomerAccount::create([
                         'customer_id' => $this->paymentId,
                         'sale_id' => null,
-                        'back_forward_amount' => -$remainingPayment, // Negative to indicate advance
+                        'back_forward_amount' => -$remainingPayment,
                         'current_due_amount' => 0,
                         'paid_due' => 0,
                         'total_due' => 0,
@@ -455,7 +459,7 @@ class DuePayments extends Component
                 }
             }
 
-            // Set attachment to the last updated account if not set in Payment
+            // Set attachment to the last updated account
             if ($attachmentPath) {
                 $lastUpdatedAccount = CustomerAccount::where('customer_id', $this->paymentId)
                     ->orderBy('updated_at', 'desc')

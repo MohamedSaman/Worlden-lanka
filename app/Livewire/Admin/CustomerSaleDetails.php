@@ -213,18 +213,20 @@ class CustomerSaleDetails extends Component
         }
 
         foreach ($payments as $p) {
-            $isPaid = ($p->is_completed === 1) || (strtolower((string)$p->status) === 'paid');
+            $isPaid = ($p->is_completed === 1) || (strtolower((string)$p->status) === 'paid') || (strtolower((string)$p->status) === 'mixed');
             if (!$isPaid) continue;
 
-            // Build label: Paid (Current/Forward) - Method
-            $target = ($p->applied_to === 'back_forward' || strtolower((string)$p->status) === 'forward') ? 'Forward' : 'Current';
+            // Build label: Paid (Current/Forward/Mixed) - Method
+            if ($p->status === 'mixed' || $p->applied_to === 'both') {
+                $target = 'Current and Forward';
+            } elseif ($p->applied_to === 'back_forward' || strtolower((string)$p->status) === 'forward') {
+                $target = 'Forward';
+            } else {
+                $target = 'Current';
+            }
             $label = 'Paid (' . $target . ')';
 
-            // Add invoice number if available (for sale-related payments)
-            if (!empty($p->invoice_number)) {
-                $label .= ' - Invoice ' . $p->invoice_number;
-            }
-
+            // Add payment method only (removed invoice number section)
             if (!empty($p->due_payment_method)) {
                 $label .= ' - ' . ucfirst(str_replace('_', ' ', $p->due_payment_method));
             }

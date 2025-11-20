@@ -59,6 +59,16 @@ Route::post('/logout', function (Request $request) {
 // Routes that require authentication
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
 
+    // Universal dashboard redirect
+    Route::get('/dashboard', function () {
+        $user = auth()->user();
+        if ($user && $user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        } elseif ($user && $user->role === 'staff') {
+            return redirect()->route('staff.dashboard');
+        }
+        return abort(403, 'Unauthorized');
+    })->name('dashboard');
     // !! Admin routes
     Route::middleware('role:admin')->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', AdminDashboard::class)->name('dashboard');
@@ -76,22 +86,20 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('/products', Products::class)->name('products');
         Route::get('/due-cheques', DueCheques::class)->name('due-cheques');
         Route::get('/due-cheques-return', DueChequesReturn::class)->name('due-cheques-return');
-        
-        Route::get('/product-stocks', \App\Livewire\Admin\ProductStocks::class)->name('product-stocks');
-        Route::get('/product-re-entry',ProductReEntry::class )->name('product-reentry');
-        Route::get('/back-forward',BackForward::class )->name('back-forward');
-        Route::get('/bill', Bill::class)->name('bill');
 
+        Route::get('/product-stocks', \App\Livewire\Admin\ProductStocks::class)->name('product-stocks');
+        Route::get('/product-re-entry', ProductReEntry::class)->name('product-reentry');
+        Route::get('/back-forward', BackForward::class)->name('back-forward');
+        Route::get('/bill', Bill::class)->name('bill');
     });
 
-   
+
     //!! Staff routes
     Route::middleware('role:staff')->prefix('staff')->name('staff.')->group(function () {
         Route::get('/dashboard', StaffDashboard::class)->name('dashboard');
         Route::get('/customer-sale-management', CustomerSaleManagement::class)->name('customer-sale-management');
         Route::get('/staff-stock-overview', StaffStockOverview::class)->name('staff-stock-overview');
         Route::get('/due-payments', DuePayments::class)->name('due-payments');
-
     });
 
 
@@ -99,15 +107,14 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
     Route::get('/watches/export', [WatchesExportController::class, 'export'])->name('watches.export')->middleware(['auth']);
     Route::get('/staff-sales/export', [StaffSaleExportController::class, 'export'])
-    ->name('staff-sales.export')->middleware(['auth']);
+        ->name('staff-sales.export')->middleware(['auth']);
     // Receipt download (accessible to authenticated users)
     Route::get('/receipts/{id}/download', [App\Http\Controllers\ReceiptController::class, 'download'])
         ->name('receipts.download')
         ->middleware(['auth']);
 
     // Export staff stock details
-    Route::get('/export/staff-stock', function() {
+    Route::get('/export/staff-stock', function () {
         return app(StaffStockDetails::class)->exportToCSV();
     })->name('export.staff-stock');
-
 });

@@ -258,6 +258,7 @@ class StoreBilling extends Component
                     'code' => $product->product_code,
                     'brand' => $product->brand->name ?? 'N/A',
                     'image' => $product->image,
+                    'customer_field' => $product->customer_field ?? null,
                     'price' => $product->selling_price,
                     'stock_quantity' => $product->stock_quantity,
                 ]
@@ -555,6 +556,7 @@ class StoreBilling extends Component
                         'code' => $product->product_code,
                         'brand' => $product->brand->name ?? 'N/A',
                         'image' => $product->image,
+                        'customer_field' => $product->customer_field ?? null,
                         'price' => $item->price,
                         'stock_quantity' => $product->stock_quantity,
                     ];
@@ -832,7 +834,7 @@ class StoreBilling extends Component
                 } else {
                     CustomerAccount::create([
                         'customer_id'         => $this->customerId,
-                        'sale_id'             => $sale->id,
+                        'sale_id'             =>null,
                         'back_forward_amount' => 0,
                         'current_due_amount'  => $actualDueAmount,
                         'paid_due'            => 0,

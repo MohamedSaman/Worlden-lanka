@@ -1089,6 +1089,7 @@
                         font-family: "Courier New", monospace;
                         font-size: 14px;
                         color: #000 !important;
+                        font-weight: bold !important;
                     }
                     * { color: #000 !important; }
                     .table-bordered th, .table-bordered td { border: 1px solid #000 !important; padding: 2px 6px !important; font-size: 12px !important; }

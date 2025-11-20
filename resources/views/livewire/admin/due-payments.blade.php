@@ -243,19 +243,7 @@
                                 <h6 class="mt-3 mb-0 fw-bold text-gray-800">{{ $paymentDetail->sale->customer->name ?? $paymentDetail->name }}</h6>
                                 <p class="text-sm text-gray-600 mb-0">{{ $paymentDetail->sale->customer->phone ?? $paymentDetail->phone }}</p>
                             </div>
-                            <h6 class="text-uppercase text-sm fw-semibold mb-3 border-bottom pb-2" style="color: #9d1c20;">Invoice Details</h6>
-                            @if ($paymentDetail->sales && $paymentDetail->sales->count() > 0)
-                            <div class="mb-3">
-                                <p class="mb-2">
-                                    <span class="text-gray-600">Invoice:</span>
-                                    <span class="fw-bold text-gray-800 fs-6">{{ $paymentDetail->sales->first()->invoice_number }}</span>
-                                </p>
-                                <p class="mb-2 d-flex justify-content-between text-sm">
-                                    <span class="text-gray-600">Sale Date:</span>
-                                    <span class="text-gray-800">{{ $paymentDetail->sales->first()->created_at->format('d/m/Y') }}</span>
-                                </p>
-                            </div>
-                            @endif
+                            <h6 class="text-uppercase text-sm fw-semibold mb-3 border-bottom pb-2" style="color: #9d1c20;">Due Payment Details</h6>
                             <div class="card border-0 shadow-sm rounded-4 p-3 mt-3 bg-light">
                                 <div>
                                     <span class="text-sm text-gray-600">Current Due:</span>
@@ -286,23 +274,64 @@
                                 <div class="p-4">
                                     <div class="row">
                                         <div class="col-md-6 mb-4">
-                                            <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">Apply To:</label>
-                                            @if($currentDueAmount > 0)
-                                            <div class="form-check">
-                                                <input type="radio" class="form-check-input" name="applyTarget" id="applyToCurrent" value="current" wire:model="applyTarget">
-                                                <label class="form-check-label" for="applyToCurrent">Current Due (Rs.{{ number_format($currentDueAmount, 2) }})</label>
-                                            </div>
-                                            @endif
-                                            @if($backForwardAmount > 0)
-                                            <div class="form-check">
-                                                <input type="radio" class="form-check-input" name="applyTarget" id="applyToBackForward" value="back_forward" wire:model="applyTarget">
-                                                <label class="form-check-label" for="applyToBackForward">Brought-Forward (Rs.{{ number_format($backForwardAmount, 2) }})</label>
-                                            </div>
-                                            @endif
-                                            @if($currentDueAmount <= 0 && $backForwardAmount <=0)
-                                                <div class="alert alert-info">
-                                                <i class="bi bi-info-circle me-2"></i>
-                                                No outstanding dues found for this customer.
+                                            <label class="form-label text-sm fw-semibold mb-2" style="color: #9d1c20;">
+                                                Apply To: <span class="text-danger">*</span>
+                                                <p class="text-muted small mb-2">Select one or both payment targets</p>
+                                                <fieldset aria-labelledby="applyToTargets" class="mb-2">
+                                                    <legend id="applyToTargets" class="visually-hidden">Payment Targets</legend>
+                                                    @if($currentDueAmount > 0)
+                                                    <div class="form-check mb-2">
+                                                        <input type="checkbox"
+                                                            class="form-check-input"
+                                                            id="applyToCurrent"
+                                                            wire:model="applyToCurrent"
+                                                            aria-checked="{{ $applyToCurrent ? 'true' : 'false' }}"
+                                                            aria-label="Apply payment to current due">
+                                                        <label class="form-check-label" for="applyToCurrent">
+                                                            <strong>Current Due</strong> - Rs.{{ number_format($currentDueAmount, 2) }}
+                                                        </label>
+                                                    </div>
+                                                    @endif
+                                                    @if($backForwardAmount > 0)
+                                                    <div class="form-check mb-2">
+                                                        <input type="checkbox"
+                                                            class="form-check-input"
+                                                            id="applyToBackForward"
+                                                            wire:model="applyToBackForward"
+                                                            aria-checked="{{ $applyToBackForward ? 'true' : 'false' }}"
+                                                            aria-label="Apply payment to brought-forward">
+                                                        <label class="form-check-label" for="applyToBackForward">
+                                                            <strong>Brought-Forward</strong> - Rs.{{ number_format($backForwardAmount, 2) }}
+                                                        </label>
+                                                    </div>
+                                                    @endif
+                                                </fieldset>
+                                                @if($currentDueAmount <= 0 && $backForwardAmount <=0)
+                                                    <div class="alert alert-info">
+                                                    <i class="bi bi-info-circle me-2"></i>
+                                                    No outstanding dues found for this customer.
+                                        </div>
+                                        @endif
+                                        <!-- Show total payable amount based on selection -->
+                                        @php
+                                        $totalPayable = 0;
+                                        if($applyToCurrent) {
+                                        $totalPayable += $currentDueAmount;
+                                        }
+                                        if($applyToBackForward) {
+                                        $totalPayable += max(0, $backForwardAmount);
+                                        }
+                                        @endphp
+                                        @if($totalPayable > 0)
+                                        <div class="alert alert-info mt-2 small">
+                                            <i class="bi bi-calculator me-1"></i>
+                                            <strong>Maximum Payable:</strong> Rs.{{ number_format($totalPayable, 2) }}
+                                        </div>
+                                        @endif
+                                        @if($applyToCurrent && $applyToBackForward)
+                                        <div class="alert alert-success mt-2 small">
+                                            <i class="bi bi-arrow-right-circle me-1"></i>
+                                            <strong>Payment Priority:</strong> Current Due will be paid first, then remaining balance will be applied to Brought-Forward.
                                         </div>
                                         @endif
                                     </div>
