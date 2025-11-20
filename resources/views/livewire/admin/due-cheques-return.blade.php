@@ -58,10 +58,10 @@
                                 </td>
                                 <td class="text-center d-flex justify-content-center gap-2">
                                     @if($cheque->status === 'return')
-                                    <button wire:click="openReentryModal({{ $cheque->id }})" class="btn btn-sm btn-primary rounded-pill px-3 transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
+                                    <button wire:click="openReentryModal({{ $cheque->id }})" class="btn btn-sm btn-primary rounded-pill px-3 transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white; font-size:11px;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
                                         <i class="bi bi-redo me-1"></i>Re-entry
                                     </button>
-                                    <button wire:click="openCompleteModal({{ $cheque->id }})" class="btn btn-sm btn-success rounded-pill px-3 transition-all hover:shadow" style="background-color: #28a745; border-color: #28a745; color: white;" onmouseover="this.style.backgroundColor='#1e7e34'; this.style.borderColor='#1e7e34';" onmouseout="this.style.backgroundColor='#28a745'; this.style.borderColor='#28a745';">
+                                    <button wire:click="openCompleteModal({{ $cheque->id }})" class="btn btn-sm btn-success rounded-pill px-3 transition-all hover:shadow" style="background-color: #28a745; border-color: #28a745; color: white; font-size:11px;" onmouseover="this.style.backgroundColor='#1e7e34'; this.style.borderColor='#1e7e34';" onmouseout="this.style.backgroundColor='#28a745'; this.style.borderColor='#28a745';">
                                         <i class="bi bi-check-circle me-1"></i>To Complete
                                     </button>
                                     @else
@@ -70,7 +70,7 @@
                                 </td>
                                 <td class="text-center">
                                     <button wire:click="openViewModal({{ $cheque->id }})" class="btn btn-sm btn-primary rounded-pill view-returned-cheque-btn" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
-                                        <i class="bi bi-eye me-1"></i>View
+                                        <i class="bi bi-eye me-1"></i>
                                     </button>
                                 </td>
                             </tr>

@@ -246,7 +246,7 @@ class DuePayments extends Component
                 return;
             }
 
-            $paymentMethod = $cashAmount > 0 && $chequeTotal > 0 ? 'cash+cheque' : ($chequeTotal > 0 ? 'cheque' : 'cash');
+            $paymentMethod = $cashAmount > 0 && $chequeTotal > 0 ? 'cash and cheque' : ($chequeTotal > 0 ? 'cheque' : 'cash');
 
             // Calculate maximum allowed payment based on selections
             $maxAllowedPayment = 0;
@@ -297,6 +297,7 @@ class DuePayments extends Component
                 'sale_id' => null,
                 'customer_id' => $this->paymentId,
                 'amount' => $totalPaid,
+                'payment_method' => $paymentMethod,
                 'due_date' => now(),
                 'status' => $paymentStatus,
                 'payment_reference' => $this->paymentNote,
