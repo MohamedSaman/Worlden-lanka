@@ -106,7 +106,7 @@
                                 </span>
                                 <input type="text"
                                     class="form-control "
-                                    placeholder="Search invoices or customers..."
+                                    placeholder="Search customers or cheque number..."
                                     wire:model.live.debounce.300ms="search"
                                     autocomplete="off">
                             </div>
