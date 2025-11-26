@@ -192,7 +192,7 @@
                                     @if($cheque->status == 'pending')
                                     <div class="d-flex justify-content-center gap-2">
                                         <button wire:click="completePaymentDetails({{ $cheque->id }})" class="btn btn-sm btn-success rounded-pill">Complete</button>
-                                        <button wire:click="returnCheque({{ $cheque->id }})" class="btn btn-sm btn-danger rounded-pill">Return</button>
+                                        <button wire:click="confirmReturn({{ $cheque->id }})" class="btn btn-sm btn-danger rounded-pill">Return</button>
                                     </div>
                                     @elseif($cheque->status == 'return')
                                     <div class="d-flex justify-content-center gap-2">
@@ -203,7 +203,7 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm rounded-pill view-cheque-btn" data-cheque-id="{{ $cheque->id }}">
+                                    <button wire:click="viewCheque({{ $cheque->id }})" class="btn btn-sm rounded-pill">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                 </td>
@@ -489,6 +489,27 @@
         </div>
     </div>
 
+    <!-- Confirm Return Modal -->
+    <div wire:ignore.self class="modal fade" id="confirm-return-modal" tabindex="-1" aria-labelledby="confirm-return-modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header text-white p-3" style="background: linear-gradient(90deg, #9d1c20 0%, #ef4444 100%);">
+                    <h5 class="modal-title fw-bold" id="confirm-return-modal-label">
+                        <i class="bi bi-exclamation-circle me-2"></i> Confirm Return Cheque
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="mb-0">Are you sure you want to mark this cheque as returned? This will record the returned amount and create a return record.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" wire:click="returnChequeConfirmed" class="btn btn-danger rounded-pill">Yes, Return Cheque</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Extend Due Date Modal -->
     <div wire:ignore.self class="modal fade" id="extend-due-modal" tabindex="-1" aria-labelledby="extend-due-modal-label" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -551,8 +572,8 @@
             </div>
         </div>
     </div>
-    <!-- Cheque view model -->
-    <div class="modal fade" id="chequeDetailsModal" tabindex="-1" aria-labelledby="chequeDetailsModalLabel" aria-hidden="true">
+    <!-- Cheque view modal -->
+    <div wire:ignore.self class="modal fade" id="chequeDetailsModal" tabindex="-1" aria-labelledby="chequeDetailsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header" style="background-color: #eff6ff;">
@@ -560,38 +581,38 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    @forelse($duePayments as $cheque)
+                    @if($selectedCheque)
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="fw-semibold text-muted">Invoice Number</label>
-                            <p class="fw-bold">{{ $cheque->payment->sale->invoice_number ?? 'N/A' }}</p>
+                            <p class="fw-bold">{{ $selectedCheque->payment->sale->invoice_number ?? 'N/A' }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="fw-semibold text-muted">Customer Name</label>
-                            <p class="fw-bold">{{ $cheque->customer->name ?? 'N/A' }}</p>
+                            <p class="fw-bold">{{ $selectedCheque->customer->name ?? 'N/A' }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="fw-semibold text-muted">Cheque Number</label>
-                            <p class="fw-bold">{{ $cheque->cheque_number ?? 'N/A' }}</p>
+                            <p class="fw-bold">{{ $selectedCheque->cheque_number ?? 'N/A' }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="fw-semibold text-muted">Cheque Amount</label>
-                            <p class="fw-bold">Rs. {{ number_format($cheque->cheque_amount ?? 0, 2) }}</p>
+                            <p class="fw-bold">Rs. {{ number_format($selectedCheque->cheque_amount ?? 0, 2) }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="fw-semibold text-muted">Cheque Date</label>
-                            <p class="fw-bold">{{ $cheque->cheque_date?->format('d/m/Y') ?? 'N/A' }}</p>
+                            <p class="fw-bold">{{ $selectedCheque->cheque_date?->format('d/m/Y') ?? 'N/A' }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="fw-semibold text-muted">Status</label>
-                            <p class="fw-bold {{ $cheque->status === 'pending' ? 'text-warning' : ($cheque->status === 'complete' ? 'text-success' : 'text-danger') }}">
-                                {{ ucfirst($cheque->status ?? 'Pending') }}
+                            <p class="fw-bold {{ $selectedCheque->status === 'pending' ? 'text-warning' : ($selectedCheque->status === 'complete' ? 'text-success' : 'text-danger') }}">
+                                {{ ucfirst($selectedCheque->status ?? 'Pending') }}
                             </p>
                         </div>
                     </div>
-                    @empty
-                    <p class="text-muted">No due cheques found.</p>
-                    @endforelse
+                    @else
+                    <p class="text-muted">No cheque selected.</p>
+                    @endif
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Close</button>

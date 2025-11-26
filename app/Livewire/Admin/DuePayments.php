@@ -248,21 +248,6 @@ class DuePayments extends Component
 
             $paymentMethod = $cashAmount > 0 && $chequeTotal > 0 ? 'cash and cheque' : ($chequeTotal > 0 ? 'cheque' : 'cash');
 
-            // Calculate maximum allowed payment based on selections
-            $maxAllowedPayment = 0;
-            if ($this->applyToCurrent) {
-                $maxAllowedPayment += $this->currentDueAmount;
-            }
-            if ($this->applyToBackForward) {
-                $maxAllowedPayment += max(0, $this->backForwardAmount);
-            }
-
-            if ($totalPaid > $maxAllowedPayment) {
-                DB::rollBack();
-                $this->js("Swal.fire('Error', 'Total payment (Rs." . number_format($totalPaid, 2) . ") exceeds selected due amount (Rs." . number_format($maxAllowedPayment, 2) . ").', 'error')");
-                return;
-            }
-
             // Get a valid sale_id
             $saleId = null;
             $customerAccountWithSale = CustomerAccount::where('customer_id', $this->paymentId)
@@ -323,6 +308,7 @@ class DuePayments extends Component
                     'back_forward_amount' => $this->backForwardAmount,
                     'total_due' => $this->backForwardAmount,
                     'paid_due' => 0,
+                    'advance_amount' => 0,
                 ]);
                 $customerAccounts = collect([$customerAccount]);
             }
@@ -336,17 +322,49 @@ class DuePayments extends Component
                     'back_forward_amount' => $this->backForwardAmount,
                     'total_due' => $this->currentDueAmount + $this->backForwardAmount,
                     'paid_due' => 0,
+                    'advance_amount' => 0,
                 ]);
                 $customerAccounts = collect([$customerAccount]);
             }
 
             $remainingPayment = $totalPaid;
 
-            // PRIORITY LOGIC: When both are selected, always pay Current Due first, then Brought-Forward
+            // PRIORITY LOGIC: When both are selected, always pay Brought-Forward FIRST, then Current Due
             // When only one is selected, pay that specific type
 
-            // Step 1: Apply to Current Due (if selected or when both are selected)
-            if ($this->applyToCurrent || ($this->applyToCurrent && $this->applyToBackForward)) {
+            // Step 1: Apply to Brought-Forward FIRST (if selected or when both are selected)
+            if ($this->applyToBackForward || ($this->applyToCurrent && $this->applyToBackForward)) {
+                foreach ($customerAccounts as $acc) {
+                    if ($remainingPayment <= 0) {
+                        break;
+                    }
+
+                    $backForwardDue = max(0, floatval($acc->back_forward_amount));
+                    if ($backForwardDue > 0) {
+                        $payForBackForward = min($backForwardDue, $remainingPayment);
+                        $newBackForward = max(0, $backForwardDue - $payForBackForward);
+                        $newTotalDue = max(0, floatval($acc->current_due_amount) + $newBackForward);
+                        $status = $newTotalDue == 0 ? 'Paid' : 'Partial';
+
+                        $acc->update([
+                            'paid_due' => DB::raw("paid_due + {$payForBackForward}"),
+                            'back_forward_amount' => $newBackForward,
+                            'total_due' => $newTotalDue,
+                            'due_payment_method' => $paymentMethod,
+                            'status' => $status,
+                            'payment_date' => now(),
+                        ]);
+
+                        $remainingPayment -= $payForBackForward;
+                    }
+                }
+            }
+
+            // Step 2: Apply to Current Due (if selected and there's remaining payment)
+            // This runs when: only current is selected, OR both are selected and there's remaining payment after paying back-forward
+            if (($this->applyToCurrent && !$this->applyToBackForward) ||
+                ($this->applyToCurrent && $this->applyToBackForward && $remainingPayment > 0)
+            ) {
                 foreach ($customerAccounts as $acc) {
                     if ($remainingPayment <= 0) {
                         break;
@@ -381,58 +399,39 @@ class DuePayments extends Component
                 }
             }
 
-            // Step 2: Apply to Brought-Forward (if selected and there's remaining payment)
-            // This runs when: only back-forward is selected, OR both are selected and there's remaining payment
-            if (($this->applyToBackForward && !$this->applyToCurrent) ||
-                ($this->applyToCurrent && $this->applyToBackForward && $remainingPayment > 0)
-            ) {
-                foreach ($customerAccounts as $acc) {
-                    if ($remainingPayment <= 0) {
-                        break;
-                    }
-
-                    $backForwardDue = max(0, floatval($acc->back_forward_amount));
-                    if ($backForwardDue > 0) {
-                        $payForBackForward = min($backForwardDue, $remainingPayment);
-                        $newBackForward = max(0, $backForwardDue - $payForBackForward);
-                        $newTotalDue = max(0, floatval($acc->current_due_amount) + $newBackForward);
-                        $status = $newTotalDue == 0 ? 'Paid' : 'Partial';
-
-                        $acc->update([
-                            'paid_due' => DB::raw("paid_due + {$payForBackForward}"),
-                            'back_forward_amount' => $newBackForward,
-                            'total_due' => $newTotalDue,
-                            'due_payment_method' => $paymentMethod,
-                            'status' => $status,
-                            'payment_date' => now(),
-                        ]);
-
-                        $remainingPayment -= $payForBackForward;
-                    }
-                }
-            }
-
-            // Handle overpayment as advance (should rarely happen with validation)
+            // Step 3: Handle overpayment as advance amount
             if ($remainingPayment > 0) {
-                $lastAccount = CustomerAccount::where('customer_id', $this->paymentId)->latest()->first();
+                $lastAccount = CustomerAccount::where('customer_id', $this->paymentId)
+                    ->orderBy('updated_at', 'desc')
+                    ->first();
+                
                 if ($lastAccount) {
-                    $newBackForward = $lastAccount->back_forward_amount - $remainingPayment;
-                    $newTotalDue = max(0, $lastAccount->current_due_amount + $newBackForward);
+                    // Add to existing advance amount
+                    $newAdvanceAmount = ($lastAccount->advance_amount ?? 0) + $remainingPayment;
                     $lastAccount->update([
-                        'back_forward_amount' => $newBackForward,
-                        'total_due' => $newTotalDue,
+                        'advance_amount' => $newAdvanceAmount,
+                        'notes' => ($lastAccount->notes ? $lastAccount->notes . "\n" : '') .
+                            "Advance payment of Rs." . number_format($remainingPayment, 2) . " received on " . now()->format('Y-m-d H:i:s'),
                     ]);
                 } else {
+                    // Create new account for advance
                     CustomerAccount::create([
                         'customer_id' => $this->paymentId,
                         'sale_id' => null,
-                        'back_forward_amount' => -$remainingPayment,
+                        'back_forward_amount' => 0,
                         'current_due_amount' => 0,
                         'paid_due' => 0,
                         'total_due' => 0,
-                        'notes' => 'Excess payment from due collection on ' . now()->format('Y-m-d H:i:s'),
+                        'advance_amount' => $remainingPayment,
+                        'notes' => 'Advance payment of Rs.' . number_format($remainingPayment, 2) . ' received on ' . now()->format('Y-m-d H:i:s'),
                     ]);
                 }
+
+                // Show success message with advance amount info
+                $this->dispatch('showAdvancePayment', [
+                    'amount' => $remainingPayment,
+                    'customerName' => $this->paymentDetail->name
+                ]);
             }
 
             // Save cheques with payment_id
@@ -448,7 +447,7 @@ class DuePayments extends Component
                 ]);
             }
 
-            // Add notes to the last updated account
+            // Add notes to the last updated account (excluding advance notes already added)
             if ($this->paymentNote) {
                 $lastUpdatedAccount = CustomerAccount::where('customer_id', $this->paymentId)
                     ->orderBy('updated_at', 'desc')
@@ -473,7 +472,13 @@ class DuePayments extends Component
             DB::commit();
 
             $this->dispatch('closeModal', 'payment-detail-modal');
-            $this->js("Swal.fire('Success', 'Payment submitted successfully.', 'success')");
+            
+            // Show different success message if there was an advance payment
+            if ($remainingPayment > 0) {
+                $this->js("Swal.fire('Success', 'Payment submitted successfully. Advance amount of Rs." . number_format($remainingPayment, 2) . " has been recorded.', 'success')");
+            } else {
+                $this->js("Swal.fire('Success', 'Payment submitted successfully.', 'success')");
+            }
 
             $this->reset([
                 'paymentDetail',

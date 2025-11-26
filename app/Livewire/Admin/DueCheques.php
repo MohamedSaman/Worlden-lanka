@@ -5,6 +5,7 @@ namespace App\Livewire\Admin;
 use App\Models\Cheque;
 use App\Models\Payment;
 use App\Models\Sale;
+use App\Models\ReturnCheque;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -37,6 +38,9 @@ class DueCheques extends Component
     public $extendDuePaymentId;
     public $newDueDate;
     public $extensionReason = '';
+    // ID of the cheque awaiting return confirmation
+    public $returningChequeId = null;
+    public $selectedCheque = null;
 
     // Statistics properties
     public $pendingChequeCount = 0;
@@ -67,13 +71,13 @@ class DueCheques extends Component
                 $query->whereHas('payment.sale', function ($q) {
                     $q->where('user_id', auth()->id());
                 })
-                // OR include cheques with pending status (even if sale_id is null)
-                ->orWhere(function ($q) {
-                    $q->where('status', 'pending')
-                      ->whereHas('payment', function ($paymentQuery) {
-                          $paymentQuery->whereNull('sale_id');
-                      });
-                });
+                    // OR include cheques with pending status (even if sale_id is null)
+                    ->orWhere(function ($q) {
+                        $q->where('status', 'pending')
+                            ->whereHas('payment', function ($paymentQuery) {
+                                $paymentQuery->whereNull('sale_id');
+                            });
+                    });
             });
 
         $filteredQuery = clone $baseQuery;
@@ -147,6 +151,32 @@ class DueCheques extends Component
         }
     }
 
+    public function confirmReturn($chequeId)
+    {
+        $this->returningChequeId = $chequeId;
+        $this->dispatch('openModal', 'confirm-return-modal');
+    }
+
+    public function returnChequeConfirmed()
+    {
+        if (!$this->returningChequeId) {
+            $this->dispatch('showToast', [
+                'type' => 'error',
+                'message' => 'No cheque selected to return.'
+            ]);
+            return;
+        }
+
+        // Call existing returnCheque logic
+        $chequeId = $this->returningChequeId;
+        $this->returningChequeId = null;
+
+        $this->returnCheque($chequeId);
+
+        // Close confirmation modal
+        $this->dispatch('closeModal', 'confirm-return-modal');
+    }
+
     public function returnCheque($chequeId)
     {
         try {
@@ -162,6 +192,22 @@ class DueCheques extends Component
             $cheque->update([
                 'status' => 'return',
             ]);
+
+            // Create or update a return_cheques record to record the returned amount
+            try {
+                ReturnCheque::firstOrCreate(
+                    ['cheque_id' => $cheque->id],
+                    [
+                        'customer_id' => $cheque->customer_id,
+                        'cheque_amount' => $cheque->cheque_amount,
+                        'balance_amount' => $cheque->cheque_amount,
+                        'status' => 'pending',
+                    ]
+                );
+            } catch (Exception $e) {
+                // If return record creation fails, log but continue to allow transaction rollback by outer catch
+                Log::error('Failed to create return_cheque record: ' . $e->getMessage());
+            }
 
             // Add a note to the related sale if it exists
             if ($cheque->payment && $cheque->payment->sale) {
@@ -188,6 +234,28 @@ class DueCheques extends Component
         }
     }
 
+    public function viewCheque($chequeId)
+    {
+        try {
+            $this->selectedCheque = Cheque::with(['customer', 'payment.sale'])->find($chequeId);
+            if (!$this->selectedCheque) {
+                $this->dispatch('showToast', [
+                    'type' => 'error',
+                    'message' => 'Cheque not found.'
+                ]);
+                return;
+            }
+
+            $this->dispatch('openModal', 'chequeDetailsModal');
+        } catch (Exception $e) {
+            Log::error('Failed to load cheque for view: ' . $e->getMessage());
+            $this->dispatch('showToast', [
+                'type' => 'error',
+                'message' => 'Failed to load cheque details.'
+            ]);
+        }
+    }
+
     public function render()
     {
         $baseQuery = Cheque::with(['customer', 'payment.sale'])
@@ -196,8 +264,8 @@ class DueCheques extends Component
                 $query->whereHas('payment.sale', function ($q) {
                     $q->where('user_id', auth()->id());
                 })
-                // OR include all cheques with pending status (even if sale_id is null)
-                ->orWhere('status', 'pending');
+                    // OR include all cheques with pending status (even if sale_id is null)
+                    ->orWhere('status', 'pending');
             });
 
         $filteredQuery = clone $baseQuery;
@@ -207,15 +275,15 @@ class DueCheques extends Component
             $filteredQuery->where(function ($q) {
                 $q->whereHas('customer', function ($q2) {
                     $q2->where('name', 'like', "%{$this->search}%")
-                      ->orWhere('phone', 'like', "%{$this->search}%");
+                        ->orWhere('phone', 'like', "%{$this->search}%");
                 })
-                ->orWhere('cheque_number', 'like', "%{$this->search}%")
-                ->orWhereHas('payment.sale', function ($q2) {
-                    $q2->where('invoice_number', 'like', "%{$this->search}%");
-                });
+                    ->orWhere('cheque_number', 'like', "%{$this->search}%")
+                    ->orWhereHas('payment.sale', function ($q2) {
+                        $q2->where('invoice_number', 'like', "%{$this->search}%");
+                    });
             });
         }
-        
+
         // Show cheques based on status filter
         if ($this->filters['status']) {
             if ($this->filters['status'] === 'null') {
@@ -226,7 +294,7 @@ class DueCheques extends Component
         } else {
             // Show all statuses including pending, complete, return, and null
             $filteredQuery->whereIn('status', ['pending', 'complete', 'return'])
-                         ->orWhereNull('status');
+                ->orWhereNull('status');
         }
 
         // Date range filter

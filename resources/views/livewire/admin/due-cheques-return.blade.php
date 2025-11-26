@@ -21,55 +21,61 @@
         <div class="col-12">
             <div class="card animate-slide-in">
                 <!-- Table Content -->
+                <div class="card-body border-bottom" style="background-color: #f8f9fa;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">Returned Cheques</h5>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <input type="text" class="form-control me-2" placeholder="Search by customer or cheque number" wire:model.debounce.500ms="search" style="width:320px;">
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-modern">
                     <table class="table table-hover mb-0">
                         <thead>
                             <tr>
-                                <th>Cheque No</th>
-                                <th>Bank</th>
+                                <th>Return Cheque No</th>
                                 <th>Customer Name</th>
-                                <th class="text-end">Amount</th>
-                                <th class="text-center">Cheque Date</th>
+                                <th class="text-end">Return Amount</th>
+                                <th class="text-end">Paid Amount</th>
+                                <th class="text-end">Balance</th>
                                 <th class="text-center">Status</th>
                                 <th class="text-center">Action</th>
                                 <th class="text-center">View</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($chequeDetails as $cheque)
+                            @forelse ($returnCheques as $rc)
                             <tr>
                                 <td>
-                                    <span class="fw-bold text-primary-custom">#{{ $cheque->cheque_number }}</span>
+                                    <span class="fw-bold text-primary-custom">#{{ $rc->cheque ? $rc->cheque->cheque_number : ($rc->cheque_id ? '#'.$rc->cheque_id : 'N/A') }}</span>
                                 </td>
                                 <td>
-                                    <div class="fw-semibold">{{ $cheque->bank_name }}</div>
-                                </td>
-                                <td>
-                                    <div class="fw-semibold">{{ $cheque->customer ? $cheque->customer->name : 'N/A' }}</div>
+                                    <div class="fw-semibold">{{ $rc->customer ? $rc->customer->name : 'N/A' }}</div>
                                 </td>
                                 <td class="text-end">
-                                    <span class="fw-bold">Rs. {{ number_format($cheque->cheque_amount, 2) }}</span>
+                                    <span class="fw-bold">Rs. {{ number_format($rc->cheque_amount, 2) }}</span>
                                 </td>
-                                <td class="text-center">{{ $cheque->cheque_date ? \Carbon\Carbon::parse($cheque->cheque_date)->format('d/m/Y') : 'N/A' }}</td>
+                                <td class="text-end">
+                                    <span>Rs. {{ number_format($rc->paid_amount ?? 0, 2) }}</span>
+                                </td>
+                                <td class="text-end">
+                                    <span class="fw-bold">Rs. {{ number_format($rc->balance_amount, 2) }}</span>
+                                </td>
                                 <td class="text-center">
-                                    <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger px-3 py-2">
-                                        {{ ucfirst($cheque->status) }}
+                                    <span class="badge rounded-pill {{ $rc->status === 'complete' ? 'bg-success bg-opacity-10 text-success' : ($rc->status === 'partial' ? 'bg-warning bg-opacity-10 text-warning' : 'bg-danger bg-opacity-10 text-danger') }} px-3 py-2">
+                                        {{ ucfirst($rc->status ?? 'pending') }}
                                     </span>
                                 </td>
                                 <td class="text-center d-flex justify-content-center gap-2">
-                                    @if($cheque->status === 'return')
-                                    <button wire:click="openReentryModal({{ $cheque->id }})" class="btn btn-sm btn-primary rounded-pill px-3 transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white; font-size:11px;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
-                                        <i class="bi bi-redo me-1"></i>Re-entry
+                                    <button wire:click="openReceiveModal({{ $rc->id }})" class="btn btn-sm btn-primary rounded-pill px-3 transition-all hover:shadow" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white; font-size:11px;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
+                                        <i class="bi bi-cash-stack me-1"></i>Receive
                                     </button>
-                                    <button wire:click="openCompleteModal({{ $cheque->id }})" class="btn btn-sm btn-success rounded-pill px-3 transition-all hover:shadow" style="background-color: #28a745; border-color: #28a745; color: white; font-size:11px;" onmouseover="this.style.backgroundColor='#1e7e34'; this.style.borderColor='#1e7e34';" onmouseout="this.style.backgroundColor='#28a745'; this.style.borderColor='#28a745';">
-                                        <i class="bi bi-check-circle me-1"></i>To Complete
-                                    </button>
-                                    @else
-                                    <span class="badge rounded-pill bg-success bg-opacity-10 text-success px-3 py-2">Processed</span>
-                                    @endif
                                 </td>
                                 <td class="text-center">
-                                    <button wire:click="openViewModal({{ $cheque->id }})" class="btn btn-sm btn-primary rounded-pill view-returned-cheque-btn" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
+                                    <button wire:click="openViewModal({{ $rc->cheque_id ?? $rc->id }})" class="btn btn-sm btn-primary rounded-pill view-returned-cheque-btn" style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
                                         <i class="bi bi-eye me-1"></i>
                                     </button>
                                 </td>
@@ -142,6 +148,126 @@
                     <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium transition-all hover:shadow" data-bs-dismiss="modal" style="background-color: #6B7280; border-color: #6B7280; color: white;">
                         <i class="bi bi-x me-1"></i>Close
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receive Payment Modal -->
+    <div wire:ignore.self class="modal fade" id="receiveModal" tabindex="-1" aria-labelledby="receiveModalLabel" aria-hidden="true" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid #9d1c20; background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                <div class="modal-header py-3 px-4" style="background-color: #9d1c20; color: white;">
+                    <h5 class="modal-title fw-bold tracking-tight" id="receiveModalLabel">
+                        <i class="bi bi-cash-stack me-2"></i>Receive Payment
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white opacity-75 hover:opacity-100" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="row g-0">
+                        <div class="col-md-4 bg-light p-4 border-end">
+                            @if($originalReturnCheque)
+                            <h6 class="text-uppercase text-sm fw-semibold mb-3" style="color: #9d1c20;">Return Cheque</h6>
+                            <p class="mb-1"><strong>Customer:</strong> {{ $originalReturnCheque->customer ? $originalReturnCheque->customer->name : 'N/A' }}</p>
+                            <p class="mb-1"><strong>Original Cheque:</strong> {{ $originalReturnCheque->cheque ? $originalReturnCheque->cheque->cheque_number : ($originalReturnCheque->cheque_id ?? 'N/A') }}</p>
+                            <p class="mb-1"><strong>Return Amount:</strong> Rs. {{ number_format($originalReturnCheque->cheque_amount ?? 0, 2) }}</p>
+                            <p class="mb-1"><strong>Paid:</strong> Rs. {{ number_format($originalReturnCheque->paid_amount ?? 0, 2) }}</p>
+                            <p class="mb-0"><strong>Balance:</strong> Rs. {{ number_format($originalReturnCheque->balance_amount ?? 0, 2) }}</p>
+                            <hr />
+                            <div><small class="text-muted">Notes</small>
+                                <div class="mt-2" style="white-space:pre-wrap">{{ $originalReturnCheque->notes ?? '-' }}</div>
+                            </div>
+                            @endif
+                        </div>
+
+                        <div class="col-md-8 p-4">
+                            <h6 class="text-uppercase text-sm fw-semibold mb-3" style="color: #9d1c20;">Receive Payment</h6>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-medium">Cash Amount</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">Rs.</span>
+                                    <input type="number" class="form-control" wire:model="receiveCashAmount" step="0.01">
+                                </div>
+                                @error('receiveCashAmount') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                            </div>
+
+                            <hr />
+
+                            <h6 class="mb-2">Add Cheque(s)</h6>
+                            <div class="row g-2 align-items-end">
+                                <div class="col-md-6">
+                                    <label class="form-label">Cheque Number</label>
+                                    <input type="text" class="form-control" wire:model="receiveChequeNumber">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Bank</label>
+                                    <input type="text" class="form-control" wire:model="receiveBankName">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" class="form-control" wire:model="receiveChequeDate">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Amount</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">Rs.</span>
+                                        <input type="number" class="form-control" wire:model="receiveAmount" step="0.01">
+                                    </div>
+                                </div>
+                                <div class="col-md-1 text-end">
+                                    <button type="button" wire:click.prevent="addReceiveCheque" class="btn btn-primary">Add</button>
+                                </div>
+                            </div>
+
+                            @if(!empty($receiveCheques))
+                            <div class="card mt-3">
+                                <div class="card-body p-3">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Cheque No</th>
+                                                    <th>Bank</th>
+                                                    <th>Date</th>
+                                                    <th class="text-end">Amount</th>
+                                                    <th class="text-center">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($receiveCheques as $i => $c)
+                                                <tr>
+                                                    <td>{{ $c['number'] }}</td>
+                                                    <td>{{ $c['bank'] }}</td>
+                                                    <td>{{ \Carbon\Carbon::parse($c['date'])->format('d/m/Y') }}</td>
+                                                    <td class="text-end">Rs. {{ number_format($c['amount'],2) }}</td>
+                                                    <td class="text-center"><button wire:click.prevent="removeReceiveCheque({{ $i }})" class="btn btn-sm btn-danger">Remove</button></td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                                    <td class="text-end"><strong>Rs. {{ number_format((array_sum(array_column($receiveCheques, 'amount')) ?? 0) + ($receiveCashAmount ?? 0),2) }}</strong></td>
+                                                    <td></td>
+                                                </tr>
+                                            </tfoot>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+
+                            <div class="mb-3 mt-3">
+                                <label class="form-label">Note</label>
+                                <textarea class="form-control" wire:model="receiveNote" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer py-3 px-4 d-flex justify-content-end gap-3" style="border-top: 1px solid #9d1c20; background: #f8f9fa;">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4 fw-medium" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" wire:click="submitReceivePayment" class="btn btn-success rounded-pill px-4 fw-medium">Submit Payment</button>
                 </div>
             </div>
         </div>
@@ -395,6 +521,7 @@
         let reentryModal = new bootstrap.Modal(document.getElementById('reentry-modal'));
         let completeModal = new bootstrap.Modal(document.getElementById('complete-modal'));
         let viewModal = new bootstrap.Modal(document.getElementById('viewChequeModal'));
+        let receiveModal = new bootstrap.Modal(document.getElementById('receiveModal'));
 
         @this.on('open-reentry-modal', () => {
             reentryModal.show();
@@ -414,6 +541,14 @@
 
         @this.on('open-view-modal', () => {
             viewModal.show();
+        });
+
+        @this.on('open-receive-modal', () => {
+            receiveModal.show();
+        });
+
+        @this.on('close-receive-modal', () => {
+            receiveModal.hide();
         });
 
         @this.on('close-view-modal', () => {

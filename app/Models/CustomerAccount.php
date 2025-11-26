@@ -16,6 +16,7 @@ class CustomerAccount extends Model
         'current_due_amount',
         'paid_due',
         'total_due',
+        'advance_amount'
     ];
 
     // A CustomerAccount belongs to a Customer

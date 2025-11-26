@@ -57,4 +57,12 @@ class Cheque extends Model
     {
         return $this->belongsTo(Payment::class);
     }
+
+    /**
+     * Get the return cheque record associated with this cheque (if any).
+     */
+    public function returnCheque()
+    {
+        return $this->hasOne(ReturnCheque::class, 'cheque_id');
+    }
 }

@@ -19,7 +19,7 @@
         <div class="col-xl-3 col-md-6">
             <div class="stat-card primary animate-fade-in">
 
-                <div class="stat-label">Total Due Payments</div>
+                <div class="stat-label">Total Current Due Payments</div>
                 <div class="stat-value">{{ number_format($duePaymentsCount) }}</div>
             </div>
         </div>
