@@ -29,6 +29,7 @@ use App\Http\Controllers\WatchesExportController;
 use App\Livewire\Admin\BackForward;
 use App\Livewire\Admin\Bill;
 use App\Livewire\Admin\Category;
+use App\Livewire\Admin\CreatePurchase;
 use App\Livewire\Admin\DueCheques;
 use App\Livewire\Admin\Products;
 use App\Livewire\Admin\DueChequesReturn;
@@ -91,6 +92,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('/product-re-entry', ProductReEntry::class)->name('product-reentry');
         Route::get('/back-forward', BackForward::class)->name('back-forward');
         Route::get('/bill', Bill::class)->name('bill');
+        Route::get('/create-purchase',CreatePurchase::class)->name('create-purchase');
+
     });
 
 

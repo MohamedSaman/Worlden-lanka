@@ -386,13 +386,7 @@ class DuePayments extends Component
                             'payment_date' => now(),
                         ]);
 
-                        // Update associated sale if exists
-                        if ($acc->sale_id) {
-                            $sale = Sale::find($acc->sale_id);
-                            if ($sale) {
-                                $sale->update(['due_amount' => $newCurrentDue]);
-                            }
-                        }
+                    
 
                         $remainingPayment -= $payForCurrent;
                     }

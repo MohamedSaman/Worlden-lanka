@@ -525,6 +525,12 @@
                     </div>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link py-2 {{ request()->routeIs('admin.create-purchase') ? 'active' : '' }}"
+                        href="{{ route('admin.create-purchase') }}">
+                        <i class="bi bi-cart-plus"></i> <span>Create Purchase</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link py-2 {{ request()->routeIs('admin.product-stocks') ? 'active' : '' }}"
                         href="{{ route('admin.product-stocks') }}">
                         <i class="bi bi-shield-lock"></i> <span>Product Stock</span>

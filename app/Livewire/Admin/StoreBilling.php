@@ -16,6 +16,7 @@ use Livewire\WithFileUploads;
 use App\Models\AdminSale;
 use App\Models\CustomerAccount;
 use App\Models\ProductDetail;
+use App\Models\ProductStock;
 use App\Models\SalesItem;
 
 #[Title("Store Billing")]
@@ -813,34 +814,59 @@ class StoreBilling extends Component
                     ]);
                 }
             } else {
-                Payment::create([
-                    'sale_id'         => $sale->id,
-                    'admin_sale_id'   => $adminSale->id,
-                    'amount'          => $actualDueAmount,
-                    'payment_method'  => 'credit',
-                    'is_completed'    => false,
-                    'status'          => null,
-                    'due_date'        => $this->balanceDueDate ?? now()->addDays(7),
-                ]);
-
-                $account = CustomerAccount::where('customer_id', $this->customerId)->first();
-
-                if ($account) {
-                    $oldCurrentDue = floatval($account->current_due_amount ?? 0);
-                    $account->current_due_amount = $oldCurrentDue + $actualDueAmount;
-                    $account->total_due = floatval($account->back_forward_amount ?? 0) + $account->current_due_amount;
-                    $account->sale_id = $sale->id;
-                    $account->save();
-                } else {
-                    CustomerAccount::create([
-                        'customer_id'         => $this->customerId,
-                        'sale_id'             =>null,
+                // Adjust due using any existing advance in the customer account BEFORE creating the due payment.
+                $account = CustomerAccount::firstOrCreate(
+                    ['customer_id' => $this->customerId],
+                    [
+                        'sale_id' => null,
                         'back_forward_amount' => 0,
-                        'current_due_amount'  => $actualDueAmount,
-                        'paid_due'            => 0,
-                        'total_due'           => $actualDueAmount,
-                    ]);
+                        'current_due_amount' => 0,
+                        'paid_due' => 0,
+                        'total_due' => 0,
+                        'advance_amount' => 0,
+                    ]
+                );
+
+                $dueToAdd = floatval($actualDueAmount);
+
+                // Consume any advance_amount first and update sale due accordingly
+                $advance = floatval($account->advance_amount ?? 0);
+                if ($advance > 0) {
+                    if ($advance >= $dueToAdd) {
+                        // Fully covered by advance -> sale due becomes 0
+                        $account->advance_amount = $advance - $dueToAdd;
+                        $dueToAdd = 0;
+                    } else {
+                        // Partially cover -> reduce due and zero advance
+                        $dueToAdd -= $advance;
+                        $account->advance_amount = 0;
+                    }
                 }
+
+                // Update sale due_amount to reflect consumption of advance
+                $sale->due_amount = $dueToAdd;
+                $sale->save();
+
+                // Only create a due Payment record if there is a remaining due
+                if ($dueToAdd > 0) {
+                    Payment::create([
+                        'sale_id'         => $sale->id,
+                        'admin_sale_id'   => $adminSale->id,
+                        'amount'          => $dueToAdd,
+                        'payment_method'  => 'credit',
+                        'is_completed'    => false,
+                        'status'          => null,
+                        'due_date'        => $this->balanceDueDate ?? now()->addDays(7),
+                    ]);
+
+                    // Add remaining due to customer's current_due_amount
+                    $account->current_due_amount = floatval($account->current_due_amount ?? 0) + $dueToAdd;
+                }
+
+                // Recalculate total_due (back_forward + current)
+                $account->total_due = floatval($account->back_forward_amount ?? 0) + floatval($account->current_due_amount ?? 0);
+                $account->sale_id = $sale->id;
+                $account->save();
             }
 
             DB::commit();

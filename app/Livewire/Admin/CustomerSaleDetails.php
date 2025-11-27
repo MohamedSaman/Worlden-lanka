@@ -20,6 +20,9 @@ class CustomerSaleDetails extends Component
 
     public $modalData = null;
     public $search = ''; // Added search property
+    protected $listeners = [
+        'refreshCustomerAccounts' => 'onRefreshCustomerAccounts',
+    ];
     // Note: printing now targets only the currently visible table page
 
     public function viewSaleDetails($customerId)
@@ -86,7 +89,9 @@ class CustomerSaleDetails extends Component
             ->select(
                 DB::raw('SUM(total_due) as total_due'),
                 DB::raw('SUM(current_due_amount) as current_due'),
-                DB::raw('SUM(back_forward_amount) as back_forward_due')
+                DB::raw('SUM(back_forward_amount) as back_forward_due'),
+                DB::raw('SUM(advance_amount) as advance_amount'),
+                DB::raw('SUM(paid_due) as paid_due')
             )
             ->first();
 
@@ -132,7 +137,7 @@ class CustomerSaleDetails extends Component
                 'sales.invoice_number',
                 'sales.notes',
                 'sales.created_at as sale_date',
-                DB::raw('SUM(sales_items.price * sales_items.quantity - sales_items.discount) as total_invoice_amount'),
+                DB::raw('SUM(sales.total_amount) as total_invoice_amount'),
                 'customers.name as customer_name'
             )
             ->join('sales_items', 'sales.id', '=', 'sales_items.sale_id')
@@ -189,7 +194,11 @@ class CustomerSaleDetails extends Component
         // Build unified invoice summary rows timeline: Brought-Forward first, then Invoices, Returns and Paid ordered by date
         $invoiceSummaryRows = [];
 
-        $bfAmount = ($accountTotals->back_forward_due + $paidForwardSum) ?? 0;
+        // Compute the brought-forward amount used for the timeline row.
+        // Formula (Option B + existing paid-forward sum): (paid_due - total_sales - advance_amount) + paidForwardSum
+        $bfAmount = (floatval($accountTotals->paid_due ?? 0) + floatval($accountTotals->back_forward_due ?? 0) + floatval($accountTotals->current_due ?? 0))  - (floatval($salesSummary->total_due ?? 0) ) ;
+       
+        // dd($accountTotals->paid_due , $salesSummary->total_due ,$accountTotals->advance_amount , $accountTotals->back_forward_due , $bfAmount);
 
         // Collect invoice and payment events with comparable dates
         $events = [];
@@ -259,16 +268,19 @@ class CustomerSaleDetails extends Component
             return $da <=> $db;
         });
 
-        // Start with Brought-Forward due (if any), then the ordered timeline
-        if ($bfAmount && floatval($bfAmount) != 0.0) {
-            $invoiceSummaryRows[] = [
-                'type' => 'broughtforward',
-                'description' => 'Brought-Forward Due',
-                'date' => null,
-                'amount' => floatval($bfAmount),
-            ];
-        }
+        // Always include the Brought-Forward row in the timeline (show zero if none)
+        $invoiceSummaryRows[] = [
+            'type' => 'broughtforward',
+            'description' => 'Brought-Forward Due',
+            'date' => null,
+            'amount' => floatval($bfAmount),
+        ];
         $invoiceSummaryRows = array_merge($invoiceSummaryRows, $events);
+
+        // Compute brought-forward value as: (paid_due - total_sales - advance_amount)
+        $computedBackForward = floatval($accountTotals->paid_due ?? 0) - floatval($salesSummary->total_due ?? 0) - floatval($accountTotals->advance_amount ?? 0) + floatval($accountTotals->back_forward_due ?? 0);
+
+        // dd($computedBackForward, $accountTotals->back_forward_due );
 
         $this->modalData = [
             'customer' => $customer,
@@ -286,12 +298,22 @@ class CustomerSaleDetails extends Component
             'accountTotals' => [
                 'total_due' => $accountTotals->total_due ?? 0,
                 'current_due' => $accountTotals->current_due ?? 0,
-                'back_forward_due' => $accountTotals->back_forward_due ?? 0,
+                // Show computed brought-forward amount in the modal as requested
+                'back_forward_due' => $computedBackForward,
+                'advance_amount' => $accountTotals->advance_amount ?? 0,
             ],
             'invoiceSummaryRows' => $invoiceSummaryRows,
         ];
 
         $this->dispatch('open-customer-sale-details-modal');
+    }
+
+    public function onRefreshCustomerAccounts($customerId)
+    {
+        // If modal is open for the same customer, refresh its data
+        if ($this->modalData && isset($this->modalData['customer']) && $this->modalData['customer']->id == $customerId) {
+            $this->viewSaleDetails($customerId);
+        }
     }
 
     // For print functionality (main table)

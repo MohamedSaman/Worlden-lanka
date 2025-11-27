@@ -74,29 +74,28 @@
                                 <td class="text-sm text-center py-3 text-gray-800" data-label="Total Sales">Rs.{{ number_format($customer->total_sales ?? 0, 2) }}</td>
                                 <td class="text-sm text-center py-3">
                                     <span class="badge"
-                                        style="background-color:#22c55e;
-                                             color: #ffffff; padding: 6px 12px; border-radius: 9999px; font-weight: 600;">
+                                        style="color:#1f8b46ff;
+                                              font-weight: 600; font-size: 14px;">
                                         Rs.{{ number_format($customer->total_paid ?? 0, 2) }}
                                     </span>
                                 </td>
                                 <td class="text-sm text-center py-3">
                                     <span class="badge"
-                                        style="background-color: {{ $customer->total_due > 0 ? '#ef4444' : '#22c55e' }};
-                                             color: #ffffff; padding: 6px 12px; border-radius: 9999px; font-weight: 600;">
+                                        style="color: {{ $customer->total_due > 0 ? '#ef4444' : '#1f8b46ff' }};  font-weight: 600; font-size: 14px;">
                                         Rs.{{ number_format($customer->total_due ?? 0, 2) }}
                                     </span>
                                 </td>
                                 <td class="text-sm text-center py-3">
                                     <span class="badge"
-                                        style="background-color: {{ $customer->total_back_forward_amount > 0 ? '#ef4444' : '#22c55e' }};
-                                             color: #ffffff; padding: 6px 12px; border-radius: 9999px; font-weight: 600;">
+                                        style="color: {{ $customer->total_back_forward_amount > 0 ? '#ef4444' : '#1f8b46ff' }};
+                                             font-weight: 600; font-size: 14px;">
                                         Rs.{{ number_format($customer->total_back_forward_amount ?? 0, 2) }}
                                     </span>
                                 </td>
                                 <td class="text-sm text-center py-3">
                                     <span class="badge"
-                                        style="background-color:#ef4444;
-                                             color: #ffffff; padding: 6px 12px; border-radius: 9999px; font-weight: 600;">
+                                        style="color:#ef4444;
+                                              font-weight: 600; font-size: 14px;">
                                         Rs.{{ number_format(($customer->total_back_forward_amount ?? 0) + ($customer->total_due ?? 0), 2) }}
                                     </span>
                                 </td>
@@ -328,6 +327,10 @@
                                             <tr class="bg-[#f1f5f9] fw-bold">
                                                 <td colspan="3" class="text-end text-gray-800">Balance Total Due Amount</td>
                                                 <td class="text-end text-gray-800">{{ number_format($adjustedBalance, 2) }}</td>
+                                            </tr>
+                                            <tr class="fw-semibold">
+                                                <td colspan="3" class="text-end text-gray-800">Advance Payment Amount</td>
+                                                <td class="text-end text-gray-800 text-success">{{ number_format($modalData['accountTotals']['advance_amount'] ?? 0, 2) }}</td>
                                             </tr>
                                         </tbody>
                                     </table>

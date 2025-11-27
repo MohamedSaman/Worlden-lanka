@@ -331,7 +331,7 @@
                                         @if($applyToCurrent && $applyToBackForward)
                                         <div class="alert alert-success mt-2 small">
                                             <i class="bi bi-arrow-right-circle me-1"></i>
-                                            <strong>Payment Priority:</strong> Current Due will be paid first, then remaining balance will be applied to Brought-Forward.
+                                            <strong>Payment Priority:</strong>Brought-Forward  will be paid first, then remaining balance will be applied to Current Due.
                                         </div>
                                         @endif
                                     </div>
