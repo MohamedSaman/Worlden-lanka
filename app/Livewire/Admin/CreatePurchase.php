@@ -312,7 +312,7 @@ class CreatePurchase extends Component
             DB::commit();
 
             // Notify other components to refresh customer account/modal data
-            $this->emit('refreshCustomerAccounts', $this->selectedCustomer->id);
+            $this->dispatch('refreshCustomerAccounts', $this->selectedCustomer->id);
 
             // Reset form
             $this->cart = [];

@@ -40,7 +40,14 @@ class DueCheques extends Component
     public $extensionReason = '';
     // ID of the cheque awaiting return confirmation
     public $returningChequeId = null;
+    // ID of the cheque awaiting complete confirmation
+    public $completingChequeId = null;
     public $selectedCheque = null;
+
+    // Edit mode properties
+    public $isEditingCheque = false;
+    public $editChequeNumber = '';
+    public $editChequeDate = '';
 
     // Statistics properties
     public $pendingChequeCount = 0;
@@ -151,6 +158,32 @@ class DueCheques extends Component
         }
     }
 
+    public function confirmComplete($chequeId)
+    {
+        $this->completingChequeId = $chequeId;
+        $this->dispatch('openModal', 'confirm-complete-modal');
+    }
+
+    public function completePaymentConfirmed()
+    {
+        if (!$this->completingChequeId) {
+            $this->dispatch('showToast', [
+                'type' => 'error',
+                'message' => 'No cheque selected to complete.'
+            ]);
+            return;
+        }
+
+        // Call existing completePaymentDetails logic
+        $chequeId = $this->completingChequeId;
+        $this->completingChequeId = null;
+
+        $this->completePaymentDetails($chequeId);
+
+        // Close confirmation modal
+        $this->dispatch('closeModal', 'confirm-complete-modal');
+    }
+
     public function confirmReturn($chequeId)
     {
         $this->returningChequeId = $chequeId;
@@ -246,6 +279,7 @@ class DueCheques extends Component
                 return;
             }
 
+            $this->isEditingCheque = false;
             $this->dispatch('openModal', 'chequeDetailsModal');
         } catch (Exception $e) {
             Log::error('Failed to load cheque for view: ' . $e->getMessage());
@@ -254,6 +288,62 @@ class DueCheques extends Component
                 'message' => 'Failed to load cheque details.'
             ]);
         }
+    }
+
+    public function toggleEditCheque()
+    {
+        if (!$this->isEditingCheque && $this->selectedCheque) {
+            $this->editChequeNumber = $this->selectedCheque->cheque_number;
+            $this->editChequeDate = $this->selectedCheque->cheque_date?->format('Y-m-d') ?? '';
+        }
+        $this->isEditingCheque = !$this->isEditingCheque;
+    }
+
+    public function saveEditCheque()
+    {
+        $this->validate([
+            'editChequeNumber' => 'required|string|max:50',
+            'editChequeDate' => 'required|date',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            if (!$this->selectedCheque) {
+                throw new Exception('No cheque selected to edit.');
+            }
+
+            $this->selectedCheque->update([
+                'cheque_number' => $this->editChequeNumber,
+                'cheque_date' => $this->editChequeDate,
+            ]);
+
+            DB::commit();
+
+            // Reload the cheque data
+            $this->selectedCheque = Cheque::with(['customer', 'payment.sale'])->find($this->selectedCheque->id);
+            $this->isEditingCheque = false;
+
+            $this->computeStatistics();
+            $this->dispatch('showToast', [
+                'type' => 'success',
+                'message' => 'Cheque details updated successfully.'
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to save cheque edit: ' . $e->getMessage());
+            $this->dispatch('showToast', [
+                'type' => 'error',
+                'message' => 'Failed to save cheque details: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    public function cancelEditCheque()
+    {
+        $this->isEditingCheque = false;
+        $this->editChequeNumber = '';
+        $this->editChequeDate = '';
     }
 
     public function render()

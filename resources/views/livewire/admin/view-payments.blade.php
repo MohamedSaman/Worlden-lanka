@@ -228,7 +228,7 @@
                                                 $statusClass = 'warning';
                                             }
                                             @endphp
-                                            <span class="badge rounded-pill bg-{{ $statusClass }} bg-opacity-20 text-black px-3 py-2">
+                                            <span class="badge rounded-pill bg-{{ $statusClass }} bg-opacity-20 text-white px-3 py-2">
                                                 {{ $displayStatus }}
                                             </span>
                                         </td>

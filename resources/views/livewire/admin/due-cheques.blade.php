@@ -191,7 +191,7 @@
                                 <td class="text-center">
                                     @if($cheque->status == 'pending')
                                     <div class="d-flex justify-content-center gap-2">
-                                        <button wire:click="completePaymentDetails({{ $cheque->id }})" class="btn btn-sm btn-success rounded-pill">Complete</button>
+                                        <button wire:click="confirmComplete({{ $cheque->id }})" class="btn btn-sm btn-success rounded-pill">Complete</button>
                                         <button wire:click="confirmReturn({{ $cheque->id }})" class="btn btn-sm btn-danger rounded-pill">Return</button>
                                     </div>
                                     @elseif($cheque->status == 'return')
@@ -489,6 +489,27 @@
         </div>
     </div>
 
+    <!-- Confirm Complete Modal -->
+    <div wire:ignore.self class="modal fade" id="confirm-complete-modal" tabindex="-1" aria-labelledby="confirm-complete-modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header text-white p-3" style="background: linear-gradient(90deg, #16a34a 0%, #22c55e 100%);">
+                    <h5 class="modal-title fw-bold" id="confirm-complete-modal-label">
+                        <i class="bi bi-check-circle me-2"></i> Confirm Complete Cheque
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="mb-0">Are you sure you want to mark this cheque as complete? This action will update the cheque status and add a note to the sale record.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light rounded-pill" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" wire:click="completePaymentConfirmed" class="btn btn-success rounded-pill">Yes, Complete Cheque</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Confirm Return Modal -->
     <div wire:ignore.self class="modal fade" id="confirm-return-modal" tabindex="-1" aria-labelledby="confirm-return-modal-label" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -582,6 +603,7 @@
                 </div>
                 <div class="modal-body">
                     @if($selectedCheque)
+                    @if(!$isEditingCheque)
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="fw-semibold text-muted">Invoice Number</label>
@@ -611,10 +633,69 @@
                         </div>
                     </div>
                     @else
+                    <form wire:submit.prevent="saveEditCheque">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="fw-semibold text-muted">Invoice Number</label>
+                                <p class="fw-bold">{{ $selectedCheque->payment->sale->invoice_number ?? 'N/A' }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="fw-semibold text-muted">Customer Name</label>
+                                <p class="fw-bold">{{ $selectedCheque->customer->name ?? 'N/A' }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Cheque Number <span class="text-danger">*</span></label>
+                                <input type="text"
+                                    class="form-control form-control-sm rounded-3 @error('editChequeNumber') is-invalid @enderror"
+                                    wire:model="editChequeNumber"
+                                    placeholder="Enter cheque number">
+                                @error('editChequeNumber')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Cheque Amount</label>
+                                <p class="fw-bold">Rs. {{ number_format($selectedCheque->cheque_amount ?? 0, 2) }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-semibold">Cheque Date <span class="text-danger">*</span></label>
+                                <input type="date"
+                                    class="form-control form-control-sm rounded-3 @error('editChequeDate') is-invalid @enderror"
+                                    wire:model="editChequeDate">
+                                @error('editChequeDate')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="fw-semibold text-muted">Status</label>
+                                <p class="fw-bold {{ $selectedCheque->status === 'pending' ? 'text-warning' : ($selectedCheque->status === 'complete' ? 'text-success' : 'text-danger') }}">
+                                    {{ ucfirst($selectedCheque->status ?? 'Pending') }}
+                                </p>
+                            </div>
+                        </div>
+                    </form>
+                    @endif
+                    @else
                     <p class="text-muted">No cheque selected.</p>
                     @endif
                 </div>
                 <div class="modal-footer">
+                    @if($selectedCheque)
+                    @if($selectedCheque->status !== 'complete')
+                    @if(!$isEditingCheque)
+                    <button type="button" class="btn btn-warning rounded-pill" wire:click="toggleEditCheque">
+                        <i class="bi bi-pencil me-1"></i> Edit
+                    </button>
+                    @else
+                    <button type="button" class="btn btn-light rounded-pill" wire:click="cancelEditCheque">
+                        <i class="bi bi-x me-1"></i> Cancel
+                    </button>
+                    <button type="button" class="btn btn-success rounded-pill" wire:click="saveEditCheque">
+                        <i class="bi bi-check-circle me-1"></i> Save
+                    </button>
+                    @endif
+                    @endif
+                    @endif
                     <button type="button" class="btn btn-secondary rounded-pill" data-bs-dismiss="modal">Close</button>
                 </div>
             </div>

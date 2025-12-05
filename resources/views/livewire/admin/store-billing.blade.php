@@ -101,8 +101,15 @@
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.9; }
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.9;
+            }
         }
     </style>
     @endpush
@@ -133,9 +140,9 @@
                                 </h2>
                                 <p class="text-white-50 mb-0">
                                     @if($isEditMode)
-                                        Update invoice and manage sale changes
+                                    Update invoice and manage sale changes
                                     @else
-                                        Create invoices and manage sales transactions
+                                    Create invoices and manage sales transactions
                                     @endif
                                 </p>
                             </div>
@@ -285,8 +292,12 @@
                                             Quantity</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Quantity Type</th>
-                                        <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
-                                            Discount</th>
+                                        <!-- <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Discount</th> -->
+                                        @if(collect($cart)->some(fn($item) => isset($item['customer_field']['Size']) && $item['customer_field']['Size'] && isset($item['customer_field']['Color']) && $item['customer_field']['Color']))
+                                        <th class="text-uppercase text-center text-secondary text-xxs font-weight-bolder opacity-7">
+                                            Size | Color</th>
+                                        @endif
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
                                             Total</th>
                                         <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">
@@ -348,14 +359,25 @@
                                             </select>
                                         </td>
 
-                                        <td>
+                                        <!-- <td>
                                             <div class="input-group input-group-sm" style="width: 150px;">
                                                 <span class="input-group-text">Rs.</span>
                                                 <input type="number" class="form-control form-control-sm"
                                                     value="{{ $discounts[$id] ?? 0 }}" min="0" max="{{ $prices[$id] }}"
                                                     step="0.01" wire:model.blur="discounts.{{ $id }}">
                                             </div>
+                                        </td> -->
+                                        @if(collect($cart)->some(fn($item) => isset($item['customer_field']['Size']) && $item['customer_field']['Size'] && isset($item['customer_field']['Color']) && $item['customer_field']['Color']))
+                                        <td>
+                                            <p class="text-xs text-center font-weight-bold mb-0">
+                                                @if(isset($item['customer_field']['Size']) && $item['customer_field']['Size'] && isset($item['customer_field']['Color']) && $item['customer_field']['Color'])
+                                                {{ $item['customer_field']['Size'] }} | {{ $item['customer_field']['Color'] }}
+                                                @else
+                                                N/A
+                                                @endif
+                                            </p>
                                         </td>
+                                        @endif
                                         <td>
                                             <p class="text-xs font-weight-bold mb-0">
                                                 Rs.{{ number_format(($prices[$id]) *
@@ -600,20 +622,20 @@
 
                                         <div class="d-flex mt-4">
                                             @if($isEditMode)
-                                                <button class="btn btn-warning me-2" wire:click="cancelEdit">
-                                                    <i class="bi bi-x-circle me-2"></i>Cancel
-                                                </button>
-                                                <button class="btn btn-primary flex-grow-1" wire:click="completeSale">
-                                                    <i class="fas fa-save me-2"></i>Update Sale
-                                                </button>
+                                            <button class="btn btn-warning me-2" wire:click="cancelEdit">
+                                                <i class="bi bi-x-circle me-2"></i>Cancel
+                                            </button>
+                                            <button class="btn btn-primary flex-grow-1" wire:click="completeSale">
+                                                <i class="fas fa-save me-2"></i>Update Sale
+                                            </button>
                                             @else
-                                                <button class="btn btn-danger me-2" wire:click="clearCart"
-                                                    style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
-                                                    <i class="fas fa-times me-2"></i>Clear
-                                                </button>
-                                                <button class="btn btn-success flex-grow-1" wire:click="completeSale">
-                                                    <i class="fas fa-check me-2"></i>Complete Sale
-                                                </button>
+                                            <button class="btn btn-danger me-2" wire:click="clearCart"
+                                                style="background-color: #d34d51ff; border-color: #d34d51ff; color: white;" onmouseover="this.style.backgroundColor='#9d1c20'; this.style.borderColor='#9d1c20';" onmouseout="this.style.backgroundColor='#d34d51ff'; this.style.borderColor='#d34d51ff';">
+                                                <i class="fas fa-times me-2"></i>Clear
+                                            </button>
+                                            <button class="btn btn-success flex-grow-1" wire:click="completeSale">
+                                                <i class="fas fa-check me-2"></i>Complete Sale
+                                            </button>
                                             @endif
                                         </div>
                                     </div>
@@ -856,7 +878,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Receipt modal -->
         <div wire:ignore.self class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel"
             aria-hidden="true">
@@ -933,7 +955,9 @@
                                         <tr>
                                             <th scope="col" class="text-center py-2">No</th>
                                             <th scope="col" class="text-center py-2">Item</th>
-                                            <th scope="col" class="text-center py-2">Size</th>
+                                            @if($receipt->items->some(fn($item) => $item->product && isset($item->product->customer_field['Size']) && $item->product->customer_field['Size'] && isset($item->product->customer_field['Color']) && $item->product->customer_field['Color']))
+                                            <th scope="col" class="text-center py-2">Size | Color</th>
+                                            @endif
                                             <th scope="col" class="text-center py-2">Price</th>
                                             <th scope="col" class="text-center py-2">Qty</th>
                                             <th scope="col" class="text-center py-2">Discount</th>
@@ -946,13 +970,15 @@
                                             <td class="text-center py-2">{{ $index + 1 }}</td>
                                             <td class="text-center py-2">{{ $item->product->product_name ?? 'N/A' }}
                                             </td>
+                                            @if($receipt->items->some(fn($i) => $i->product && isset($i->product->customer_field['Size']) && $i->product->customer_field['Size'] && isset($i->product->customer_field['Color']) && $i->product->customer_field['Color']))
                                             <td class="text-center py-2">
-                                                @if($item->product && $item->product->customer_field)
-                                                {{ $item->product->customer_field['Size'] ?? '-' }}
+                                                @if($item->product && isset($item->product->customer_field['Size']) && $item->product->customer_field['Size'] && isset($item->product->customer_field['Color']) && $item->product->customer_field['Color'])
+                                                {{ $item->product->customer_field['Size'] }} | {{ $item->product->customer_field['Color'] }}
                                                 @else
                                                 -
                                                 @endif
                                             </td>
+                                            @endif
                                             <td class="text-center py-2">Rs.{{ number_format($item->price, 2) }}
                                             </td>
                                             <td class="text-center py-2">{{ $item->quantity }}</td>
