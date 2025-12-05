@@ -102,43 +102,32 @@ class DuePayments extends Component
 
     public function getPaymentDetails($customerId)
     {
-
         $this->applyToCurrent = true;
         $this->applyToBackForward = false;
         $this->paymentId = $customerId;
-        $customer = Customer::withSum(['customerAccounts' => function ($query) {
-            $query->where('total_due', '>', 0);
-        }], 'total_due')
-            ->withSum('customerAccounts', 'current_due_amount')
-            ->withSum('customerAccounts', 'back_forward_amount')
-            ->with(['customerAccounts' => function ($query) {
-                $query->where('total_due', '>', 0)->latest()->limit(1);
-            }, 'sales' => function ($query) {
-                $query->latest()->limit(1);
-            }])
-            ->find($customerId);
 
-        // Calculate total return amount for this customer
-        $totalReturnAmount = ReturnProduct::whereHas('sale', function ($query) use ($customerId) {
-            $query->where('customer_id', $customerId);
-        })->sum('total_amount');
+        // Fetch customer with related data
+        $customer = Customer::with(['customerAccounts' => function ($query) {
+            $query->where('total_due', '>', 0)->latest();
+        }])->find($customerId);
 
         $this->paymentDetail = $customer;
-        $rawCurrentDue = $customer->customer_accounts_sum_current_due_amount ?? 0;
-        $rawTotalDue = $customer->customer_accounts_sum_total_due ?? 0;
 
-        // Calculate actual current due after subtracting returns
-        $actualCurrentDue = max(0, $rawCurrentDue - $totalReturnAmount);
+        // Get latest customer account
+        $latestAccount = $customer->customerAccounts->first();
 
-        // If actual current due is 0 or negative, set all dues to 0
-        if ($actualCurrentDue <= 0) {
-            $this->currentDueAmount = 0;
-            $this->totalDueAmount = 0;
-            $this->backForwardAmount = $customer->customer_accounts_sum_back_forward_amount ?? 0;
+        if ($latestAccount) {
+            $currentDue = floatval($latestAccount->current_due_amount ?? 0);
+            $backForward = floatval($latestAccount->back_forward_amount ?? 0);
+            $totalDue = floatval($latestAccount->total_due ?? 0);
+
+            $this->currentDueAmount = $currentDue;
+            $this->backForwardAmount = $backForward;
+            $this->totalDueAmount = $totalDue;
         } else {
-            $this->currentDueAmount = $actualCurrentDue;
-            $this->totalDueAmount = max(0, $rawTotalDue - $totalReturnAmount);
-            $this->backForwardAmount = $customer->customer_accounts_sum_back_forward_amount ?? 0;
+            $this->currentDueAmount = 0;
+            $this->backForwardAmount = 0;
+            $this->totalDueAmount = 0;
         }
 
         $this->duePaymentMethod = '';
@@ -386,7 +375,7 @@ class DuePayments extends Component
                             'payment_date' => now(),
                         ]);
 
-                    
+
 
                         $remainingPayment -= $payForCurrent;
                     }
@@ -398,7 +387,7 @@ class DuePayments extends Component
                 $lastAccount = CustomerAccount::where('customer_id', $this->paymentId)
                     ->orderBy('updated_at', 'desc')
                     ->first();
-                
+
                 if ($lastAccount) {
                     // Add to existing advance amount
                     $newAdvanceAmount = ($lastAccount->advance_amount ?? 0) + $remainingPayment;
@@ -466,7 +455,7 @@ class DuePayments extends Component
             DB::commit();
 
             $this->dispatch('closeModal', 'payment-detail-modal');
-            
+
             // Show different success message if there was an advance payment
             if ($remainingPayment > 0) {
                 $this->js("Swal.fire('Success', 'Payment submitted successfully. Advance amount of Rs." . number_format($remainingPayment, 2) . " has been recorded.', 'success')");
@@ -513,11 +502,9 @@ class DuePayments extends Component
 
     public function render()
     {
-        $query = Customer::withSum(['customerAccounts' => function ($subQuery) {
-            $subQuery->where('total_due', '>', 0);
-        }], 'total_due')
-            ->withSum('customerAccounts', 'current_due_amount')
-            ->withSum('customerAccounts', 'back_forward_amount')
+        $query = Customer::with(['customerAccounts' => function ($q) {
+            $q->where('total_due', '>', 0)->latest()->limit(1);
+        }])
             ->withMin('customerAccounts', 'created_at')
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
@@ -552,47 +539,34 @@ class DuePayments extends Component
 
         $duePayments = $query->orderBy('id')->paginate(10);
 
-        // Calculate adjusted due amounts after returns
+        // Get due amounts from latest customer account
         foreach ($duePayments as $customer) {
-            // Calculate total return amount for this customer
-            $totalReturnAmount = ReturnProduct::whereHas('sale', function ($query) use ($customer) {
-                $query->where('customer_id', $customer->id);
-            })->sum('total_amount');
+            $latestAccount = $customer->customerAccounts->first();
 
-            // Store original values
-            $customer->original_current_due = $customer->customer_accounts_sum_current_due_amount ?? 0;
-            $customer->original_total_due = $customer->customer_accounts_sum_total_due ?? 0;
-            $customer->total_return_amount = $totalReturnAmount;
-
-            // Calculate adjusted current due (current due - returns)
-            $adjustedCurrentDue = max(0, $customer->original_current_due - $totalReturnAmount);
-
-            // If adjusted current due is 0 or negative, set all current dues to 0
-            if ($adjustedCurrentDue <= 0) {
-                $customer->adjusted_current_due = 0;
-                $customer->adjusted_total_due = $customer->customer_accounts_sum_back_forward_amount ?? 0;
+            if ($latestAccount) {
+                $customer->adjusted_current_due = floatval($latestAccount->current_due_amount ?? 0);
+                $customer->back_forward_amount = floatval($latestAccount->back_forward_amount ?? 0);
+                $customer->adjusted_total_due = floatval($latestAccount->total_due ?? 0);
             } else {
-                $customer->adjusted_current_due = $adjustedCurrentDue;
-                $customer->adjusted_total_due = max(0, $customer->original_total_due - $totalReturnAmount);
+                $customer->adjusted_current_due = 0;
+                $customer->back_forward_amount = 0;
+                $customer->adjusted_total_due = 0;
             }
         }
 
-        // Filter out customers with 0 adjusted current due if they have no brought forward
-        $duePayments->getCollection()->transform(function ($customer) {
-            $hasRealDue = $customer->adjusted_current_due > 0 ||
-                ($customer->customer_accounts_sum_back_forward_amount ?? 0) > 0;
-            return $hasRealDue ? $customer : null;
-        })->filter();
+        // Filter out customers with no real due
+        $duePayments->getCollection()->filter(function ($customer) {
+            return $customer->adjusted_current_due > 0 || $customer->back_forward_amount > 0;
+        })->values();
 
         $duePaymentsCount = Customer::whereHas('customerAccounts', function ($q) {
             $q->where('total_due', '>', 0);
         })->count();
 
-        $totalDue = CustomerAccount::where('total_due', '>', 0)->sum('total_due');
-
-        // Subtract total returns from total due
-        $totalReturns = ReturnProduct::sum('total_amount');
-        $adjustedTotalDue = max(0, $totalDue - $totalReturns);
+        // Calculate total adjusted due from all customers
+        $adjustedTotalDue = $duePayments->sum(function ($customer) {
+            return $customer->adjusted_total_due;
+        });
 
         $todayDuePayments = CustomerAccount::where('total_due', '>', 0)->whereDate('created_at', today())->sum('total_due');
 

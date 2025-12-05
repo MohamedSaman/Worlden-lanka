@@ -155,7 +155,7 @@
                                     <span class="fw-bold">Rs.{{ number_format($customer->adjusted_current_due ?? 0, 2) }}</span>
                                 </td>
                                 <td class="text-end">
-                                    <span class="fw-bold">Rs.{{ number_format($customer->customer_accounts_sum_back_forward_amount ?? 0, 2) }}</span>
+                                    <span class="fw-bold">Rs.{{ number_format($customer->back_forward_amount ?? 0, 2) }}</span>
                                 </td>
                                 <td class="text-end">
                                     <span class="fw-bold text-primary-custom">Rs.{{ number_format($customer->adjusted_total_due ?? 0, 2) }}</span>
@@ -165,7 +165,7 @@
                                     <span class="badge-modern badge-danger-modern">
                                         <i class="bi bi-exclamation-circle-fill"></i> Overdue
                                     </span>
-                                    @elseif(($customer->adjusted_current_due ?? 0) > 0 || ($customer->customer_accounts_sum_back_forward_amount ?? 0) > 0)
+                                    @elseif(($customer->adjusted_current_due ?? 0) > 0 || ($customer->back_forward_amount ?? 0) > 0)
                                     <span class="badge-modern badge-warning-modern">
                                         <i class="bi bi-clock-fill"></i> Pending
                                     </span>
@@ -176,7 +176,7 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    @if (($customer->adjusted_current_due ?? 0) > 0 || ($customer->customer_accounts_sum_back_forward_amount ?? 0) > 0)
+                                    @if (($customer->adjusted_current_due ?? 0) > 0 || ($customer->back_forward_amount ?? 0) > 0)
                                     <button wire:click="getPaymentDetails({{ $customer->id }})"
                                         class="btn-modern btn-view"
                                         title="Receive Payment">
@@ -331,7 +331,7 @@
                                         @if($applyToCurrent && $applyToBackForward)
                                         <div class="alert alert-success mt-2 small">
                                             <i class="bi bi-arrow-right-circle me-1"></i>
-                                            <strong>Payment Priority:</strong>Brought-Forward  will be paid first, then remaining balance will be applied to Current Due.
+                                            <strong>Payment Priority:</strong>Brought-Forward will be paid first, then remaining balance will be applied to Current Due.
                                         </div>
                                         @endif
                                     </div>

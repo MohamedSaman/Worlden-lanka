@@ -542,6 +542,12 @@
                         <i class="bi bi-cash"></i> <span>Store Billing</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link py-2 {{ request()->routeIs('admin.settings') ? 'active' : '' }}"
+                        href="{{ route('admin.settings') }}">
+                        <i class="bi bi-gear"></i> <span>Settings</span>
+                    </a>
+                </li>
             </ul>
         </div>
 
@@ -565,7 +571,7 @@
                     aria-expanded="false">
                     <div class="admin-avatar">A</div>
                     <div class="admin-name">Admin</div>
-                    
+
                 </div>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="adminDropdown">
                     <li>

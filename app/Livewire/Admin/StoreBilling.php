@@ -18,6 +18,7 @@ use App\Models\CustomerAccount;
 use App\Models\ProductDetail;
 use App\Models\ProductStock;
 use App\Models\SalesItem;
+use App\Models\QuantityType;
 
 #[Title("Store Billing")]
 #[Layout('components.layouts.admin')]
@@ -144,15 +145,24 @@ class StoreBilling extends Component
 
     public function loadQuantityTypes()
     {
-        $this->availableQuantityTypes = [
-            'pcs' => 'Pieces',
-            'box' => 'Box',
-            'pack' => 'Pack',
-            'set' => 'Set',
-            'doz' => 'Dozen',
-            'roll' => 'Roll',
-            'yards' => 'Yards'
-        ];
+        // Load active quantity types from database
+        $this->availableQuantityTypes = QuantityType::where('is_active', true)
+            ->orderBy('name')
+            ->pluck('name', 'code')
+            ->toArray();
+
+        // Fallback to default types if none exist in database
+        if (empty($this->availableQuantityTypes)) {
+            $this->availableQuantityTypes = [
+                'pcs' => 'Pieces',
+                'box' => 'Box',
+                'pack' => 'Pack',
+                'set' => 'Set',
+                'doz' => 'Dozen',
+                'roll' => 'Roll',
+                'yards' => 'Yards'
+            ];
+        }
     }
 
     public function generateInvoiceNumber($useDate = null)
@@ -663,6 +673,9 @@ class StoreBilling extends Component
         try {
             DB::beginTransaction();
 
+            // Track whether we already updated the customer account for due amounts
+            $accountUpdated = false;
+
             // If in edit mode, delete old sale records first
             if ($this->isEditMode && $this->editingSaleId) {
                 $oldSale = Sale::find($this->editingSaleId);
@@ -867,6 +880,29 @@ class StoreBilling extends Component
                 $account->total_due = floatval($account->back_forward_amount ?? 0) + floatval($account->current_due_amount ?? 0);
                 $account->sale_id = $sale->id;
                 $account->save();
+
+                // Mark as updated so we don't add the due again later
+                $accountUpdated = true;
+            }
+
+            // Ensure customer account reflects any due amount in cases not handled above
+            if (!$accountUpdated && floatval($sale->due_amount ?? 0) > 0) {
+                $acct = CustomerAccount::firstOrCreate(
+                    ['customer_id' => $this->customerId],
+                    [
+                        'sale_id' => $sale->id,
+                        'back_forward_amount' => 0,
+                        'current_due_amount' => 0,
+                        'paid_due' => 0,
+                        'total_due' => 0,
+                        'advance_amount' => 0,
+                    ]
+                );
+
+                $acct->current_due_amount = floatval($acct->current_due_amount ?? 0) + floatval($sale->due_amount);
+                $acct->total_due = floatval($acct->back_forward_amount ?? 0) + floatval($acct->current_due_amount ?? 0);
+                $acct->sale_id = $sale->id;
+                $acct->save();
             }
 
             DB::commit();
