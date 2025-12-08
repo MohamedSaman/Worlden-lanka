@@ -543,6 +543,18 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.manual-billing') ? 'active' : '' }}"
+                        href="{{ route('admin.manual-billing') }}">
+                        <i class="bi bi-pencil-square"></i> <span>Manual Billing</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {{ request()->routeIs('admin.manual-sales') ? 'active' : '' }}"
+                        href="{{ route('admin.manual-sales') }}">
+                        <i class="bi bi-journal-text"></i> <span>Manual Sales</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link py-2 {{ request()->routeIs('admin.settings') ? 'active' : '' }}"
                         href="{{ route('admin.settings') }}">
                         <i class="bi bi-gear"></i> <span>Settings</span>

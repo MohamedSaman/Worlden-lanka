@@ -23,6 +23,8 @@ use App\Livewire\Staff\StaffStockOverview;
 use App\Livewire\Admin\CustomerSaleDetails;
 use App\Livewire\Staff\CustomerSaleManagement;
 use App\Livewire\Admin\StoreBilling;
+use App\Livewire\Admin\ManualBilling;
+use App\Livewire\Admin\ManualSales;
 use App\Livewire\Admin\DuePayments as AdminDuePayments;
 use App\Http\Controllers\StaffSaleExportController;
 use App\Http\Controllers\WatchesExportController;
@@ -83,6 +85,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('/admin/staff/{staffId}/reentry', \App\Livewire\Admin\StockReentry::class)->name('staff.reentry');
         // Route::get('/store-billing', [StoreBilling::class, 'index'])->name('store-billing');
         Route::get('/store-billing', StoreBilling::class)->name('store-billing');
+        Route::get('/manual-billing', ManualBilling::class)->name('manual-billing');
+        Route::get('/manual-sales', ManualSales::class)->name('manual-sales');
         Route::get('/due-payments', AdminDuePayments::class)->name('due-payments');
         Route::get('/categories', Category::class)->name('categories');
         Route::get('/products', Products::class)->name('products');
