@@ -22,7 +22,15 @@ class ManualSale extends Model
         'notes',
         'delivery_note',
         'due_amount',
+      'created_at',
+        'updated_at',
     ];
+
+    protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
 
     public function customer()
     {
