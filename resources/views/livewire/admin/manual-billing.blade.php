@@ -63,6 +63,20 @@
     @endpush
 
     <div class="container-fluid py-4">
+        <!-- Edit Mode Banner -->
+        @if($isEditMode)
+        <div class="alert alert-warning d-flex justify-content-between align-items-center mb-4" 
+            style="background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%); border: 2px solid #ff9800;" role="alert">
+            <div>
+                <i class="bi bi-pencil-square me-2"></i>
+                <strong>EDIT MODE:</strong> You are editing Invoice #{{ $invoiceNumber }}. Make your changes and click "Complete Sale" to update or "Cancel Edit".
+            </div>
+            <button class="btn btn-sm btn-dark" wire:click="cancelEdit">
+                <i class="bi bi-x-circle me-1"></i>Cancel Edit
+            </button>
+        </div>
+        @endif
+
         <!-- Professional Header Section -->
         <div class="row mb-4">
             <div class="col-12">
@@ -819,12 +833,13 @@
         // Sale completed event - show success message and modal
         window.addEventListener('sale-completed', event => {
             const data = event.detail;
+            const message = data.message || `Sale completed successfully! Invoice #${data.invoiceNumber}`;
             
             // Show success message
             Swal.fire({
                 icon: 'success',
                 title: 'Success',
-                text: `Sale completed successfully! Invoice #${data.invoiceNumber}`,
+                text: message,
                 timer: 2000,
                 showConfirmButton: false
             }).then(() => {

@@ -227,12 +227,19 @@
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <button class="btn btn-sm btn-info" wire:click="viewSale({{ $sale->id }})"
-                                                    data-bs-toggle="modal" data-bs-target="#saleDetailModal">
+                                                    data-bs-toggle="modal" data-bs-target="#saleDetailModal"
+                                                    title="View Details">
                                                     <i class="bi bi-eye"></i>
                                                 </button>
+                                                <a href="{{ route('admin.manual-billing') }}?edit={{ $sale->id }}" 
+                                                    class="btn btn-sm btn-warning"
+                                                    title="Edit Sale">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
                                                 <button class="btn btn-sm btn-danger" 
                                                     wire:click="deleteSale({{ $sale->id }})"
-                                                    onclick="return confirm('Are you sure you want to delete this sale?')">
+                                                    onclick="return confirm('Are you sure you want to delete this sale?')'"
+                                                    title="Delete Sale">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             </div>

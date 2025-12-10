@@ -81,6 +81,10 @@ class ManualBilling extends Component
     public $banks = [];
     public $availableQuantityTypes = [];
     
+    // Edit mode properties
+    public $isEditMode = false;
+    public $editingSaleId = null;
+    
     // Manual entry properties
     public $manualProductName = '';
     public $manualProductCode = '';
@@ -101,6 +105,12 @@ class ManualBilling extends Component
         $this->balanceDueDate = date('Y-m-d', strtotime('+7 days'));
         $this->invoiceDate = date('Y-m-d');
         $this->generateInvoiceNumber();
+
+        // Check if there's an edit parameter from URL
+        if (request()->has('edit')) {
+            $saleId = request()->get('edit');
+            $this->loadSaleForEditing($saleId);
+        }
     }
 
     public function loadBanks()
@@ -204,6 +214,14 @@ class ManualBilling extends Component
             ]);
             $this->generateInvoiceNumber();
             return false;
+        }
+
+        // Skip validation if in edit mode and invoice number hasn't changed
+        if ($this->isEditMode && $this->editingSaleId) {
+            $currentSale = ManualSale::find($this->editingSaleId);
+            if ($currentSale && $currentSale->invoice_number === $this->invoiceNumber) {
+                return true;
+            }
         }
 
         // Check both Sale and ManualSale tables for existing invoice
@@ -443,6 +461,101 @@ class ManualBilling extends Component
         }
     }
 
+    // Load Sale for Editing
+    public function loadSaleForEditing($saleId)
+    {
+        try {
+            $sale = ManualSale::with(['customer', 'items', 'payments'])->find($saleId);
+
+            if (!$sale) {
+                $this->js('swal.fire("Error", "Sale not found", "error")');
+                return;
+            }
+
+            // Set edit mode
+            $this->isEditMode = true;
+            $this->editingSaleId = $sale->id;
+
+            // Load sale data into form
+            $this->invoiceNumber = $sale->invoice_number;
+            $this->invoiceDate = $sale->created_at->format('Y-m-d');
+            $this->customerName = $sale->customer->name ?? '';
+            $this->customerPhone = $sale->customer->phone ?? '';
+            $this->saleNotes = $sale->notes;
+            $this->deliveryNote = $sale->delivery_note;
+            $this->paymentType = $sale->payment_type;
+
+            // Restore cart items
+            $this->cart = [];
+            $this->quantities = [];
+            $this->prices = [];
+            $this->discounts = [];
+            $this->quantityTypes = [];
+
+            foreach ($sale->items as $item) {
+                $tempId = 'manual_' . $this->tempProductIdCounter++;
+                
+                $this->cart[$tempId] = [
+                    'id' => $tempId,
+                    'name' => $item->product_name,
+                    'code' => $item->product_code ?? 'N/A',
+                    'category' => $item->category,
+                    'price' => $item->price,
+                    'stock_quantity' => 999999,
+                ];
+                
+                $this->quantities[$tempId] = $item->quantity;
+                $this->prices[$tempId] = $item->price;
+                $this->discounts[$tempId] = $item->discount;
+                $this->quantityTypes[$tempId] = $item->quantity_type ?? '';
+            }
+
+            // Restore payment info
+            $this->cashAmount = 0;
+            $this->cheques = [];
+
+            foreach ($sale->payments as $payment) {
+                if ($payment->payment_method === 'cash') {
+                    $this->cashAmount = $payment->amount;
+                } elseif ($payment->payment_method === 'cheque') {
+                    // Find cheque by payment reference
+                    $cheque = Cheque::where('cheque_number', $payment->payment_reference)->first();
+                    if ($cheque) {
+                        $this->cheques[] = [
+                            'number' => $cheque->cheque_number,
+                            'bank' => $cheque->bank_name,
+                            'date' => $cheque->cheque_date,
+                            'amount' => $cheque->cheque_amount,
+                        ];
+                    }
+                }
+            }
+
+            $this->updateTotals();
+            $this->dispatch('show-toast', ['type' => 'info', 'message' => 'Sale loaded for editing. Make your changes and click "Complete Sale" to update.']);
+        } catch (Exception $e) {
+            Log::error('Edit manual sale error: ' . $e->getMessage());
+            $this->js('swal.fire("Error", "Failed to load sale for editing: ' . $e->getMessage() . '", "error")');
+        }
+    }
+
+    // Cancel Edit
+    public function cancelEdit()
+    {
+        $this->isEditMode = false;
+        $this->editingSaleId = null;
+        $this->clearCart();
+        $this->resetPaymentInfo();
+        $this->invoiceDate = date('Y-m-d');
+        $this->generateInvoiceNumber();
+        $this->dispatch('show-toast', ['type' => 'info', 'message' => 'Edit cancelled']);
+
+        // Redirect to clear URL parameter if present
+        if (request()->has('edit')) {
+            return redirect()->route('admin.manual-billing');
+        }
+    }
+
     public function completeSale()
     {
         if (empty($this->cart)) {
@@ -492,6 +605,39 @@ class ManualBilling extends Component
 
         try {
             DB::beginTransaction();
+
+            // If in edit mode, delete old sale records first
+            if ($this->isEditMode && $this->editingSaleId) {
+                $oldSale = ManualSale::find($this->editingSaleId);
+                if ($oldSale) {
+                    // Get payment IDs before deleting payments
+                    $paymentIds = ManualSalePayment::where('manual_sale_id', $oldSale->id)->pluck('id')->toArray();
+
+                    // Delete related cheques first (linked through Payment table)
+                    if (!empty($paymentIds)) {
+                        $linkedPayments = Payment::where('applied_to', 'manual_sale')
+                            ->whereIn('payment_reference', function($query) use ($paymentIds) {
+                                $query->select('payment_reference')
+                                    ->from('manual_sale_payments')
+                                    ->whereIn('id', $paymentIds);
+                            })->pluck('id');
+                        
+                        if ($linkedPayments->isNotEmpty()) {
+                            Cheque::whereIn('payment_id', $linkedPayments)->delete();
+                            Payment::whereIn('id', $linkedPayments)->delete();
+                        }
+                    }
+
+                    // Delete manual sale payments
+                    ManualSalePayment::where('manual_sale_id', $oldSale->id)->delete();
+
+                    // Delete manual sales items
+                    ManualSalesItem::where('manual_sale_id', $oldSale->id)->delete();
+
+                    // Finally delete the sale
+                    $oldSale->delete();
+                }
+            }
 
             // Find or create customer
             $customer = Customer::where('name', $this->customerName)->first();
@@ -618,6 +764,12 @@ class ManualBilling extends Component
             $this->lastSaleId = $sale->id;
             $this->showReceipt = true;
 
+            $message = $this->isEditMode ? 'Sale updated successfully!' : 'Sale completed successfully!';
+
+            // Reset edit mode
+            $this->isEditMode = false;
+            $this->editingSaleId = null;
+
             // Clear form and reset BEFORE showing modal
             $this->clearCart();
             $this->resetPaymentInfo();
@@ -625,7 +777,7 @@ class ManualBilling extends Component
             $this->generateInvoiceNumber();
 
             // Dispatch event to show modal with sale info
-            $this->dispatch('sale-completed', saleId: $sale->id, invoiceNumber: $sale->invoice_number);
+            $this->dispatch('sale-completed', saleId: $sale->id, invoiceNumber: $sale->invoice_number, message: $message);
 
         } catch (Exception $e) {
             DB::rollBack();
