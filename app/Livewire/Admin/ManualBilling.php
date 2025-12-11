@@ -92,11 +92,17 @@ class ManualBilling extends Component
     public $manualProductPrice = '';
     public $manualProductQuantity = 1;
     public $tempProductIdCounter = 999999;
+    public $productSearchResults;
+    public $showProductDropdown = false;
+    
+    protected $queryString = [];
+    protected $updatesQueryString = [];
 
     protected $listeners = ['quantityUpdated' => 'updateTotals'];
 
     public function mount()
     {
+        $this->productSearchResults = collect();
         $this->loadCustomers();
         $this->loadBanks();
         $this->loadQuantityTypes();
@@ -163,6 +169,59 @@ class ManualBilling extends Component
     public function loadCategories()
     {
         $this->categories = ProductCategory::orderBy('name')->get();
+    }
+
+    public function updatedManualProductName($value)
+    {
+        $value = trim($value);
+        
+        if (strlen($value) >= 2) {
+            $this->productSearchResults = \App\Models\ProductDetail::select('id', 'product_name', 'product_code', 'selling_price', 'category_id')
+                ->with(['category:id,name'])
+                ->where(function($query) use ($value) {
+                    $query->where('product_name', 'LIKE', $value . '%')
+                          ->orWhere('product_code', 'LIKE', $value . '%');
+                })
+                ->limit(10)
+                ->get();
+            $this->showProductDropdown = $this->productSearchResults->isNotEmpty();
+        } else {
+            $this->productSearchResults = collect();
+            $this->showProductDropdown = false;
+        }
+    }
+
+    public function selectProduct($productId)
+    {
+        // Use cached search result instead of querying again
+        $product = $this->productSearchResults->firstWhere('id', $productId);
+        
+        if ($product) {
+            // Add product directly to cart
+            $tempId = 'temp_' . $this->tempProductIdCounter++;
+            
+            $this->cart[$tempId] = [
+                'id' => $tempId,
+                'product_id' => $product->id,
+                'name' => $product->product_name,
+                'code' => $product->product_code ?? '',
+                'category' => $product->category->name ?? '',
+                'is_manual' => false, // This is from product_details table
+            ];
+            
+            $this->quantities[$tempId] = 1;
+            $this->discounts[$tempId] = 0;
+            $this->prices[$tempId] = $product->selling_price;
+            $this->quantityTypes[$tempId] = 'pieces';
+            
+            // Clear search
+            $this->manualProductName = '';
+            $this->showProductDropdown = false;
+            $this->productSearchResults = collect();
+            
+            $this->updateTotals();
+            $this->dispatch('show-toast', ['type' => 'success', 'message' => 'Product added to cart']);
+        }
     }
 
     public function generateInvoiceNumber()

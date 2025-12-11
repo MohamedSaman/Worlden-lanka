@@ -139,19 +139,42 @@
                         <!-- Manual Product Entry Section -->
                         <div class="row mb-4">
                             <div class="col-12">
-                                <div class="card border-0 shadow-sm manual-entry-card">
-                                    <div class="card-body p-3">
+                                <div class="card border-0 shadow-sm manual-entry-card" style="overflow: visible;">
+                                    <div class="card-body p-3" style="overflow: visible;">
                                         <div class="d-flex align-items-center mb-3">
                                             <i class="bi bi-plus-circle-fill text-danger me-2" style="font-size: 1.2rem;"></i>
                                             <h6 class="mb-0 text-danger fw-bold">Add Product Manually</h6>
                                         </div>
-                                        <div class="row g-2">
-                                            <div class="col-md-3">
+                                        <div class="row g-2" style="overflow: visible;">
+                                            <div class="col-md-3" style="overflow: visible;">
                                                 <label class="form-label small mb-1">Product Name *</label>
-                                                <input type="text" 
-                                                    class="form-control form-control-sm" 
-                                                    wire:model="manualProductName"
-                                                    placeholder="Enter product name">
+                                                <div class="position-relative" style="z-index: 1000;">
+                                                    <input type="text" 
+                                                        class="form-control form-control-sm" 
+                                                        wire:model.live.debounce.300ms="manualProductName"
+                                                        placeholder="Type to search products..."
+                                                        autocomplete="off">
+                                                    
+                                                    @if($showProductDropdown && $productSearchResults && $productSearchResults->count() > 0)
+                                                        <div class="position-absolute w-100 bg-white border border-2 rounded shadow-lg" 
+                                                             style="z-index: 9999; max-height: 300px; overflow-y: auto; top: 100%; left: 0; margin-top: 4px; border-color: #dee2e6 !important;">
+                                                            @foreach($productSearchResults as $product)
+                                                                <div class="p-3 border-bottom"
+                                                                     wire:click="selectProduct({{ $product->id }})"
+                                                                     style="cursor: pointer; transition: all 0.2s;"
+                                                                     onmouseover="this.style.backgroundColor='#e9ecef'; this.style.transform='scale(1.01)'"
+                                                                     onmouseout="this.style.backgroundColor='white'; this.style.transform='scale(1)'">
+                                                                    <div class="fw-bold text-dark mb-1" style="font-size: 14px;">{{ $product->product_name }}</div>
+                                                                    <div class="small text-muted" style="font-size: 12px;">
+                                                                        <span class="badge bg-secondary me-1">{{ $product->product_code ?? 'N/A' }}</span>
+                                                                        <span class="badge bg-info me-1">{{ $product->category->name ?? 'N/A' }}</span>
+                                                                        <span class="badge bg-success">Rs. {{ number_format($product->selling_price, 2) }}</span>
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
+                                                </div>
                                             </div>
                                             <div class="col-md-2">
                                                 <label class="form-label small mb-1">Product Code</label>
