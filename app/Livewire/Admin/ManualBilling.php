@@ -169,10 +169,10 @@ class ManualBilling extends Component
     {
         $prefix = 'INV-';
 
-        // Check both Sale and ManualSale tables to get the highest invoice number
-        $lastStoreSale = Sale::where('invoice_number', 'like', "{$prefix}%")
-            ->orderBy('id', 'DESC')
-            ->first();
+        // // Check both Sale and ManualSale tables to get the highest invoice number
+        // $lastStoreSale = Sale::where('invoice_number', 'like', "{$prefix}%")
+        //     ->orderBy('id', 'DESC')
+        //     ->first();
 
         $lastManualSale = ManualSale::where('invoice_number', 'like', "{$prefix}%")
             ->orderBy('id', 'DESC')
@@ -181,10 +181,10 @@ class ManualBilling extends Component
         $nextNumber = 1;
         
         // Get the highest number from both tables
-        if ($lastStoreSale) {
-            $storeNumber = intval(str_replace($prefix, '', $lastStoreSale->invoice_number));
-            $nextNumber = max($nextNumber, $storeNumber + 1);
-        }
+        // if ($lastStoreSale) {
+        //     $storeNumber = intval(str_replace($prefix, '', $lastStoreSale->invoice_number));
+        //     $nextNumber = max($nextNumber, $storeNumber + 1);
+        // }
         
         if ($lastManualSale) {
             $manualNumber = intval(str_replace($prefix, '', $lastManualSale->invoice_number));
@@ -194,7 +194,7 @@ class ManualBilling extends Component
         $invoiceNumber = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
         
         // Ensure the number doesn't exist in either table
-        while (Sale::where('invoice_number', $invoiceNumber)->exists() || 
+        while (
                ManualSale::where('invoice_number', $invoiceNumber)->exists()) {
             $nextNumber++;
             $invoiceNumber = $prefix . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
@@ -225,10 +225,9 @@ class ManualBilling extends Component
         }
 
         // Check both Sale and ManualSale tables for existing invoice
-        $existingStoreSale = Sale::where('invoice_number', $this->invoiceNumber)->first();
         $existingManualSale = ManualSale::where('invoice_number', $this->invoiceNumber)->first();
 
-        if ($existingStoreSale || $existingManualSale) {
+        if ($existingManualSale) {
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Invoice Already Exists',
