@@ -19,14 +19,13 @@ class ManualSale extends Model
         'total_amount',
         'payment_type',
         'payment_status',
+        'status',
         'notes',
         'delivery_note',
         'due_amount',
-      'created_at',
+        'created_at',
         'updated_at',
-    ];
-
-    protected $casts = [
+    ];    protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

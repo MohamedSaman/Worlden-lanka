@@ -148,15 +148,23 @@
                             <div class="col-md-2">
                                 <label class="form-label small fw-bold">Payment Status</label>
                                 <select class="form-select" wire:model.live="paymentStatus">
-                                    <option value="">All Status</option>
+                                    <option value="">All</option>
                                     <option value="paid">Paid</option>
                                     <option value="partial">Partial</option>
                                     <option value="pending">Pending</option>
                                 </select>
                             </div>
-                            <div class="col-md-2 d-flex align-items-end">
-                                <button class="btn btn-secondary w-100" wire:click="$set('search', ''); $set('paymentStatus', '')">
-                                    <i class="bi bi-arrow-clockwise me-1"></i>Reset Filters
+                            <div class="col-md-2">
+                                <label class="form-label small fw-bold">Status</label>
+                                <select class="form-select" wire:model.live="status">
+                                    <option value="">All</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1 d-flex align-items-end">
+                                <button class="btn btn-secondary w-100" wire:click="$set('search', ''); $set('paymentStatus', ''); $set('status', 'active')">
+                                    <i class="bi bi-arrow-clockwise me-1"></i>Reset
                                 </button>
                             </div>
                             <div class="col-md-1 d-flex align-items-end">
@@ -236,9 +244,14 @@
                                                     title="Edit Sale">
                                                     <i class="bi bi-pencil"></i>
                                                 </a>
+                                                <button class="btn btn-sm {{ $sale->status === 'active' ? 'btn-secondary' : 'btn-success' }}" 
+                                                    wire:click="toggleStatus({{ $sale->id }})"
+                                                    title="{{ $sale->status === 'active' ? 'Mark as Inactive' : 'Mark as Active' }}">
+                                                    <i class="bi bi-{{ $sale->status === 'active' ? 'x-circle' : 'check-circle' }}"></i>
+                                                </button>
                                                 <button class="btn btn-sm btn-danger" 
                                                     wire:click="deleteSale({{ $sale->id }})"
-                                                    onclick="return confirm('Are you sure you want to delete this sale?')'"
+                                                    onclick="return confirm('Are you sure you want to delete this sale?')"
                                                     title="Delete Sale">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
@@ -493,6 +506,22 @@
         window.addEventListener('open-sale-modal', event => {
             var modal = new bootstrap.Modal(document.getElementById('saleDetailModal'));
             modal.show();
+        });
+
+        // Toast notifications
+        window.addEventListener('show-toast', event => {
+            const data = event.detail[0];
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+            });
+            Toast.fire({
+                icon: data.type,
+                title: data.message
+            });
         });
 
         function printManualSalesTable() {

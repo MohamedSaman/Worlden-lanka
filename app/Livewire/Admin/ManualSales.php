@@ -18,6 +18,7 @@ class ManualSales extends Component
     public $startDate = '';
     public $endDate = '';
     public $paymentStatus = '';
+    public $status = 'active';
     public $selectedSale = null;
 
     protected $paginationTheme = 'bootstrap';
@@ -37,6 +38,27 @@ class ManualSales extends Component
     {
         $this->selectedSale = ManualSale::with(['customer', 'items', 'payments'])->find($saleId);
         $this->dispatch('open-sale-modal');
+    }
+
+    public function toggleStatus($saleId)
+    {
+        try {
+            $sale = ManualSale::find($saleId);
+            if ($sale) {
+                $newStatus = $sale->status === 'active' ? 'inactive' : 'active';
+                $sale->update(['status' => $newStatus]);
+                
+                $this->dispatch('show-toast', [
+                    'type' => 'success',
+                    'message' => 'Sale status updated to ' . $newStatus
+                ]);
+            }
+        } catch (\Exception $e) {
+            $this->dispatch('show-toast', [
+                'type' => 'error',
+                'message' => 'Failed to update status: ' . $e->getMessage()
+            ]);
+        }
     }
 
     public function deleteSale($saleId)
@@ -85,6 +107,10 @@ class ManualSales extends Component
 
         if ($this->paymentStatus) {
             $query->where('payment_status', $this->paymentStatus);
+        }
+
+        if ($this->status) {
+            $query->where('status', $this->status);
         }
 
         $sales = $query->paginate(15);
