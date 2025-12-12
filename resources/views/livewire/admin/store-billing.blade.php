@@ -923,7 +923,7 @@
                                     <p class="mb-1" style="color: #9d1c20;"><strong>Invoice Number: {{
                                             $receipt->invoice_number }}</strong></p>
                                     <p class="mb-1" style="color: #9d1c20;"><strong>Date: {{
-                                            $receipt->created_at->setTimezone('Asia/Colombo')->format('d/m/Y h:i A') }}</strong>
+                                            \Carbon\Carbon::parse($receipt->sales_date)->setTimezone('Asia/Colombo')->format('d/m/Y h:i A') }}</strong>
                                     </p>
                                     <p class="mb-1" style="color: #9d1c20;">
                                         <strong>Payment Status:{{ ucfirst($receipt->payment_status) }}
