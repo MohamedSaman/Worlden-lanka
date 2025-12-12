@@ -239,10 +239,10 @@ class Bill extends Component
                     });
             })
             ->when($this->filters['dateFrom'], function ($q) {
-                $q->whereDate('created_at', '>=', $this->filters['dateFrom']);
+                $q->whereDate('sales_date', '>=', $this->filters['dateFrom']);
             })
             ->when($this->filters['dateTo'], function ($q) {
-                $q->whereDate('created_at', '<=', $this->filters['dateTo']);
+                $q->whereDate('sales_date', '<=', $this->filters['dateTo']);
             })
             ->when($this->filters['paymentType'], function ($q) {
                 $q->where('payment_type', $this->filters['paymentType']);
@@ -250,15 +250,15 @@ class Bill extends Component
             ->when($this->filters['customerType'], function ($q) {
                 $q->where('customer_type', $this->filters['customerType']);
             })
-            ->orderBy('created_at', 'desc');
+            ->orderBy('sales_date', 'desc');
 
         $sales = $query->paginate(10);
 
         // Calculate stats
         $totalSales = Sale::count();
-        $todaySales = Sale::whereDate('created_at', today())->count();
+        $todaySales = Sale::whereDate('sales_date', today())->count();
         $totalRevenue = Sale::sum('total_amount');
-        $todayRevenue = Sale::whereDate('created_at', today())->sum('total_amount');
+        $todayRevenue = Sale::whereDate('sales_date', today())->sum('total_amount');
 
         return view('livewire.admin.bill', [
             'sales' => $sales,

@@ -94,7 +94,7 @@ class ProductReEntry extends Component
         }
         $query = Sale::with('customer')
             ->where('invoice_number', 'like', "%{$term}%")
-            ->orderBy('created_at', 'desc');
+            ->orderBy('sales_date', 'desc');
         if ($this->selectedCustomerId) {
             $query->where('customer_id', $this->selectedCustomerId);
         }

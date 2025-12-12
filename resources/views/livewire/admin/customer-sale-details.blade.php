@@ -190,7 +190,7 @@
                                         <h6 class="text-sm fw-semibold text-gray-800 mb-2" style="color: #9d1c20;">Total Sales</h6>
                                         <h3 class="fw-bold text-gray-800">Rs.{{ number_format($modalData['salesSummary']->total_amount, 2) }}</h3>
                                         @php
-                                        $todaySales = collect($modalData['invoices'])->where('created_at', '>=', now()->startOfDay());
+                                        $todaySales = collect($modalData['invoices'])->where('sales_date', '>=', now()->startOfDay());
                                         $todaySalesAmount = $todaySales->sum('total_amount');
                                         $todayInvoiceCount = $todaySales->count();
                                         @endphp

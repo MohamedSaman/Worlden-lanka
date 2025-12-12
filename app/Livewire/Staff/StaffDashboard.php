@@ -140,12 +140,12 @@ class StaffDashboard extends Component
                 'sales.invoice_number',
                 'sales.total_amount',
                 'sales.payment_status',
-                'sales.created_at',
+                'sales.sales_date',
                 'customers.name',
                 'customers.email',
                 'sales.due_amount'
             )
-            ->orderBy('sales.created_at', 'desc')
+            ->orderBy('sales.sales_date', 'desc')
             ->limit(5)
             ->get();
     }

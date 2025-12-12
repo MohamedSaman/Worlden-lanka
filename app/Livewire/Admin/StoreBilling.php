@@ -751,7 +751,7 @@ class StoreBilling extends Component
                 'notes'            => $this->saleNotes,
                 'delivery_note'    => $this->deliveryNote,
                 'due_amount'       => $actualDueAmount,
-                'created_at'       => $this->invoiceDate . ' ' . date('H:i:s'),
+                'sales_date'       => $this->invoiceDate . ' ' . date('H:i:s'),
                 'updated_at'       => now(),
             ]);
 

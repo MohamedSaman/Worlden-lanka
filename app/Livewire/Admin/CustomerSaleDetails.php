@@ -80,7 +80,7 @@ class CustomerSaleDetails extends Component
 
         // Get individual invoices
         $invoices = Sale::where('customer_id', $customerId)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('sales_date', 'desc')
             ->get();
 
         // Get due totals from customer_accounts (authoritative due balances)
@@ -109,7 +109,7 @@ class CustomerSaleDetails extends Component
                 DB::raw('SUM(sales_items.price * sales_items.quantity) as total_item_sales'),
                 DB::raw('SUM(sales.total_amount) as total_sales'),
                 'sales.invoice_number',
-                'sales.created_at as sale_date',
+                'sales.sales_date as sale_date',
                 'product_details.product_name',
                 'product_details.category_id as product_category',
                 'product_details.product_code',
@@ -120,13 +120,13 @@ class CustomerSaleDetails extends Component
                 'sales.invoice_number',
                 'sales_items.price',
                 'sales_items.discount',
-                'sales.created_at',
+                'sales.sales_date',
                 'product_details.product_name',
                 'product_details.category_id',
                 'product_details.product_code',
                 'customers.name'
             )
-            ->orderBy('sales.created_at', 'desc')
+            ->orderBy('sales.sales_date', 'desc')
             ->get();
 
         $invoiceSales = DB::table('sales')
@@ -136,13 +136,13 @@ class CustomerSaleDetails extends Component
                 'sales.id',
                 'sales.invoice_number',
                 'sales.notes',
-                'sales.created_at as sale_date',
+                'sales.sales_date as sale_date',
                 DB::raw('SUM(sales.total_amount) as total_invoice_amount'),
                 'customers.name as customer_name'
             )
             ->join('sales_items', 'sales.id', '=', 'sales_items.sale_id')
-            ->groupBy('sales.id', 'sales.invoice_number', 'sales.notes', 'sales.created_at', 'customers.name')
-            ->orderBy('sales.created_at', 'desc')
+            ->groupBy('sales.id', 'sales.invoice_number', 'sales.notes', 'sales.sales_date', 'customers.name')
+            ->orderBy('sales.sales_date', 'desc')
             ->get();
 
         // Get paid records related to this customer's sales and Brought-forward payments
@@ -478,7 +478,7 @@ class CustomerSaleDetails extends Component
     {
         $customerSales = DB::table('customers')
             ->leftJoin(DB::raw('(SELECT customer_id, SUM(current_due_amount) as current_due FROM customer_accounts GROUP BY customer_id) as account_summary'), 'customers.id', '=', 'account_summary.customer_id')
-            ->leftJoin(DB::raw('(SELECT customer_id, COUNT(DISTINCT invoice_number) as invoice_count, SUM(total_amount) as total_sales, SUM(due_amount) as total_due, MAX(created_at) as last_sale_date FROM sales GROUP BY customer_id) as sales_summary'), 'customers.id', '=', 'sales_summary.customer_id')
+            ->leftJoin(DB::raw('(SELECT customer_id, COUNT(DISTINCT invoice_number) as invoice_count, SUM(total_amount) as total_sales, SUM(due_amount) as total_due, MAX(sales_date) as last_sale_date FROM sales GROUP BY customer_id) as sales_summary'), 'customers.id', '=', 'sales_summary.customer_id')
             ->leftJoin(DB::raw('(SELECT customer_id, SUM(back_forward_amount) as total_back_forward_amount FROM customer_accounts GROUP BY customer_id) as back_forward_summary'), 'customers.id', '=', 'back_forward_summary.customer_id')
             ->select(
                 'customers.id as customer_id',

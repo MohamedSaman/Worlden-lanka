@@ -613,6 +613,7 @@ public function addToCart($watchId)
                 'payment_status' => $paymentStatus,
                 'notes' => $this->saleNotes,
                 'due_amount' => $this->balanceAmount,
+                'sales_date' => now(),
             ]);
 foreach ($this->cart as $id => $item) {
     $requestedQty = $this->quantities[$id];

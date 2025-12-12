@@ -48,10 +48,10 @@ class AdminDashboard extends Component
         $this->totalSales = $salesStats->total_sales ?? 0;
         $this->totalDueAmount = $salesStats->total_due ?? 0;
         $this->totalRevenue = $this->totalSales - $this->totalDueAmount;
-        $this->todayRevenue = Sale::whereDate('created_at', Carbon::today())
-            ->sum('total_amount') - Sale::whereDate('created_at', Carbon::today())
+        $this->todayRevenue = Sale::whereDate('sales_date', Carbon::today())
+            ->sum('total_amount') - Sale::whereDate('sales_date', Carbon::today())
             ->sum('due_amount');
-        $this->todayRevenueCount = Sale::whereDate('created_at', Carbon::today())->count();
+        $this->todayRevenueCount = Sale::whereDate('sales_date', Carbon::today())->count();
 
         // Calculate percentages
         if ($this->totalSales > 0) {
@@ -61,7 +61,7 @@ class AdminDashboard extends Component
 
         // Get previous month's revenue for comparison
         $previousMonthSales = Sale::whereMonth(
-            'created_at',
+            'sales_date',
             '=',
             now()->subMonth()->month
         )->select(
@@ -124,13 +124,13 @@ class AdminDashboard extends Component
                 'sales.invoice_number',
                 'sales.total_amount',
                 'sales.payment_status',
-                'sales.created_at',
+                'sales.sales_date',
                 'customers.name',
                 'customers.email',
                 'customers.type',
                 'sales.due_amount'
             )
-            ->orderBy('sales.created_at', 'desc')
+            ->orderBy('sales.sales_date', 'desc')
             ->limit(5)
             ->get();
     }

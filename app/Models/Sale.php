@@ -23,6 +23,7 @@ class Sale extends Model
         'delivery_note',
         'due_amount',
         'user_id',
+        'sales_date',
         'created_at',
         'updated_at',
     ];
@@ -52,11 +53,18 @@ class Sale extends Model
         return $this->hasOne(CustomerAccount::class);
     }
     // Generate unique invoice numbers
-    public static function generateInvoiceNumber()
+    public static function generateInvoiceNumber($salesDate = null)
     {
+        if (!$salesDate) {
+            $salesDate = now();
+        } elseif (is_string($salesDate)) {
+            $salesDate = \Carbon\Carbon::parse($salesDate);
+        }
+        
         $prefix = 'INV-';
-        $date = now()->format('Ymd');
-        $lastInvoice = self::where('invoice_number', 'like', "{$prefix}{$date}%")
+        $date = $salesDate->format('Ymd');
+        $lastInvoice = self::whereDate('sales_date', $salesDate)
+            ->where('invoice_number', 'like', "{$prefix}{$date}%")
             ->orderBy('invoice_number', 'desc')
             ->first();
 

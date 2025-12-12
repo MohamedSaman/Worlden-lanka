@@ -74,7 +74,7 @@ class CustomerSaleManagement extends Component
             $salesQuery->where('customer_type', $this->filterCustomerType);
         }
         
-        $sales = $salesQuery->orderBy('created_at', 'desc')
+        $sales = $salesQuery->orderBy('sales_date', 'desc')
             ->paginate(10);
             
         // Calculate total sales and due amount
