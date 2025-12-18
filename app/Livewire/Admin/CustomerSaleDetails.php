@@ -137,11 +137,11 @@ class CustomerSaleDetails extends Component
                 'sales.invoice_number',
                 'sales.notes',
                 'sales.sales_date as sale_date',
-                DB::raw('SUM(sales.total_amount) as total_invoice_amount'),
+                'sales.total_amount as total_invoice_amount',
                 'customers.name as customer_name'
             )
             ->join('sales_items', 'sales.id', '=', 'sales_items.sale_id')
-            ->groupBy('sales.id', 'sales.invoice_number', 'sales.notes', 'sales.sales_date', 'customers.name')
+            ->groupBy('sales.id', 'sales.invoice_number', 'sales.notes', 'sales.sales_date', 'customers.name', 'sales.total_amount')
             ->orderBy('sales.sales_date', 'desc')
             ->get();
 
@@ -196,8 +196,8 @@ class CustomerSaleDetails extends Component
 
         // Compute the brought-forward amount used for the timeline row.
         // Formula (Option B + existing paid-forward sum): (paid_due - total_sales - advance_amount) + paidForwardSum
-        $bfAmount = (floatval($accountTotals->paid_due ?? 0) + floatval($accountTotals->back_forward_due ?? 0) + floatval($accountTotals->current_due ?? 0))  - (floatval($salesSummary->total_due ?? 0) ) ;
-       
+        $bfAmount = (floatval($accountTotals->paid_due ?? 0) + floatval($accountTotals->back_forward_due ?? 0) + floatval($accountTotals->current_due ?? 0))  - (floatval($salesSummary->total_due ?? 0));
+
         // dd($accountTotals->paid_due , $salesSummary->total_due ,$accountTotals->advance_amount , $accountTotals->back_forward_due , $bfAmount);
 
         // Collect invoice and payment events with comparable dates

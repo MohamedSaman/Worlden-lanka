@@ -542,12 +542,12 @@
                         <i class="bi bi-cash"></i> <span>Store Billing</span>
                     </a>
                 </li>
-                <li class="nav-item">
+                <!-- <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.manual-billing') ? 'active' : '' }}"
                         href="{{ route('admin.manual-billing') }}">
                         <i class="bi bi-pencil-square"></i> <span>Manual Billing</span>
                     </a>
-                </li>
+                </li> -->
                 <li class="nav-item">
                     <a class="nav-link {{ request()->routeIs('admin.manual-sales') ? 'active' : '' }}"
                         href="{{ route('admin.manual-sales') }}">
