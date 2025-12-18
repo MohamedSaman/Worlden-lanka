@@ -268,7 +268,7 @@
                                 <p class="mb-1" style="color: #9d1c20;"><strong>Invoice Number: {{
                                         $saleDetails['sale']->invoice_number }}</strong></p>
                                 <p class="mb-1" style="color: #9d1c20;"><strong>Date: {{
-                                        $saleDetails['sale']->created_at->setTimezone('Asia/Colombo')->format('d/m/Y h:i A') }}</strong>
+                                        \Carbon\Carbon::parse($saleDetails['sale']->sales_date)->setTimezone('Asia/Colombo')->format('d/m/Y h:i A') }}</strong>
                                 </p>
                                 <p class="mb-1" style="color: #9d1c20;">
                                     <strong>Payment Status: {{ ucfirst($saleDetails['sale']->payment_status) }}
