@@ -626,6 +626,10 @@
                             <p class="fw-bold">{{ $selectedCheque->cheque_date?->format('d/m/Y') ?? 'N/A' }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
+                            <label class="fw-semibold text-muted">Bank Name</label>
+                            <p class="fw-bold">{{ $selectedCheque->bank_name ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <label class="fw-semibold text-muted">Status</label>
                             <p class="fw-bold {{ $selectedCheque->status === 'pending' ? 'text-warning' : ($selectedCheque->status === 'complete' ? 'text-success' : 'text-danger') }}">
                                 {{ ucfirst($selectedCheque->status ?? 'Pending') }}
@@ -665,6 +669,10 @@
                                 @error('editChequeDate')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="fw-semibold text-muted">Bank Name</label>
+                                <p class="fw-bold">{{ $selectedCheque->bank_name ?? 'N/A' }}</p>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="fw-semibold text-muted">Status</label>
