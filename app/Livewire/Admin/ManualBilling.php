@@ -283,14 +283,14 @@ class ManualBilling extends Component
             }
         }
 
-        // Check both Sale and ManualSale tables for existing invoice
+        // Check only ManualSale table for existing invoice (separate from Store Billing)
         $existingManualSale = ManualSale::where('invoice_number', $this->invoiceNumber)->first();
 
         if ($existingManualSale) {
             $this->dispatch('swal', [
                 'icon' => 'error',
                 'title' => 'Invoice Already Exists',
-                'text' => 'This invoice number already exists in the system. Please use a different number.'
+                'text' => 'This invoice number already exists in Manual Billing. Please use a different number.'
             ]);
             return false;
         }
