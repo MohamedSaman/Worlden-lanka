@@ -149,8 +149,8 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="small">{{ $sale->created_at->format('d M Y') }}</div>
-                                    <div class="small text-secondary">{{ $sale->created_at->format('h:i A') }}</div>
+                                    <div class="small">{{ $sale->sales_date->format('d M Y') }}</div>
+                                    <div class="small text-secondary">{{ $sale->sales_date->format('h:i A') }}</div>
                                 </td>
                                 <td class="text-center">
                                     <span class="badge-modern badge-info-modern">
