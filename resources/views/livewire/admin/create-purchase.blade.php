@@ -361,7 +361,7 @@
                                     </thead>
                                     <tbody>
                                         @php
-                                            $purchaseResults = $this->getPurchaseResults();
+                                        $purchaseResults = $this->getPurchaseResults();
                                         @endphp
                                         @forelse($purchaseResults as $purchase)
                                         <tr wire:click="selectPurchase({{ $purchase->id }})"
