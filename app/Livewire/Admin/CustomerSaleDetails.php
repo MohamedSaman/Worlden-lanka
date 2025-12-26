@@ -159,6 +159,7 @@ class CustomerSaleDetails extends Component
                 'payments.due_payment_method',
                 'payments.payment_reference',
                 'payments.payment_date',
+                'payments.payment_method',
                 'payments.created_at',
                 'payments.is_completed',
                 'payments.status',
@@ -234,6 +235,11 @@ class CustomerSaleDetails extends Component
                 $target = 'Current';
             }
             $label = 'Paid (' . $target . ')';
+
+            // Check if payment is via purchase order
+            if (!empty($p->payment_method) && strtolower($p->payment_method) === 'purchase_order') {
+                $label .= ' - Purchase Order';
+            }
 
             // Add payment method only (removed invoice number section)
             if (!empty($p->due_payment_method)) {

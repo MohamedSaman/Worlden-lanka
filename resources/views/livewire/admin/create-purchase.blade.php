@@ -46,11 +46,18 @@
     <div class="row mb-4">
         <div class="col-12">
             <div class="card border-0 shadow-sm" style="background: linear-gradient(135deg, #9d1c20 0%, #d34d51 100%);">
-                <div class="card-body p-4">
-                    <h2 class="text-white mb-1 fw-bold">
-                        <i class="bi bi-cart-plus me-2"></i>Create Purchase Order
-                    </h2>
-                    <p class="text-white-50 mb-0">Add products and create purchase orders</p>
+                <div class="card-body p-4 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 class="text-white mb-1 fw-bold">
+                            <i class="bi bi-cart-plus me-2"></i>Create Purchase Order
+                        </h2>
+                        <p class="text-white-50 mb-0">Add products and create purchase orders</p>
+                    </div>
+                    <div class="mt-3 text-end">
+                        <button wire:click="showPurchaseHistory" class="btn btn-light">
+                            <i class="bi bi-clock-history me-1"></i> Purchase History
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -290,6 +297,171 @@
                             <i class="bi bi-check-circle me-1"></i> Complete Purchase
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Purchase History Modal -->
+    <div wire:ignore.self class="modal fade" id="purchaseHistoryModal" tabindex="-1" aria-labelledby="purchaseHistoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+            <div class="modal-content rounded-4 shadow-lg border-0">
+                <!-- Header with gradient -->
+                <div class="modal-header border-0 p-4" style="background: linear-gradient(90deg, #9d1c20 0%, #d34d51 100%);">
+                    <div>
+                        <h5 class="modal-title text-white fw-bold mb-1" id="purchaseHistoryModalLabel">
+                            <i class="bi bi-clock-history me-2"></i>Purchase History
+                        </h5>
+                        <small class="text-white-50">View and manage your purchase orders</small>
+                    </div>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body p-4">
+                    <!-- Search Section -->
+                    <div class="row mb-4 g-3 align-items-end">
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold mb-2">Search Purchases</label>
+                            <div class="input-group search-enhanced">
+                                <span class="input-group-text bg-white border-end-0">
+                                    <i class="bi bi-search" style="color:#9d1c20;"></i>
+                                </span>
+                                <input type="text"
+                                    class="form-control border-start-0"
+                                    placeholder="Search by ID, notes or amount..."
+                                    wire:model.debounce.300ms="purchaseSearch">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <button wire:click="searchPurchases" class="btn w-100" style="background-color:#9d1c20; color:white; border:none;">
+                                <i class="bi bi-search me-2"></i>Search
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Purchases Table Section -->
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header p-3" style="background-color:#f0f4f8; border-bottom:2px solid #9d1c20;">
+                            <h6 class="mb-0 fw-bold" style="color:#9d1c20;">
+                                <i class="bi bi-list-check me-2"></i>Purchase Orders
+                            </h6>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive" style="max-height:300px; overflow-y:auto;">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead style="background-color:#f8f9fa; position:sticky; top:0;">
+                                        <tr>
+                                            <th class="ps-3" style="color:#9d1c20;">#</th>
+                                            <th style="color:#9d1c20;">Customer</th>
+                                            <th style="color:#9d1c20;">Notes</th>
+                                            <th class="text-end pe-3" style="color:#9d1c20;">Grand Total</th>
+                                            <th style="color:#9d1c20;">Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @php
+                                            $purchaseResults = $this->getPurchaseResults();
+                                        @endphp
+                                        @forelse($purchaseResults as $purchase)
+                                        <tr wire:click="selectPurchase({{ $purchase->id }})"
+                                            style="cursor:pointer; transition:all 0.2s ease;"
+                                            class="{{ isset($selectedPurchase) && $selectedPurchase->id == $purchase->id ? '' : 'hover-highlight' }}"
+                                            @class(['border-start ps-3', 'fw-semibold'=> isset($selectedPurchase) && $selectedPurchase->id == $purchase->id])
+                                            @style(['border-left:4px solid #9d1c20 !important; background-color:#f0f4f8 !important;' => isset($selectedPurchase) && $selectedPurchase->id == $purchase->id])>
+                                            <td class="ps-3">{{ $purchase->id }}</td>
+                                            <td>{{ optional($purchase->customer)->name ?? 'N/A' }}</td>
+                                            <td>
+                                                <span class="text-muted small">{{ Str::limit($purchase->notes ?? 'No notes', 50) }}</span>
+                                            </td>
+                                            <td class="text-end pe-3">
+                                                <span class="fw-bold" style="color:#9d1c20;">Rs.{{ number_format($purchase->grand_total ?? 0, 2) }}</span>
+                                            </td>
+                                            <td>
+                                                <small class="text-muted">{{ optional($purchase->created_at)->format('d M Y') }}</small>
+                                            </td>
+                                        </tr>
+                                        @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center py-5 text-muted">
+                                                <i class="bi bi-inbox" style="font-size:2rem; margin-bottom:10px; display:block; opacity:0.5;"></i>
+                                                No purchases found.
+                                            </td>
+                                        </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!-- Pagination -->
+                            <div class="p-3 border-top">
+                                {{ $purchaseResults->links('pagination::bootstrap-4', ['pageName' => 'purchasePage']) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Selected Purchase Items Section -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header p-3" style="background-color:#f0f4f8; border-bottom:2px solid #9d1c20;">
+                            <h6 class="mb-0 fw-bold" style="color:#9d1c20;">
+                                <i class="bi bi-box-seam me-2"></i>Purchase Items
+                            </h6>
+                        </div>
+                        <div class="card-body p-4">
+                            @if($selectedPurchase)
+                            <!-- Purchase Summary Card -->
+                            <div class="alert mb-4" style="background: linear-gradient(135deg, #f0f4f8 0%, #e8ecf1 100%); border-left:4px solid #9d1c20; border:none;">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <small class="text-muted d-block">Purchase Order #</small>
+                                        <h5 class="mb-0 fw-bold" style="color:#9d1c20;">{{ $selectedPurchase->id }}</h5>
+                                    </div>
+                                    <div class="col-md-6 text-md-end">
+                                        <small class="text-muted d-block">Grand Total</small>
+                                        <h5 class="mb-0 fw-bold" style="color:#9d1c20;">Rs.{{ number_format($selectedPurchase->grand_total ?? 0, 2) }}</h5>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Items Table -->
+                            <div class="table-responsive">
+                                <table class="table table-sm align-middle mb-0">
+                                    <thead style="background-color:#f8f9fa;">
+                                        <tr>
+                                            <th style="color:#9d1c20;">Product</th>
+                                            <th class="text-center" style="color:#9d1c20;">Qty</th>
+                                            <th class="text-end" style="color:#9d1c20;">Unit Price</th>
+                                            <th class="text-end" style="color:#9d1c20;">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($selectedPurchaseItems as $it)
+                                        <tr class="border-bottom">
+                                            <td class="fw-semibold">{{ $it['product_name'] }}</td>
+                                            <td class="text-center">
+                                                <span class="badge" style="background-color:#e8ecf1; color:#9d1c20;">{{ $it['quantity'] }}</span>
+                                            </td>
+                                            <td class="text-end">Rs.{{ number_format($it['unit_price'], 2) }}</td>
+                                            <td class="text-end fw-bold" style="color:#9d1c20;">Rs.{{ number_format($it['subtotal'], 2) }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                            @else
+                            <div class="text-center py-5 text-muted">
+                                <i class="bi bi-hand-index" style="font-size:2rem; margin-bottom:10px; display:block; opacity:0.5;"></i>
+                                <p class="mb-0">Click a purchase row to view its items.</p>
+                            </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="modal-footer p-3 border-top">
+                    <button type="button" class="btn btn-light rounded-3 px-4" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg me-1"></i>Close
+                    </button>
                 </div>
             </div>
         </div>

@@ -15,11 +15,14 @@ use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 #[Layout('components.layouts.admin')]
 #[Title('Create Purchase')]
 class CreatePurchase extends Component
 {
+    use WithPagination;
+
     public $searchCustomer = '';
     public $customerResults = [];
     public $selectedCustomer = null;
@@ -35,6 +38,63 @@ class CreatePurchase extends Component
     public $notes = '';
 
     protected $listeners = [];
+
+    // Purchase history modal/search state
+    public $purchaseSearch = '';
+    public $purchaseResults = [];
+    public $selectedPurchase = null;
+    public $selectedPurchaseItems = [];
+
+    public function updatedPurchaseSearch()
+    {
+        $this->searchPurchases();
+    }
+
+    public function searchPurchases()
+    {
+        $this->resetPage('purchasePage');
+    }
+
+    public function getPurchaseResults()
+    {
+        $term = trim($this->purchaseSearch);
+
+        $query = Purchase::with('customer')
+            ->orderBy('created_at', 'desc');
+
+        if (strlen($term) > 0) {
+            $query->where(function ($q) use ($term) {
+                $q->where('id', 'like', "%{$term}%")
+                    ->orWhere('notes', 'like', "%{$term}%")
+                    ->orWhere('grand_total', 'like', "%{$term}%");
+            });
+        }
+
+        return $query->paginate(10, ['*'], 'purchasePage');
+    }
+
+    public function showPurchaseHistory()
+    {
+        $this->purchaseSearch = '';
+        $this->resetPage('purchasePage');
+        $this->dispatch('openModal', 'purchaseHistoryModal');
+    }
+
+    public function selectPurchase($purchaseId)
+    {
+        $purchase = Purchase::with(['items.product'])->find($purchaseId);
+        if (!$purchase) return;
+
+        $this->selectedPurchase = $purchase;
+        $this->selectedPurchaseItems = $purchase->items->map(function ($it) {
+            return [
+                'product_name' => optional($it->product)->product_name ?? 'N/A',
+                'quantity' => $it->quantity,
+                'unit_price' => $it->unit_price,
+                'subtotal' => $it->subtotal,
+            ];
+        })->toArray();
+    }
 
     public function updatedSearchCustomer()
     {
