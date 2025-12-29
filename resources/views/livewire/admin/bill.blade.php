@@ -303,7 +303,7 @@
                                         @endif
                                         <th scope="col" class="text-center py-2">Price</th>
                                         <th scope="col" class="text-center py-2">Qty</th>
-                                        <th scope="col" class="text-center py-2">Discount</th>
+                                        <th scope="col" class="text-center py-2">Qty Type</th>
                                         <th scope="col" class="text-center py-2">Total</th>
                                     </tr>
                                 </thead>
@@ -323,7 +323,7 @@
                                         @endif
                                         <td class="text-center py-2">Rs.{{ number_format($item->price, 2) }}</td>
                                         <td class="text-center py-2">{{ $item->quantity }}</td>
-                                        <td class="text-center py-2">Rs.{{ number_format($item->discount * $item->quantity, 2) }}</td>
+                                        <td class="text-center py-2">{{ $item->quantity_type ?? '-' }}</td>
                                         <td class="text-center py-2">Rs.{{ number_format(($item->price * $item->quantity) - ($item->discount * $item->quantity), 2) }}</td>
                                     </tr>
                                     @endforeach
@@ -378,10 +378,10 @@
                                             <span><strong>Subtotal:</strong></span>
                                             <span><strong>Rs.{{ number_format($saleDetails['sale']->subtotal, 2) }}</strong></span>
                                         </div>
-                                        <div class="d-flex justify-content-between mb-2" style="color: #9d1c20;">
+                                        <!-- <div class="d-flex justify-content-between mb-2" style="color: #9d1c20;">
                                             <span><strong>Total Discount:</strong></span>
                                             <span><strong>Rs.{{ number_format($saleDetails['sale']->discount_amount, 2) }}</strong></span>
-                                        </div>
+                                        </div> -->
                                         <hr style="border-color: #9d1c20;">
                                         <div class="d-flex justify-content-between" style="color: #9d1c20;">
                                             <span class="fw-bold">Grand Total:</span>

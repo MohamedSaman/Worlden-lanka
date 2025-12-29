@@ -28,6 +28,12 @@ class Sale extends Model
         'updated_at',
     ];
 
+    protected $casts = [
+        'sales_date' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);
@@ -60,7 +66,7 @@ class Sale extends Model
         } elseif (is_string($salesDate)) {
             $salesDate = \Carbon\Carbon::parse($salesDate);
         }
-        
+
         $prefix = 'INV-';
         $date = $salesDate->format('Ymd');
         $lastInvoice = self::whereDate('sales_date', $salesDate)
