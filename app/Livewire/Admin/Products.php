@@ -11,12 +11,14 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use TheSeer\Tokenizer\Exception;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Livewire\WithFileUploads;
 
 #[Layout('components.layouts.admin')]
 #[Title('Product Management')]
 class Products extends Component
 {
     use WithPagination;
+    use WithFileUploads;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -29,6 +31,8 @@ class Products extends Component
     public $showAddModal = false;
     public $showEditModal = false;
     public $showDeleteModal = false;
+    public $showImportModal = false;
+    public $excel_file;
 
     public $editingProductId = null;
     public $deletingProductId = null;
@@ -357,6 +361,117 @@ class Products extends Component
         ]);
 
         $this->resetValidation();
+    }
+
+    public function toggleImportModal()
+    {
+        $this->showImportModal = !$this->showImportModal;
+        if (!$this->showImportModal) {
+            $this->excel_file = null;
+        }
+    }
+
+    public function downloadTemplate(): StreamedResponse
+    {
+        $fileName = 'product_import_template.csv';
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$fileName\"",
+        ];
+
+        $callback = function () {
+            $handle = fopen('php://output', 'w');
+
+            // Define your CSV headers for import
+            fputcsv($handle, [
+                'Product Name',   // [0]
+                'Supplier Price', // [1]
+                'Selling Price',  // [2]
+                'Total Stock',    // [3]
+                'Damage Stock',   // [4]
+            ]);
+
+            // Add a sample row
+            fputcsv($handle, [
+                'Sample Product',
+                '1000',
+                '1500',
+                '50',
+                '5',
+            ]);
+
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    public function importFromExcel()
+    {
+        $this->validate([
+            'excel_file' => 'required|mimes:csv,txt|max:10240',
+        ]);
+
+        try {
+            $filePath = $this->excel_file->getRealPath();
+            $handle = fopen($filePath, 'r');
+
+            // Skip header row
+            fgetcsv($handle);
+
+            // Get or create a default category
+            $defaultCategory = ProductCategory::firstOrCreate(
+                ['name' => 'General'],
+                ['description' => 'Default category for imported products']
+            );
+
+            DB::beginTransaction();
+            
+            $importedCount = 0;
+            while (($row = fgetcsv($handle)) !== FALSE) {
+                if (count($row) < 5) continue;
+
+                $productName = $row[0];
+                $supplierPrice = floatval($row[1]);
+                $sellingPrice = floatval($row[2]);
+                $totalStock = intval($row[3]);
+                $damageStock = intval($row[4]);
+
+                if (empty($productName)) continue;
+
+                // Create product
+                $product = ProductDetail::create([
+                    'category_id' => $defaultCategory->id,
+                    'product_name' => $productName,
+                    'supplier_price' => $supplierPrice,
+                    'selling_price' => $sellingPrice,
+                    'stock_quantity' => $totalStock - $damageStock,
+                    'damage_quantity' => $damageStock,
+                    'status' => 'Active',
+                    'customer_field' => null,
+                ]);
+
+                // Generate product_code
+                $productPrefix = strtoupper(substr($productName, 0, 2));
+                $categoryPrefix = strtoupper(substr($defaultCategory->name, 0, 2));
+                $generatedCode = $productPrefix . $categoryPrefix . '0' . $product->id;
+
+                $product->update(['product_code' => $generatedCode]);
+                $importedCount++;
+            }
+
+            DB::commit();
+            fclose($handle);
+
+            $this->showImportModal = false;
+            $this->excel_file = null;
+            $this->js("Swal.fire('Success!', '$importedCount products imported successfully.', 'success')");
+        } catch (\Exception $e) {
+            DB::rollBack();
+            if (isset($handle)) fclose($handle);
+            $this->js("Swal.fire('Error!', '" . addslashes($e->getMessage()) . "', 'error')");
+        }
     }
 
 

@@ -40,6 +40,11 @@
                                     <i class="bi bi-plus-circle me-1"></i>
                                     <span class="d-none d-sm-inline">Add </span>Product
                                 </button>
+                                <button class="btn btn-modern btn-info-modern"
+                                    wire:click="toggleImportModal">
+                                    <i class="bi bi-upload me-1"></i>
+                                    <span class="d-none d-sm-inline">Import </span>Excel
+                                </button>
                                 <button wire:click="exportToCSV"
                                     class="btn btn-modern btn-secondary-modern">
                                     <i class="bi bi-download me-1"></i>
@@ -714,6 +719,88 @@
                         wire:click="$set('showViewModal', false)"
                         style="background-color: #6B7280;">
                         Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    <!-- Import Modal -->
+    @if($showImportModal)
+    <div class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 shadow-xl overflow-hidden" style="border: 2px solid var(--info); background: linear-gradient(145deg, #ffffff, #f8f9fa);">
+                <div class="modal-header py-3 px-4" style="background-color: var(--info); color: white;">
+                    <h5 class="modal-title fw-bold">
+                        <i class="bi bi-file-earmark-excel me-2"></i>Import Products from Excel/CSV
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" wire:click="toggleImportModal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="alert alert-info border-0 rounded-3 mb-4" style="background-color: rgba(59, 130, 246, 0.1); color: var(--info);">
+                        <div class="d-flex">
+                            <i class="bi bi-info-circle-fill fs-4 me-3"></i>
+                            <div>
+                                <h6 class="fw-bold mb-1">Import Instructions</h6>
+                                <p class="mb-0 small">Please use the template below to format your data. All products will be imported into a <strong>"General"</strong> category by default and codes will be auto-generated.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 text-center">
+                        <p class="text-muted mb-2 small">First, download the official template to see the required format:</p>
+                        <button wire:click="downloadTemplate" class="btn btn-outline-info btn-sm rounded-pill px-4">
+                            <i class="bi bi-download me-1"></i>Download CSV Template
+                        </button>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label fw-semibold small mb-2" style="color: var(--info);">Select Excel/CSV File</label>
+                            <div class="input-group overflow-hidden rounded-3 border-2 shadow-sm" style="border: 1px solid var(--info);">
+                                <span class="input-group-text bg-white border-0 text-info"><i class="bi bi-file-earmark-arrow-up"></i></span>
+                                <input type="file" class="form-control border-0 shadow-none @error('excel_file') is-invalid @enderror" wire:model="excel_file">
+                            </div>
+                            @error('excel_file') <div class="text-danger small mt-1">{{ $message }}</div> @enderror
+                            <div wire:loading wire:target="excel_file" class="mt-2 small text-info text-center">
+                                <span class="spinner-border spinner-border-sm me-1"></span>Uploading file...
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-4">
+                            <h6 class="fw-bold mb-3 small text-uppercase text-muted" style="letter-spacing: 1px;">Template Format Preview</h6>
+                            <div class="table-responsive rounded-3 border shadow-sm">
+                                <table class="table table-sm table-bordered mb-0 small text-center">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="py-2">Product Name</th>
+                                            <th class="py-2">Supplier Price</th>
+                                            <th class="py-2">Selling Price</th>
+                                            <th class="py-2">Total Stock</th>
+                                            <th class="py-2">Damage Stock</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-muted py-2">Example Item</td>
+                                            <td class="text-muted py-2">100.00</td>
+                                            <td class="text-muted py-2">150.00</td>
+                                            <td class="text-muted py-2">100</td>
+                                            <td class="text-muted py-2">5</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="mt-2 text-muted italic small text-center" style="font-size: 0.75rem;">* Stock Quantity will be calculated as (Total Stock - Damage Stock)</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light py-3 px-4 border-0">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" wire:click="toggleImportModal" style="background-color: #6B7280; border: none; color: white;">Cancel</button>
+                    <button type="button" class="btn btn-info text-white rounded-pill px-4 shadow-sm" wire:click="importFromExcel" wire:loading.attr="disabled" style="background-color: var(--info); border: none;">
+                        <span wire:loading.remove wire:target="importFromExcel"><i class="bi bi-check-circle me-1"></i>Start Import</span>
+                        <span wire:loading wire:target="importFromExcel"><span class="spinner-border spinner-border-sm me-1"></span>Importing...</span>
                     </button>
                 </div>
             </div>

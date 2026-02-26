@@ -179,6 +179,16 @@
         color: white;
     }
 
+    .btn-info-modern {
+        background: linear-gradient(135deg, var(--info) 0%, #60a5fa 100%);
+        color: white;
+    }
+
+    .btn-info-modern:hover {
+        background: linear-gradient(135deg, #2563eb 0%, var(--info) 100%);
+        color: white;
+    }
+
     .btn-secondary-modern {
         background: white;
         color: var(--text-primary);
