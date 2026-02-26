@@ -11,15 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasColumn('sales_items', 'product_name')) {
+            Schema::table('sales_items', function (Blueprint $table) {
+                $table->string('product_name')->after('product_id')->nullable();
+            });
+        }
+
         Schema::table('sales_items', function (Blueprint $table) {
-            $table->string('product_name')->after('product_id')->nullable();
-            
-            // Drop existing foreign key and add new one with nullOnDelete
-            $table->dropForeign(['product_id']);
-            
-            // Make product_id nullable and set foreign key with nullOnDelete
+            // Make product_id nullable if it's not already
             $table->unsignedBigInteger('product_id')->nullable()->change();
             
+            // Re-setup foreign key with nullOnDelete
+            // We'll wrap this in a try-catch or check if possible to avoid errors if FK doesn't exist
+            try {
+                $table->dropForeign(['product_id']);
+            } catch (\Exception $e) {
+                // Foreign key might not exist, ignore
+            }
+
             $table->foreign('product_id')
                 ->references('id')
                 ->on('product_details')
@@ -33,15 +42,20 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('sales_items', function (Blueprint $table) {
-            $table->dropForeign(['product_id']);
-            
+            try {
+                $table->dropForeign(['product_id']);
+            } catch (\Exception $e) {}
+
             $table->foreign('product_id')
                 ->references('id')
                 ->on('product_details')
                 ->onDelete('cascade');
                 
             $table->unsignedBigInteger('product_id')->nullable(false)->change();
-            $table->dropColumn('product_name');
+            
+            if (Schema::hasColumn('sales_items', 'product_name')) {
+                $table->dropColumn('product_name');
+            }
         });
     }
 };
