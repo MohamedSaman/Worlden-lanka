@@ -409,13 +409,27 @@ class Products extends Component
 
     public function importFromExcel()
     {
+        set_time_limit(600); // 10 minutes
+        
         $this->validate([
             'excel_file' => 'required|mimes:csv,txt|max:10240',
         ]);
 
         try {
             $filePath = $this->excel_file->getRealPath();
-            $handle = fopen($filePath, 'r');
+            
+            // Try to detect encoding and convert file to UTF-8 if necessary
+            $content = file_get_contents($filePath);
+            $encoding = mb_detect_encoding($content, ['UTF-8', 'ISO-8859-1', 'Windows-1252'], true);
+            
+            if ($encoding && $encoding !== 'UTF-8') {
+                $content = mb_convert_encoding($content, 'UTF-8', $encoding);
+                $tmpFile = tempnam(sys_get_temp_dir(), 'import');
+                file_put_contents($tmpFile, $content);
+                $handle = fopen($tmpFile, 'r');
+            } else {
+                $handle = fopen($filePath, 'r');
+            }
 
             // Skip header row
             fgetcsv($handle);
@@ -432,7 +446,10 @@ class Products extends Component
             while (($row = fgetcsv($handle)) !== FALSE) {
                 if (count($row) < 5) continue;
 
-                $productName = $row[0];
+                // Ensure data is clean UTF-8 for JSON responses/database
+                // Convert even if it seems okay, to strip illegal bytes
+                $productName = mb_convert_encoding(trim($row[0]), 'UTF-8', 'UTF-8');
+                
                 $supplierPrice = floatval($row[1]);
                 $sellingPrice = floatval($row[2]);
                 $totalStock = intval($row[3]);
@@ -463,6 +480,10 @@ class Products extends Component
 
             DB::commit();
             fclose($handle);
+            
+            if (isset($tmpFile) && file_exists($tmpFile)) {
+                unlink($tmpFile);
+            }
 
             $this->showImportModal = false;
             $this->excel_file = null;
@@ -470,6 +491,7 @@ class Products extends Component
         } catch (\Exception $e) {
             DB::rollBack();
             if (isset($handle)) fclose($handle);
+            if (isset($tmpFile) && file_exists($tmpFile)) unlink($tmpFile);
             $this->js("Swal.fire('Error!', '" . addslashes($e->getMessage()) . "', 'error')");
         }
     }
