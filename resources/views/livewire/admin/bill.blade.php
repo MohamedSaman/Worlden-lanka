@@ -311,7 +311,7 @@
                                     @foreach ($saleDetails['items'] as $index => $item)
                                     <tr class="transition-all hover:bg-gray-50">
                                         <td class="text-center py-2">{{ $index + 1 }}</td>
-                                        <td class="text-center py-2">{{ $item->product->product_name ?? 'N/A' }}</td>
+                                        <td class="text-center py-2">{{ $item->product_name ?? $item->product->product_name ?? 'N/A' }}</td>
                                         @if($saleDetails && $saleDetails['sale']->items->some(fn($i) => $i->product && isset($i->product->customer_field['Size']) && $i->product->customer_field['Size'] && isset($i->product->customer_field['Color']) && $i->product->customer_field['Color']))
                                         <td class="text-center py-2">
                                             @if($item->product && isset($item->product->customer_field['Size']) && $item->product->customer_field['Size'] && isset($item->product->customer_field['Color']) && $item->product->customer_field['Color'])

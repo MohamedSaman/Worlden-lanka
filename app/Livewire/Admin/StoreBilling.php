@@ -778,6 +778,7 @@ class StoreBilling extends Component
                 SalesItem::create([
                     'sale_id'       => $sale->id,
                     'product_id'    => $item['id'],
+                    'product_name'  => $item['name'],
                     'quantity'      => $quantityToSell,
                     'quantity_type' => $qtyType,
                     'price'         => $price,
