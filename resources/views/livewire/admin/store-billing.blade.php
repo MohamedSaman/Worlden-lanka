@@ -654,7 +654,7 @@
             <div class="modal-dialog modal-xl modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header bg-primary">
-                        <h1 class="modal-title fs-5 text-white" id="viewDetailModalLabel">Watch Details</h1>
+                        <h1 class="modal-title fs-5 text-white" id="viewDetailModalLabel">Product Details</h1>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     @if ($productDetails)
@@ -937,10 +937,6 @@
                                     @if ($receipt->customer)
                                     <p class="mb-1" style="color: #9d1c20;"><strong>Name: {{
                                             $receipt->customer->name }}</strong></p>
-                                    <p class="mb-1" style="color: #9d1c20;"><strong>Phone: {{
-                                            $receipt->customer->phone ?? 'N/A' }}</strong></p>
-                                    <strong class="mb-1" style="color: #9d1c20;"><strong>Type:</strong> {{
-                                            ucfirst($receipt->customer_type) ?? 'N/A' }}</strong></p>
                                     @else
                                     <p class="text" style="color: #9d1c20;"><strong>Walk-in Customer</strong></p>
                                     @endif

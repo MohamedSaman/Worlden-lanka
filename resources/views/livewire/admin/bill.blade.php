@@ -281,10 +281,6 @@
                                 @if ($saleDetails['sale']->customer)
                                 <p class="mb-1" style="color: #9d1c20;"><strong>Name: {{
                                         $saleDetails['sale']->customer->name }}</strong></p>
-                                <p class="mb-1" style="color: #9d1c20;"><strong>Phone: {{
-                                        $saleDetails['sale']->customer->phone ?? 'N/A' }}</strong></p>
-                                <p class="mb-1" style="color: #9d1c20;"><strong>Type: {{
-                                        ucfirst($saleDetails['sale']->customer_type) ?? 'N/A' }}</strong></p>
                                 @else
                                 <p class="text" style="color: #9d1c20;"><strong>Walk-in Customer</strong></p>
                                 @endif
