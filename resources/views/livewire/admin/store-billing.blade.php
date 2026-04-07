@@ -1107,12 +1107,12 @@
                     <style>
                     body {
                         font-family: "Courier New", monospace;
-                        font-size: 14px;
+                        font-size: 16px;
                         color: #000 !important;
                         font-weight: bold !important;
                     }
                     * { color: #000 !important; }
-                    .table-bordered th, .table-bordered td { border: 1px solid #000 !important; padding: 2px 6px !important; font-size: 12px !important; }
+                    .table-bordered th, .table-bordered td { border: 1px solid #000 !important; padding: 2px 6px !important; font-size: 14px !important; }
                     .receipt-container { max-width: 700px; margin: 0 auto; }
                     .d-flex.flex-row { display: flex; flex-direction: row; gap: 2rem; }
                     .d-flex.flex-row > .flex-fill { width: 50%; min-width: 0; }
