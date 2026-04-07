@@ -87,11 +87,8 @@ class CustomerSaleDetails extends Component
         $accountTotals = DB::table('customer_accounts')
             ->where('customer_id', $customerId)
             ->select(
-                DB::raw('SUM(total_due) as total_due'),
-                DB::raw('SUM(current_due_amount) as current_due'),
                 DB::raw('SUM(back_forward_amount) as back_forward_due'),
-                DB::raw('SUM(advance_amount) as advance_amount'),
-                DB::raw('SUM(paid_due) as paid_due')
+                DB::raw('SUM(advance_amount) as advance_amount')
             )
             ->first();
 
@@ -129,20 +126,15 @@ class CustomerSaleDetails extends Component
             ->orderBy('sales.sales_date', 'desc')
             ->get();
 
-        $invoiceSales = DB::table('sales')
-            ->join('customers', 'sales.customer_id', '=', 'customers.id')
-            ->where('sales.customer_id', $customerId)
+        $invoiceSales = Sale::where('customer_id', $customerId)
             ->select(
-                'sales.id',
-                'sales.invoice_number',
-                'sales.notes',
-                'sales.sales_date as sale_date',
-                'sales.total_amount as total_invoice_amount',
-                'customers.name as customer_name'
+                'id',
+                'invoice_number',
+                'notes',
+                'sales_date as sale_date',
+                'total_amount as total_invoice_amount'
             )
-            ->join('sales_items', 'sales.id', '=', 'sales_items.sale_id')
-            ->groupBy('sales.id', 'sales.invoice_number', 'sales.notes', 'sales.sales_date', 'customers.name', 'sales.total_amount')
-            ->orderBy('sales.sales_date', 'desc')
+            ->orderBy('id', 'asc')
             ->get();
 
         // Get paid records related to this customer's sales and Brought-forward payments
@@ -192,12 +184,14 @@ class CustomerSaleDetails extends Component
         // Calculate total return amount
         $totalReturnAmount = $returns->sum('total_amount');
 
+        // Net current due from sales after returns are applied.
+        $currentDueAfterReturns = max(0, floatval($salesSummary->total_due ?? 0) - floatval($totalReturnAmount ?? 0));
+
         // Build unified invoice summary rows timeline: Brought-Forward first, then Invoices, Returns and Paid ordered by date
         $invoiceSummaryRows = [];
 
-        // Compute the brought-forward amount used for the timeline row.
-        // Formula (Option B + existing paid-forward sum): (paid_due - total_sales - advance_amount) + paidForwardSum
-        $bfAmount = (floatval($accountTotals->paid_due ?? 0) + floatval($accountTotals->back_forward_due ?? 0) + floatval($accountTotals->current_due ?? 0))  - (floatval($salesSummary->total_due ?? 0));
+        // Use authoritative brought-forward due from customer_accounts for modal timeline.
+        $bfAmount = max(0, floatval($accountTotals->back_forward_due ?? 0));
 
         // dd($accountTotals->paid_due , $salesSummary->total_due ,$accountTotals->advance_amount , $accountTotals->back_forward_due , $bfAmount);
 
@@ -245,6 +239,9 @@ class CustomerSaleDetails extends Component
             if (!empty($p->due_payment_method)) {
                 $label .= ' - ' . ucfirst(str_replace('_', ' ', $p->due_payment_method));
             }
+            if (!empty($p->invoice_number)) {
+                $label .= ' - Invoice ' . $p->invoice_number;
+            }
             if (!empty($p->payment_reference)) {
                 $label .= ' (' . $p->payment_reference . ')';
             }
@@ -283,8 +280,13 @@ class CustomerSaleDetails extends Component
         ];
         $invoiceSummaryRows = array_merge($invoiceSummaryRows, $events);
 
-        // Compute brought-forward value as: (paid_due - total_sales - advance_amount)
-        $computedBackForward = floatval($accountTotals->paid_due ?? 0) - floatval($salesSummary->total_due ?? 0) - floatval($accountTotals->advance_amount ?? 0) + floatval($accountTotals->back_forward_due ?? 0);
+        // Use authoritative brought-forward due from customer_accounts in summary cards.
+        $computedBackForward = max(0, floatval($accountTotals->back_forward_due ?? 0));
+        $currentDueFromSales = $currentDueAfterReturns;
+        $computedTotalDue = $currentDueFromSales + $computedBackForward;
+
+        // Keep summary total due aligned with the net current due shown in the modal.
+        $salesSummary->total_due = $currentDueFromSales;
 
         // dd($computedBackForward, $accountTotals->back_forward_due );
 
@@ -302,8 +304,8 @@ class CustomerSaleDetails extends Component
             'returns' => $returns,
             'totalReturnAmount' => $totalReturnAmount,
             'accountTotals' => [
-                'total_due' => $accountTotals->total_due ?? 0,
-                'current_due' => $accountTotals->current_due ?? 0,
+                'total_due' => $computedTotalDue,
+                'current_due' => $currentDueFromSales,
                 // Show computed brought-forward amount in the modal as requested
                 'back_forward_due' => $computedBackForward,
                 'advance_amount' => $accountTotals->advance_amount ?? 0,
@@ -483,9 +485,21 @@ class CustomerSaleDetails extends Component
     public function render()
     {
         $customerSales = DB::table('customers')
-            ->leftJoin(DB::raw('(SELECT customer_id, SUM(current_due_amount) as current_due FROM customer_accounts GROUP BY customer_id) as account_summary'), 'customers.id', '=', 'account_summary.customer_id')
             ->leftJoin(DB::raw('(SELECT customer_id, COUNT(DISTINCT invoice_number) as invoice_count, SUM(total_amount) as total_sales, SUM(due_amount) as total_due, MAX(sales_date) as last_sale_date FROM sales GROUP BY customer_id) as sales_summary'), 'customers.id', '=', 'sales_summary.customer_id')
             ->leftJoin(DB::raw('(SELECT customer_id, SUM(back_forward_amount) as total_back_forward_amount FROM customer_accounts GROUP BY customer_id) as back_forward_summary'), 'customers.id', '=', 'back_forward_summary.customer_id')
+            ->leftJoin(DB::raw('(SELECT sales.customer_id, SUM(return_products.total_amount) as total_return_amount FROM return_products JOIN sales ON return_products.sale_id = sales.id GROUP BY sales.customer_id) as return_summary'), 'customers.id', '=', 'return_summary.customer_id')
+            ->leftJoin(DB::raw('(
+                SELECT
+                    COALESCE(s.customer_id, p.customer_id) as customer_id,
+                    SUM(CASE
+                        WHEN p.is_completed = 1 OR LOWER(COALESCE(p.status, "")) IN ("paid", "current", "forward", "mixed")
+                        THEN p.amount
+                        ELSE 0
+                    END) as total_paid
+                FROM payments p
+                LEFT JOIN sales s ON p.sale_id = s.id
+                GROUP BY COALESCE(s.customer_id, p.customer_id)
+            ) as payment_summary'), 'customers.id', '=', 'payment_summary.customer_id')
             ->select(
                 'customers.id as customer_id',
                 'customers.name',
@@ -493,10 +507,10 @@ class CustomerSaleDetails extends Component
                 'customers.business_name',
                 'customers.type',
                 'sales_summary.total_sales',
-                'account_summary.current_due as total_due',
+                DB::raw('GREATEST(COALESCE(sales_summary.total_due, 0) - COALESCE(return_summary.total_return_amount, 0), 0) as total_due'),
                 'back_forward_summary.total_back_forward_amount',
                 'sales_summary.last_sale_date',
-                DB::raw('COALESCE(sales_summary.total_sales, 0) - (COALESCE(account_summary.current_due, 0)) as total_paid')
+                DB::raw('COALESCE(payment_summary.total_paid, 0) as total_paid')
             )
             ->orderByDesc('last_sale_date');
 

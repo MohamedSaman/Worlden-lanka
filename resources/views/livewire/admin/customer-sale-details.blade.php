@@ -57,10 +57,11 @@
                                 <th class="text-center ps-4 py-3">ID</th>
                                 <th class="text-center py-3">Customer Name</th>
                                 <th class="text-center py-3">Total Sales</th>
-                                <th class="text-center py-3">Current Paid Amount</th>
+                                
                                 <th class="text-center py-3">Current Due</th>
                                 <th class="text-center py-3">Brought-Forward Due</th>
                                 <th class="text-center py-3">Total Due Amount</th>
+                                <th class="text-center py-3">Paid Amount</th>
                                 <th class="text-center py-3">Action</th>
                             </tr>
                         </thead>
@@ -72,13 +73,7 @@
                                 </td>
                                 <td class="text-sm text-center py-3" data-label="Customer Name">{{ $customer->name }}</td>
                                 <td class="text-sm text-center py-3 text-gray-800" data-label="Total Sales">Rs.{{ number_format($customer->total_sales ?? 0, 2) }}</td>
-                                <td class="text-sm text-center py-3">
-                                    <span class="badge"
-                                        style="color:#1f8b46ff;
-                                              font-weight: 600; font-size: 14px;">
-                                        Rs.{{ number_format($customer->total_paid ?? 0, 2) }}
-                                    </span>
-                                </td>
+                                
                                 <td class="text-sm text-center py-3">
                                     <span class="badge"
                                         style="color: {{ $customer->total_due > 0 ? '#ef4444' : '#1f8b46ff' }};  font-weight: 600; font-size: 14px;">
@@ -97,6 +92,13 @@
                                         style="color:#ef4444;
                                               font-weight: 600; font-size: 14px;">
                                         Rs.{{ number_format(($customer->total_back_forward_amount ?? 0) + ($customer->total_due ?? 0), 2) }}
+                                    </span>
+                                </td>
+                                <td class="text-sm text-center py-3">
+                                    <span class="badge"
+                                        style="color:#1f8b46ff;
+                                              font-weight: 600; font-size: 14px;">
+                                        Rs.{{ number_format($customer->total_paid ?? 0, 2) }}
                                     </span>
                                 </td>
                                 <td class="text-sm text-center py-3">
@@ -321,12 +323,10 @@
                                             @endforelse
                                             @php
                                             $accountTotalDue = $modalData['accountTotals']['total_due'] ?? 0;
-                                            $totalReturnAmount = $modalData['totalReturnAmount'] ?? 0;
-                                            $adjustedBalance = max(0, $accountTotalDue - $totalReturnAmount);
                                             @endphp
                                             <tr class="bg-[#f1f5f9] fw-bold">
                                                 <td colspan="3" class="text-end text-gray-800">Balance Total Due Amount</td>
-                                                <td class="text-end text-gray-800">{{ number_format($adjustedBalance, 2) }}</td>
+                                                <td class="text-end text-gray-800">{{ number_format($accountTotalDue, 2) }}</td>
                                             </tr>
                                             <tr class="fw-semibold">
                                                 <td colspan="3" class="text-end text-gray-800">Advance Payment Amount</td>

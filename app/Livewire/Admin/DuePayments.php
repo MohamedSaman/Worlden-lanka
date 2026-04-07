@@ -34,6 +34,7 @@ class DuePayments extends Component
     public $paymentNote = '';
     public $duePaymentAttachmentPreview;
     public $receivedAmount = '';
+    public $overpaidPayoutAmount = '';
     public $totalDueAmount = 0;
     public $currentDueAmount = 0;
     public $backForwardAmount = 0;
@@ -106,35 +107,31 @@ class DuePayments extends Component
         $this->applyToBackForward = false;
         $this->paymentId = $customerId;
 
-        // Fetch customer with related data
-        $customer = Customer::with(['customerAccounts' => function ($query) {
-            $query->where('total_due', '>', 0)->latest();
-        }])->find($customerId);
+        // Fetch customer basic info
+        $customer = Customer::find($customerId);
 
         $this->paymentDetail = $customer;
 
-        // Get latest customer account
-        $latestAccount = $customer->customerAccounts->first();
+        $salesDue = (float) Sale::where('customer_id', $customerId)->sum('due_amount');
+        $returnAmount = (float) ReturnProduct::join('sales', 'return_products.sale_id', '=', 'sales.id')
+            ->where('sales.customer_id', $customerId)
+            ->sum('return_products.total_amount');
+        $currentDue = max(0, $salesDue - $returnAmount);
+        $latestAccount = CustomerAccount::where('customer_id', $customerId)
+            ->latest('id')
+            ->first();
+        $backForward = (float) ($latestAccount->back_forward_amount ?? 0);
 
-        if ($latestAccount) {
-            $currentDue = floatval($latestAccount->current_due_amount ?? 0);
-            $backForward = floatval($latestAccount->back_forward_amount ?? 0);
-            $totalDue = floatval($latestAccount->total_due ?? 0);
-
-            $this->currentDueAmount = $currentDue;
-            $this->backForwardAmount = $backForward;
-            $this->totalDueAmount = $totalDue;
-        } else {
-            $this->currentDueAmount = 0;
-            $this->backForwardAmount = 0;
-            $this->totalDueAmount = 0;
-        }
+        $this->currentDueAmount = $currentDue;
+        $this->backForwardAmount = $backForward;
+        $this->totalDueAmount = max(0, $this->currentDueAmount + $this->backForwardAmount);
 
         $this->duePaymentMethod = '';
         $this->paymentNote = '';
         $this->duePaymentAttachment = null;
         $this->duePaymentAttachmentPreview = null;
         $this->receivedAmount = '';
+        $this->overpaidPayoutAmount = '';
         $this->chequeNumber = '';
         $this->bankName = '';
         $this->chequeAmount = '';
@@ -182,35 +179,61 @@ class DuePayments extends Component
     {
         $this->validate([
             'receivedAmount' => 'nullable|numeric|min:0',
+            'overpaidPayoutAmount' => 'nullable|numeric|min:0',
             'duePaymentAttachment' => 'nullable|file|mimes:jpg,jpeg,png,gif,pdf|max:2048',
         ]);
 
-        // Check if there are any dues to pay against
-        if ($this->currentDueAmount <= 0 && $this->backForwardAmount <= 0) {
+        $cashAmount = floatval($this->receivedAmount) ?: 0;
+        $chequeTotal = collect($this->cheques)->sum('amount');
+        $totalPaid = $cashAmount + $chequeTotal;
+
+        $overpaidPayoutAmount = floatval($this->overpaidPayoutAmount) ?: 0;
+        $hasNegativeBroughtForward = floatval($this->backForwardAmount) < 0;
+        $isOverpaidPayout = $overpaidPayoutAmount > 0;
+
+        if ($isOverpaidPayout && !$hasNegativeBroughtForward) {
+            $this->js("Swal.fire('Error', 'Overpaid payout is allowed only when brought-forward is negative.', 'error')");
+            return;
+        }
+
+        if ($isOverpaidPayout && $overpaidPayoutAmount > abs(floatval($this->backForwardAmount))) {
+            $this->js("Swal.fire('Error', 'Overpaid payout amount exceeds available negative brought-forward balance.', 'error')");
+            return;
+        }
+
+        // Check if there are any dues to pay against (after applying any negative brought-forward credit)
+        if ($this->totalDueAmount <= 0 && !$isOverpaidPayout) {
             $this->js("Swal.fire('Error', 'No outstanding dues found for this customer.', 'error')");
             return;
         }
 
-        // Validate that at least one target is selected
-        if (!$this->applyToCurrent && !$this->applyToBackForward) {
-            $this->js("Swal.fire('Error', 'Please select at least one payment target: Current Due or Brought-Forward.', 'error')");
-            return;
+        if ($totalPaid > 0) {
+            // Validate that at least one target is selected
+            if (!$this->applyToCurrent && !$this->applyToBackForward) {
+                $this->js("Swal.fire('Error', 'Please select at least one payment target: Current Due or Brought-Forward.', 'error')");
+                return;
+            }
+
+            // Validate that selected targets have due amounts (only when single option selected)
+            if ($this->applyToCurrent && !$this->applyToBackForward && $this->currentDueAmount <= 0) {
+                $this->js("Swal.fire('Error', 'Current due amount is zero. Cannot apply payment to current dues.', 'error')");
+                return;
+            }
+
+            if (!$this->applyToCurrent && $this->applyToBackForward && $this->backForwardAmount <= 0) {
+                $this->js("Swal.fire('Error', 'Brought-forward amount is zero. Cannot apply payment to Brought-forward dues.', 'error')");
+                return;
+            }
+
+            // When both are selected, ensure at least one has due amount
+            if ($this->applyToCurrent && $this->applyToBackForward && $this->currentDueAmount <= 0 && $this->backForwardAmount <= 0) {
+                $this->js("Swal.fire('Error', 'No outstanding dues found to apply payment.', 'error')");
+                return;
+            }
         }
 
-        // Validate that selected targets have due amounts (only when single option selected)
-        if ($this->applyToCurrent && !$this->applyToBackForward && $this->currentDueAmount <= 0) {
-            $this->js("Swal.fire('Error', 'Current due amount is zero. Cannot apply payment to current dues.', 'error')");
-            return;
-        }
-
-        if (!$this->applyToCurrent && $this->applyToBackForward && $this->backForwardAmount <= 0) {
-            $this->js("Swal.fire('Error', 'Brought-forward amount is zero. Cannot apply payment to Brought-forward dues.', 'error')");
-            return;
-        }
-
-        // When both are selected, ensure at least one has due amount
-        if ($this->applyToCurrent && $this->applyToBackForward && $this->currentDueAmount <= 0 && $this->backForwardAmount <= 0) {
-            $this->js("Swal.fire('Error', 'No outstanding dues found to apply payment.', 'error')");
+        if ($totalPaid <= 0 && !$isOverpaidPayout) {
+            $this->js("Swal.fire('Error', 'Please enter a cash amount, add cheque(s), or enter overpaid payout amount.', 'error')");
             return;
         }
 
@@ -223,16 +246,6 @@ class DuePayments extends Component
                 $receiptName = time() . '-payment-' . $this->paymentId . '.' . $this->duePaymentAttachment->getClientOriginalExtension();
                 $this->duePaymentAttachment->storeAs('public/due-receipts', $receiptName);
                 $attachmentPath = "due-receipts/{$receiptName}";
-            }
-
-            $cashAmount = floatval($this->receivedAmount) ?: 0;
-            $chequeTotal = collect($this->cheques)->sum('amount');
-            $totalPaid = $cashAmount + $chequeTotal;
-
-            if ($totalPaid <= 0) {
-                DB::rollBack();
-                $this->js("Swal.fire('Error', 'Please enter a cash amount, add cheque(s), or both.', 'error')");
-                return;
             }
 
             $paymentMethod = $cashAmount > 0 && $chequeTotal > 0 ? 'cash and cheque' : ($chequeTotal > 0 ? 'cheque' : 'cash');
@@ -266,21 +279,112 @@ class DuePayments extends Component
                 $appliedTo = 'back_forward';
             }
 
-            // Create Payment record
-            $payment = Payment::create([
-                'sale_id' => null,
-                'customer_id' => $this->paymentId,
-                'amount' => $totalPaid,
-                'payment_method' => $paymentMethod,
-                'due_date' => now(),
-                'status' => $paymentStatus,
-                'payment_reference' => $this->paymentNote,
-                'is_completed' => true,
-                'payment_date' => now(),
-                'due_payment_method' => $paymentMethod,
-                'due_payment_attachment' => $attachmentPath,
-                'applied_to' => $appliedTo,
-            ]);
+            $payment = null;
+            if ($totalPaid > 0) {
+                // Create collection payment record (money received from customer)
+                $payment = Payment::create([
+                    'sale_id' => null,
+                    'customer_id' => $this->paymentId,
+                    'amount' => $totalPaid,
+                    'payment_method' => $paymentMethod,
+                    'due_date' => now(),
+                    'status' => $paymentStatus,
+                    'payment_reference' => $this->paymentNote,
+                    'is_completed' => true,
+                    'payment_date' => now(),
+                    'due_payment_method' => $paymentMethod,
+                    'due_payment_attachment' => $attachmentPath,
+                    'applied_to' => $appliedTo,
+                ]);
+            }
+
+            if ($isOverpaidPayout) {
+                $remainingPayout = $overpaidPayoutAmount;
+
+                // Apply payout amount to oldest sale due balances first (FIFO)
+                $remainingToReduceSalesDue = $overpaidPayoutAmount;
+                $openSales = Sale::where('customer_id', $this->paymentId)
+                    ->where('due_amount', '>', 0)
+                    ->orderBy('sales_date')
+                    ->orderBy('id')
+                    ->get();
+
+                foreach ($openSales as $sale) {
+                    if ($remainingToReduceSalesDue <= 0) {
+                        break;
+                    }
+
+                    $saleDue = floatval($sale->due_amount ?? 0);
+                    if ($saleDue <= 0) {
+                        continue;
+                    }
+
+                    $reduceBy = min($saleDue, $remainingToReduceSalesDue);
+                    $sale->update([
+                        'due_amount' => max(0, $saleDue - $reduceBy),
+                    ]);
+
+                    $remainingToReduceSalesDue -= $reduceBy;
+                }
+
+                $creditAccounts = CustomerAccount::where('customer_id', $this->paymentId)
+                    ->where('back_forward_amount', '<', 0)
+                    ->orderByDesc('id')
+                    ->get();
+
+                if ($creditAccounts->isEmpty()) {
+                    DB::rollBack();
+                    $this->js("Swal.fire('Error', 'No negative brought-forward balance found for payout.', 'error')");
+                    return;
+                }
+
+                foreach ($creditAccounts as $acc) {
+                    if ($remainingPayout <= 0) {
+                        break;
+                    }
+
+                    $availableCredit = abs(floatval($acc->back_forward_amount));
+                    if ($availableCredit <= 0) {
+                        continue;
+                    }
+
+                    $usePayout = min($availableCredit, $remainingPayout);
+                    $newBackForward = floatval($acc->back_forward_amount) + $usePayout;
+                    $newTotalDue = max(0, floatval($acc->current_due_amount) + $newBackForward);
+
+                    $acc->update([
+                        'back_forward_amount' => $newBackForward,
+                        'total_due' => $newTotalDue,
+                        'due_payment_method' => 'overpaid_payout',
+                        'status' => $newTotalDue == 0 ? 'Paid' : 'Partial',
+                        'payment_date' => now(),
+                    ]);
+
+                    $remainingPayout -= $usePayout;
+                }
+
+                if ($remainingPayout > 0) {
+                    DB::rollBack();
+                    $this->js("Swal.fire('Error', 'Unable to complete full overpaid payout amount.', 'error')");
+                    return;
+                }
+
+                // Log payout as a separate non-collection payment event.
+                Payment::create([
+                    'sale_id' => null,
+                    'customer_id' => $this->paymentId,
+                    'amount' => $overpaidPayoutAmount,
+                    'payment_method' => 'cash',
+                    'due_date' => now(),
+                    'status' => 'overpaid_payout',
+                    'payment_reference' => $this->paymentNote,
+                    'is_completed' => false,
+                    'payment_date' => now(),
+                    'due_payment_method' => 'overpaid_payout',
+                    'due_payment_attachment' => $attachmentPath,
+                    'applied_to' => 'back_forward_payout',
+                ]);
+            }
 
             // Get all due accounts for the customer, ordered by creation date (oldest first)
             $customerAccounts = CustomerAccount::where('customer_id', $this->paymentId)
@@ -317,6 +421,7 @@ class DuePayments extends Component
             }
 
             $remainingPayment = $totalPaid;
+            $paidToCurrentDue = 0;
 
             // PRIORITY LOGIC: When both are selected, always pay Brought-Forward FIRST, then Current Due
             // When only one is selected, pay that specific type
@@ -378,7 +483,36 @@ class DuePayments extends Component
 
 
                         $remainingPayment -= $payForCurrent;
+                        $paidToCurrentDue += $payForCurrent;
                     }
+                }
+            }
+
+            // Keep sales due balances aligned with current due collections (FIFO on oldest sales).
+            if ($paidToCurrentDue > 0) {
+                $remainingToReduceSalesDue = $paidToCurrentDue;
+                $openSales = Sale::where('customer_id', $this->paymentId)
+                    ->where('due_amount', '>', 0)
+                    ->orderBy('sales_date')
+                    ->orderBy('id')
+                    ->get();
+
+                foreach ($openSales as $sale) {
+                    if ($remainingToReduceSalesDue <= 0) {
+                        break;
+                    }
+
+                    $saleDue = floatval($sale->due_amount ?? 0);
+                    if ($saleDue <= 0) {
+                        continue;
+                    }
+
+                    $reduceBy = min($saleDue, $remainingToReduceSalesDue);
+                    $sale->update([
+                        'due_amount' => max(0, $saleDue - $reduceBy),
+                    ]);
+
+                    $remainingToReduceSalesDue -= $reduceBy;
                 }
             }
 
@@ -426,7 +560,7 @@ class DuePayments extends Component
                     'cheque_amount' => $cheque['amount'],
                     'status' => 'pending',
                     'customer_id' => $this->paymentId,
-                    'payment_id' => $payment->id,
+                    'payment_id' => $payment ? $payment->id : null,
                 ]);
             }
 
@@ -469,6 +603,7 @@ class DuePayments extends Component
                 'duePaymentAttachment',
                 'paymentNote',
                 'receivedAmount',
+                'overpaidPayoutAmount',
                 'totalDueAmount',
                 'currentDueAmount',
                 'backForwardAmount',
@@ -502,76 +637,84 @@ class DuePayments extends Component
 
     public function render()
     {
-        $query = Customer::with(['customerAccounts' => function ($q) {
-            $q->where('total_due', '>', 0)->latest()->limit(1);
-        }])
-            ->withMin('customerAccounts', 'created_at')
+        $currentDueExpr = 'GREATEST(COALESCE(sales_summary.total_due, 0) - COALESCE(return_summary.total_return_amount, 0), 0)';
+        $totalDueExpr = $currentDueExpr . ' + COALESCE(back_forward_summary.back_forward_amount, 0)';
+
+        $query = DB::table('customers')
+            ->leftJoin(DB::raw('(SELECT customer_id, SUM(due_amount) as total_due, MAX(sales_date) as last_sale_date FROM sales GROUP BY customer_id) as sales_summary'), 'customers.id', '=', 'sales_summary.customer_id')
+            ->leftJoin(DB::raw('(SELECT sales.customer_id, SUM(return_products.total_amount) as total_return_amount FROM return_products JOIN sales ON return_products.sale_id = sales.id GROUP BY sales.customer_id) as return_summary'), 'customers.id', '=', 'return_summary.customer_id')
+            ->leftJoin(DB::raw('(
+                SELECT ca.customer_id, ca.back_forward_amount
+                FROM customer_accounts ca
+                INNER JOIN (
+                    SELECT customer_id, MAX(id) as max_id
+                    FROM customer_accounts
+                    GROUP BY customer_id
+                ) latest_ca ON latest_ca.max_id = ca.id
+            ) as back_forward_summary'), 'customers.id', '=', 'back_forward_summary.customer_id')
+            ->select(
+                'customers.id',
+                'customers.name',
+                'customers.phone',
+                'sales_summary.last_sale_date',
+                DB::raw($currentDueExpr . ' as adjusted_current_due'),
+                DB::raw('COALESCE(back_forward_summary.back_forward_amount, 0) as back_forward_amount'),
+                DB::raw('(' . $totalDueExpr . ') as adjusted_total_due')
+            )
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
-                    $q->where('name', 'like', '%' . $this->search . '%')
-                        ->orWhere('phone', 'like', '%' . $this->search . '%');
-                })->orWhereHas('sales', function ($s) {
-                    $s->where('invoice_number', 'like', '%' . $this->search . '%');
+                    $q->where('customers.name', 'like', '%' . $this->search . '%')
+                        ->orWhere('customers.phone', 'like', '%' . $this->search . '%')
+                        ->orWhereExists(function ($sq) {
+                            $sq->select(DB::raw(1))
+                                ->from('sales')
+                                ->whereColumn('sales.customer_id', 'customers.id')
+                                ->where('sales.invoice_number', 'like', '%' . $this->search . '%');
+                        });
                 });
-            })
-            ->when($this->filters['status'] !== '', function ($query) {
-                if ($this->filters['status'] === 'pending') {
-                    $query->whereRelation('customerAccounts', 'total_due', '>', 0);
-                } elseif ($this->filters['status'] === 'paid') {
-                    $query->whereDoesntHave('customerAccounts', function ($q) {
-                        $q->where('total_due', '>', 0);
-                    });
-                }
             })
             ->when($this->filters['dateFrom'], function ($query) {
-                $query->whereHas('customerAccounts', function ($q) {
-                    $q->whereDate('created_at', '>=', $this->filters['dateFrom']);
-                });
+                $query->whereDate('sales_summary.last_sale_date', '>=', $this->filters['dateFrom']);
             })
             ->when($this->filters['dateTo'], function ($query) {
-                $query->whereHas('customerAccounts', function ($q) {
-                    $q->whereDate('created_at', '<=', $this->filters['dateTo']);
-                });
-            })
-            ->whereHas('customerAccounts', function ($q) {
-                $q->where('total_due', '>', 0);
+                $query->whereDate('sales_summary.last_sale_date', '<=', $this->filters['dateTo']);
             });
 
-        $duePayments = $query->orderBy('id')->paginate(10);
-
-        // Get due amounts from latest customer account
-        foreach ($duePayments as $customer) {
-            $latestAccount = $customer->customerAccounts->first();
-
-            if ($latestAccount) {
-                $customer->adjusted_current_due = floatval($latestAccount->current_due_amount ?? 0);
-                $customer->back_forward_amount = floatval($latestAccount->back_forward_amount ?? 0);
-                $customer->adjusted_total_due = floatval($latestAccount->total_due ?? 0);
-            } else {
-                $customer->adjusted_current_due = 0;
-                $customer->back_forward_amount = 0;
-                $customer->adjusted_total_due = 0;
-            }
+        if ($this->filters['status'] === 'paid') {
+            $query->whereRaw('(' . $totalDueExpr . ') <= 0');
+        } else {
+            // default and pending: show customers with due amounts
+            $query->whereRaw('(' . $totalDueExpr . ') > 0');
         }
 
-        // Filter out customers with no real due
-        $duePayments->getCollection()->filter(function ($customer) {
-            return $customer->adjusted_current_due > 0 || $customer->back_forward_amount > 0;
-        })->values();
+        $duePayments = $query->orderBy('customers.id')->paginate(10);
 
-        $duePaymentsCount = Customer::whereHas('customerAccounts', function ($q) {
-            $q->where('total_due', '>', 0);
-        })->count();
+        $summaryRows = DB::table('customers')
+            ->leftJoin(DB::raw('(SELECT customer_id, SUM(due_amount) as total_due, MAX(sales_date) as last_sale_date FROM sales GROUP BY customer_id) as sales_summary'), 'customers.id', '=', 'sales_summary.customer_id')
+            ->leftJoin(DB::raw('(SELECT sales.customer_id, SUM(return_products.total_amount) as total_return_amount FROM return_products JOIN sales ON return_products.sale_id = sales.id GROUP BY sales.customer_id) as return_summary'), 'customers.id', '=', 'return_summary.customer_id')
+            ->leftJoin(DB::raw('(
+                SELECT ca.customer_id, ca.back_forward_amount
+                FROM customer_accounts ca
+                INNER JOIN (
+                    SELECT customer_id, MAX(id) as max_id
+                    FROM customer_accounts
+                    GROUP BY customer_id
+                ) latest_ca ON latest_ca.max_id = ca.id
+            ) as back_forward_summary'), 'customers.id', '=', 'back_forward_summary.customer_id')
+            ->select(
+                DB::raw('(' . $totalDueExpr . ') as adjusted_total_due'),
+                'sales_summary.last_sale_date'
+            )
+            ->whereRaw('(' . $totalDueExpr . ') > 0')
+            ->get();
 
-        // Calculate total adjusted due from all customers
-        $adjustedTotalDue = $duePayments->sum(function ($customer) {
-            return $customer->adjusted_total_due;
-        });
-
-        $todayDuePayments = CustomerAccount::where('total_due', '>', 0)->whereDate('created_at', today())->sum('total_due');
-
-        $todayDuePaymentsCount = Customer::whereHas('customerAccounts', function ($q) {
-            $q->where('total_due', '>', 0)->whereDate('created_at', today());
+        $duePaymentsCount = $summaryRows->count();
+        $adjustedTotalDue = $summaryRows->sum('adjusted_total_due');
+        $todayDuePayments = $summaryRows->filter(function ($row) {
+            return !empty($row->last_sale_date) && now()->isSameDay($row->last_sale_date);
+        })->sum('adjusted_total_due');
+        $todayDuePaymentsCount = $summaryRows->filter(function ($row) {
+            return !empty($row->last_sale_date) && now()->isSameDay($row->last_sale_date);
         })->count();
 
         return view('livewire.admin.due-payments', [
