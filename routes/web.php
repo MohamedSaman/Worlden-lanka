@@ -36,6 +36,7 @@ use App\Livewire\Admin\DueCheques;
 use App\Livewire\Admin\Products;
 use App\Livewire\Admin\DueChequesReturn;
 use App\Livewire\Admin\ProductReEntry;
+use App\Livewire\Admin\ReturnList;
 use App\Livewire\Admin\Settings;
 
 /*
@@ -95,6 +96,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
         Route::get('/product-stocks', \App\Livewire\Admin\ProductStocks::class)->name('product-stocks');
         Route::get('/product-re-entry', ProductReEntry::class)->name('product-reentry');
+        Route::get('/return-list', \App\Livewire\Admin\ReturnList::class)->name('return-list');
         Route::get('/back-forward', BackForward::class)->name('back-forward');
         Route::get('/bill', Bill::class)->name('bill');
         Route::get('/create-purchase', CreatePurchase::class)->name('create-purchase');

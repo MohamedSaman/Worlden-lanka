@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Sale;
 use App\Models\Customer;
 use App\Models\Payment;
-use App\Models\ReturnProduct;
+
 
 #[Layout('components.layouts.admin')]
 #[Title('Customer Sales Details')]
@@ -185,13 +185,15 @@ class CustomerSaleDetails extends Component
         $totalReturnAmount = $returns->sum('total_amount');
 
         // Net current due from sales after returns are applied.
-        $currentDueAfterReturns = max(0, floatval($salesSummary->total_due ?? 0) - floatval($totalReturnAmount ?? 0));
+        // Keep signed values so over-returns can be seen as credit (negative).
+        $currentDueAfterReturns = floatval($salesSummary->total_due ?? 0) - floatval($totalReturnAmount ?? 0);
 
         // Build unified invoice summary rows timeline: Brought-Forward first, then Invoices, Returns and Paid ordered by date
         $invoiceSummaryRows = [];
 
         // Use authoritative brought-forward due from customer_accounts for modal timeline.
-        $bfAmount = max(0, floatval($accountTotals->back_forward_due ?? 0));
+        // Keep signed values so negative brought-forward amounts are visible.
+        $bfAmount = floatval($accountTotals->back_forward_due ?? 0);
 
         // dd($accountTotals->paid_due , $salesSummary->total_due ,$accountTotals->advance_amount , $accountTotals->back_forward_due , $bfAmount);
 
@@ -281,7 +283,7 @@ class CustomerSaleDetails extends Component
         $invoiceSummaryRows = array_merge($invoiceSummaryRows, $events);
 
         // Use authoritative brought-forward due from customer_accounts in summary cards.
-        $computedBackForward = max(0, floatval($accountTotals->back_forward_due ?? 0));
+        $computedBackForward = floatval($accountTotals->back_forward_due ?? 0);
         $currentDueFromSales = $currentDueAfterReturns;
         $computedTotalDue = $currentDueFromSales + $computedBackForward;
 
@@ -507,7 +509,7 @@ class CustomerSaleDetails extends Component
                 'customers.business_name',
                 'customers.type',
                 'sales_summary.total_sales',
-                DB::raw('GREATEST(COALESCE(sales_summary.total_due, 0) - COALESCE(return_summary.total_return_amount, 0), 0) as total_due'),
+                DB::raw('COALESCE(sales_summary.total_due, 0) - COALESCE(return_summary.total_return_amount, 0) as total_due'),
                 'back_forward_summary.total_back_forward_amount',
                 'sales_summary.last_sale_date',
                 DB::raw('COALESCE(payment_summary.total_paid, 0) as total_paid')

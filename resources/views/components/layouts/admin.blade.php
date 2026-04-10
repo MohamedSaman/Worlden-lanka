@@ -456,15 +456,10 @@
                                     <i class="bi bi-collection"></i> <span>Product Category</span>
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link py-2 {{ request()->routeIs('admin.product-reentry') ? 'active' : '' }}"
-                                    href="{{ route('admin.product-reentry') }}">
-                                    <i class="bi bi-collection"></i> <span>Product Return</span>
-                                </a>
-                            </li>
                         </ul>
                     </div>
                 </li>
+                
                 <li class="nav-item">
                     <a class="nav-link py-2 {{ request()->routeIs('admin.manage-customer') ? 'active' : '' }}"
                         href="{{ route('admin.manage-customer') }}">
@@ -519,6 +514,28 @@
                                 <a class="nav-link py-2 {{ request()->routeIs('admin.back-forward') ? 'active' : '' }}"
                                     href="{{ route('admin.back-forward') }}">
                                     <i class="bi bi-cash-coin"></i> <span>Brought Forward</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link dropdown-toggle" href="#returnsSubmenu" data-bs-toggle="collapse" role="button"
+                        aria-expanded="false" aria-controls="returnsSubmenu">
+                        <i class="bi bi-arrow-counterclockwise"></i> <span>Returns</span>
+                    </a>
+                    <div class="collapse" id="returnsSubmenu">
+                        <ul class="nav flex-column ms-3">
+                            <li class="nav-item">
+                                <a class="nav-link py-2 {{ request()->routeIs('admin.return-list') ? 'active' : '' }}"
+                                    href="{{ route('admin.return-list') }}">
+                                    <i class="bi bi-list-check"></i> <span>Return List</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link py-2 {{ request()->routeIs('admin.product-reentry') ? 'active' : '' }}"
+                                    href="{{ route('admin.product-reentry') }}">
+                                    <i class="bi bi-box-arrow-left"></i> <span>Product Return</span>
                                 </a>
                             </li>
                         </ul>
