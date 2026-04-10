@@ -459,7 +459,7 @@
                         </ul>
                     </div>
                 </li>
-                
+
                 <li class="nav-item">
                     <a class="nav-link py-2 {{ request()->routeIs('admin.manage-customer') ? 'active' : '' }}"
                         href="{{ route('admin.manage-customer') }}">
